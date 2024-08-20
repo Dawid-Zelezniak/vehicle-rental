@@ -3,6 +3,7 @@ package com.vehicle.rental.zelezniak.vehicle_domain.controller;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    @GetMapping("/")
+    @GetMapping
     public Page<Vehicle> findAll(Pageable pageable) {
         return vehicleService.findAll(pageable);
     }
@@ -34,7 +35,7 @@ public class VehicleController {
     }
 
     @PutMapping("/update/{id}")
-    public Vehicle update(@PathVariable Long id, @Validated @RequestBody Vehicle newData) {
+    public Vehicle update(@PathVariable Long id,  @RequestBody @Validated Vehicle newData) {
        return vehicleService.update(id, newData);
     }
 
@@ -45,8 +46,7 @@ public class VehicleController {
     }
 
     @PostMapping("/criteria")
-    public <T> Page<Vehicle> findByCriteria(@RequestBody CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
-        return vehicleService.findByCriteria(
-                searchRequest,pageable);
+    public <T> Page<Vehicle> findByCriteria(@RequestBody @Validated CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
+        return vehicleService.findByCriteria(searchRequest,pageable);
     }
 }

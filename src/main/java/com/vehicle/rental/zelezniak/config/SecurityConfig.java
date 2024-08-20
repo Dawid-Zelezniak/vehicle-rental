@@ -31,14 +31,14 @@ public class SecurityConfig {
     private static final String USER = "USER";
 
     private static final String[] ADMIN_ENDPOINTS = {
-            "/clients/",
+            "/clients",
             "/clients/{id}",
             "/clients/delete/**",
             "/clients/email/**",
             "/vehicles/add",
             "/vehicles/update/**",
             "/vehicles/delete/**",
-            "/reservations/"
+            "/reservations"
     };
 
     private static final String[] USER_AND_ADMIN_ENDPOINTS = {
@@ -46,7 +46,7 @@ public class SecurityConfig {
             "/vehicles/criteria",
             "/vehicles/{id}",
             "/reservations/{id}",
-            "/vehicles/",
+            "/vehicles",
             "/reservations/{id}",
             "/reservations/client/**",
             "/reservations/create",

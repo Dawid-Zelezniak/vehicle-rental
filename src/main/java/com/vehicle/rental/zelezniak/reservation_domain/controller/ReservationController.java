@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +18,13 @@ public class ReservationController {
 
     private final ReservationService service;
 
-    @GetMapping("/")
+    @GetMapping
     public Page<Reservation> findAll(Pageable pageable) {
         return service.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public Reservation findById(@PathVariable Long id){
+    public Reservation findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
@@ -34,17 +35,17 @@ public class ReservationController {
 
     @PostMapping("/create")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Reservation add(@RequestBody ReservationCreationRequest request) {
+    public Reservation add(@RequestBody @Validated ReservationCreationRequest request) {
         return service.addReservation(request);
     }
 
     @PutMapping("/update/location/{id}")
-    public Reservation updateLocation(@PathVariable Long id, @RequestBody Reservation newData) {
+    public Reservation updateLocation(@PathVariable Long id, @RequestBody @Validated Reservation newData) {
         return service.updateReservationLocation(id, newData);
     }
 
     @PutMapping("/update/duration/{id}")
-    public Reservation updateDuration(@PathVariable Long id, @RequestBody RentDuration duration) {
+    public Reservation updateDuration(@PathVariable Long id, @RequestBody @Validated RentDuration duration) {
         return service.updateDuration(id, duration);
     }
 
@@ -65,7 +66,7 @@ public class ReservationController {
     }
 
     @GetMapping("/calculate/cost/{id}")
-    public Reservation calculate(@PathVariable Long id){
+    public Reservation calculate(@PathVariable Long id) {
         return service.calculateCost(id);
     }
 }

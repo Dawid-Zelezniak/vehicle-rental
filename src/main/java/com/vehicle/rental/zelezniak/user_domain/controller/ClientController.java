@@ -16,7 +16,7 @@ public class ClientController {
 
     private final ClientService clientService;
 
-    @GetMapping("/")
+    @GetMapping
     public Page<Client> findAll(Pageable pageable) {
         return clientService.findAll(pageable);
     }
@@ -27,7 +27,7 @@ public class ClientController {
     }
 
     @PutMapping("/update/{id}")
-    public Client update(@PathVariable Long id, @Validated @RequestBody Client newData) {
+    public Client update(@PathVariable Long id,  @RequestBody @Validated Client newData) {
        return clientService.update(id, newData);
     }
 
