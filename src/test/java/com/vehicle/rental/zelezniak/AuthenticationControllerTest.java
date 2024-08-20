@@ -78,12 +78,12 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.name.lastName").value(name.getLastName()))
                 .andExpect(jsonPath("$.credentials.email").value(client.getEmail()))
-                .andExpect(jsonPath("$.address.street.streetName").value(address.getStreet().getStreetName()))
+                .andExpect(jsonPath("$.address.street.streetName").value(address.getStreet().streetName()))
                 .andExpect(jsonPath("$.address.houseNumber").value(address.getHouseNumber()))
                 .andExpect(jsonPath("$.address.flatNumber").value(address.getFlatNumber()))
-                .andExpect(jsonPath("$.address.city.cityName").value(address.getCity().getCityName()))
+                .andExpect(jsonPath("$.address.city.cityName").value(address.getCity().cityName()))
                 .andExpect(jsonPath("$.address.postalCode").value(address.getPostalCode()))
-                .andExpect(jsonPath("$.address.country.countryName").value(address.getCountry().getCountryName()));
+                .andExpect(jsonPath("$.address.country.countryName").value(address.getCountry().countryName()));
 
         assertEquals(4, clientRepository.count());
     }
@@ -106,12 +106,12 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.client.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.client.name.lastName").value(name.getLastName()))
                 .andExpect(jsonPath("$.client.credentials.email").value(client.getEmail()))
-                .andExpect(jsonPath("$.client.address.street.streetName").value(address.getStreet().getStreetName()))
+                .andExpect(jsonPath("$.client.address.street.streetName").value(address.getStreet().streetName()))
                 .andExpect(jsonPath("$.client.address.houseNumber").value(address.getHouseNumber()))
                 .andExpect(jsonPath("$.client.address.flatNumber").value(address.getFlatNumber()))
-                .andExpect(jsonPath("$.client.address.city.cityName").value(address.getCity().getCityName()))
+                .andExpect(jsonPath("$.client.address.city.cityName").value(address.getCity().cityName()))
                 .andExpect(jsonPath("$.client.address.postalCode").value(address.getPostalCode()))
-                .andExpect(jsonPath("$.client.address.country.countryName").value(address.getCountry().getCountryName()))
+                .andExpect(jsonPath("$.client.address.country.countryName").value(address.getCountry().countryName()))
                 .andExpect(jsonPath("$.jwt").isNotEmpty());
     }
 

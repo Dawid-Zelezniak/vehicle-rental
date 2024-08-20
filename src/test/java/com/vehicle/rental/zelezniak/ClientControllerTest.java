@@ -78,7 +78,7 @@ class ClientControllerTest {
     void shouldReturnAllClients() throws Exception {
         var credentials = clientWithId5.getCredentials();
         var name = clientWithId5.getName();
-        mockMvc.perform(get("/clients/")
+        mockMvc.perform(get("/clients")
                         .param("page",String.valueOf(pageable.getPageNumber()))
                         .param("size",String.valueOf(pageable.getPageSize()))
                         .header("Authorization", "Bearer " + adminToken))
@@ -90,7 +90,7 @@ class ClientControllerTest {
                 .andExpect(jsonPath("$.content[0].credentials.password").value(credentials.getPassword()))
                 .andExpect(jsonPath("$.content[0].name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.content[0].name.lastName").value(name.getLastName()))
-                .andExpect(jsonPath("$.content[0].address.street.streetName").value(clientWithId5.getAddress().getStreet().getStreetName()))
+                .andExpect(jsonPath("$.content[0].address.street.streetName").value(clientWithId5.getAddress().getStreet().streetName()))
                 .andExpect(jsonPath("$.content[0].roles", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].roles[0].roleName").value(ROLE_USER));
     }
@@ -98,7 +98,7 @@ class ClientControllerTest {
     @Test
     void shouldNotReturnAllClientsForRoleUser() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
-        mockMvc.perform(get("/clients/")
+        mockMvc.perform(get("/clients")
                         .param("page",String.valueOf(pageable.getPageNumber()))
                         .param("size",String.valueOf(pageable.getPageSize()))
                         .header("Authorization", "Bearer " + token))
@@ -119,7 +119,7 @@ class ClientControllerTest {
                 .andExpect(jsonPath("$.credentials.password").value(credentials.getPassword()))
                 .andExpect(jsonPath("$.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.name.lastName").value(name.getLastName()))
-                .andExpect(jsonPath("$.address.street.streetName").value(clientWithId5.getAddress().getStreet().getStreetName()))
+                .andExpect(jsonPath("$.address.street.streetName").value(clientWithId5.getAddress().getStreet().streetName()))
                 .andExpect(jsonPath("$.roles", hasSize(1)))
                 .andExpect(jsonPath("$.roles[0].roleName").value(ROLE_USER));
     }
@@ -212,7 +212,7 @@ class ClientControllerTest {
                 .andExpect(jsonPath("$.credentials.password").value(credentials.getPassword()))
                 .andExpect(jsonPath("$.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.name.lastName").value(name.getLastName()))
-                .andExpect(jsonPath("$.address.street.streetName").value(clientWithId5.getAddress().getStreet().getStreetName()))
+                .andExpect(jsonPath("$.address.street.streetName").value(clientWithId5.getAddress().getStreet().streetName()))
                 .andExpect(jsonPath("$.roles", hasSize(1)))
                 .andExpect(jsonPath("$.roles[0].roleName").value(ROLE_USER));
     }

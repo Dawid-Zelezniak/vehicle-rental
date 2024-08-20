@@ -174,7 +174,7 @@ class VehicleControllerCriteriaSearchTest {
         String fuelType = engine.getFuelType().toString();
         String gearType = info.getGearType().toString();
         double pricePerDay = result.getPricePerDay()
-                .getValue().setScale(2, RoundingMode.HALF_UP).doubleValue();
+                .value().setScale(2, RoundingMode.HALF_UP).doubleValue();
         String status = result.getStatus().toString();
 
         mockMvc.perform(post("/vehicles/criteria")

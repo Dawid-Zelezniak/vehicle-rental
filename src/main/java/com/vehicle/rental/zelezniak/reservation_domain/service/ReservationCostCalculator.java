@@ -60,7 +60,7 @@ public class ReservationCostCalculator {
         BigDecimal cost = BigDecimal.ZERO;
         for (Vehicle vehicle : vehicles) {
             Money pricePerDay = vehicle.getPricePerDay();
-            BigDecimal value = pricePerDay.getValue();
+            BigDecimal value = pricePerDay.value();
             BigDecimal vehicleRentalCost = value.multiply(
                     BigDecimal.valueOf(duration));
             cost = cost.add(vehicleRentalCost);
@@ -79,7 +79,7 @@ public class ReservationCostCalculator {
         BigDecimal result = BigDecimal.ZERO;
         for (Vehicle vehicle : vehicles) {
             Money deposit = vehicle.getDeposit();
-            result = result.add(deposit.getValue());
+            result = result.add(deposit.value());
         }
         return result;
     }

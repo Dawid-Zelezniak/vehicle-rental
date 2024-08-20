@@ -92,18 +92,18 @@ class ReservationControllerTest {
     void shouldFindAllReservationsForRoleADMIN() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_ADMIN);
 
-        ResultActions actions = mockMvc.perform(get("/reservations/")
+        ResultActions actions = mockMvc.perform(get("/reservations")
                 .param("page", String.valueOf(pageable.getPageNumber()))
                 .param("size", String.valueOf(pageable.getPageSize()))
                 .header("Authorization", "Bearer " + token));
-        performExpectations(actions, 5, reservationWithId5);
+        performReservationExpectations(actions, 5, reservationWithId5);
     }
 
     @Test
     void shouldNotFindReservationsForRoleUser() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
 
-        mockMvc.perform(get("/reservations/")
+        mockMvc.perform(get("/reservations")
                         .param("page", String.valueOf(pageable.getPageNumber()))
                         .param("size", String.valueOf(pageable.getPageSize()))
                         .header("Authorization", "Bearer " + token))
@@ -116,7 +116,7 @@ class ReservationControllerTest {
 
         ResultActions actions = mockMvc.perform(get("/reservations/{id}", reservationWithId5.getId())
                 .header("Authorization", "Bearer " + token));
-        performExpectations(actions, reservationWithId5);
+        performReservationExpectations(actions, reservationWithId5);
     }
 
     @Test
@@ -128,7 +128,7 @@ class ReservationControllerTest {
                 .param("page", String.valueOf(pageable.getPageNumber()))
                 .param("size", String.valueOf(pageable.getPageSize()))
                 .header("Authorization", "Bearer " + token));
-        performExpectations(actions, 2, reservationWithId5);
+        performReservationExpectations(actions, 2, reservationWithId5);
     }
 
     @Test
@@ -172,8 +172,8 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.reservationStatus").value(reservation.getReservationStatus().toString()))
                 .andExpect(jsonPath("$.rentInformation.rentDuration.rentalStart").value(rentDuration.getRentalStart().format(formatter)))
                 .andExpect(jsonPath("$.rentInformation.rentDuration.rentalEnd").value(rentDuration.getRentalEnd().format(formatter)))
-                .andExpect(jsonPath("$.rentInformation.pickUpLocation.city.cityName").value(pickUpLocation.getCity().getCityName()))
-                .andExpect(jsonPath("$.rentInformation.pickUpLocation.street.streetName").value(pickUpLocation.getStreet().getStreetName()));
+                .andExpect(jsonPath("$.rentInformation.pickUpLocation.city.cityName").value(pickUpLocation.getCity().cityName()))
+                .andExpect(jsonPath("$.rentInformation.pickUpLocation.street.streetName").value(pickUpLocation.getStreet().streetName()));
 
         assertEquals(reservation, findReservationById(id));
     }
@@ -189,7 +189,7 @@ class ReservationControllerTest {
                 .content(mapper.writeValueAsString(reservationWithId5))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + token));
-        performExpectations(actions,reservationWithId5);
+        performReservationExpectations(actions,reservationWithId5);
 
         assertEquals(reservationWithId5, findReservationById(id));
     }
@@ -224,7 +224,7 @@ class ReservationControllerTest {
                 .content(mapper.writeValueAsString(duration))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + token));
-        performExpectations(actions,reservationWithId5);
+        performReservationExpectations(actions,reservationWithId5);
 
         vehicles = reservationRepository.findVehiclesByReservationId(id);
         assertEquals(0, vehicles.size());
@@ -394,17 +394,17 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.message").value("When calculating the total cost, the reservation status should be NEW"));
     }
 
-    private void performExpectations(ResultActions actions, int size, Reservation expected) throws Exception {
+    private void performReservationExpectations(ResultActions actions, int size, Reservation expected) throws Exception {
         RentInformation rentInformation = expected.getRentInformation();
         RentDuration rentDuration = rentInformation.getRentDuration();
         Location pickUpLocation = rentInformation.getPickUpLocation();
         Location dropOffLocation = rentInformation.getDropOffLocation();
 
-        String pickUpCity = pickUpLocation.getCity().getCityName();
-        String pickUpStreet = pickUpLocation.getStreet().getStreetName();
+        String pickUpCity = pickUpLocation.getCity().cityName();
+        String pickUpStreet = pickUpLocation.getStreet().streetName();
         String pickUpAdditionalInfo = pickUpLocation.getAdditionalInformation();
-        String dropOffCity = dropOffLocation.getCity().getCityName();
-        String dropOffStreet = dropOffLocation.getStreet().getStreetName();
+        String dropOffCity = dropOffLocation.getCity().cityName();
+        String dropOffStreet = dropOffLocation.getStreet().streetName();
         String dropOffAdditionalInfo = dropOffLocation.getAdditionalInformation();
 
         actions.andExpect(jsonPath("$.content", hasSize(size)))
@@ -424,21 +424,21 @@ class ReservationControllerTest {
     }
 
     private double getValueFromMoney(Money totalCost) {
-        BigDecimal value = totalCost.getValue();
+        BigDecimal value = totalCost.value();
         return value.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
-    private void performExpectations(ResultActions actions, Reservation reservation) throws Exception {
+    private void performReservationExpectations(ResultActions actions, Reservation reservation) throws Exception {
         RentInformation rentInformation = reservation.getRentInformation();
         RentDuration rentDuration = rentInformation.getRentDuration();
         Location pickUpLocation = rentInformation.getPickUpLocation();
         Location dropOffLocation = rentInformation.getDropOffLocation();
 
-        String pickUpCity = pickUpLocation.getCity().getCityName();
-        String pickUpStreet = pickUpLocation.getStreet().getStreetName();
+        String pickUpCity = pickUpLocation.getCity().cityName();
+        String pickUpStreet = pickUpLocation.getStreet().streetName();
         String pickUpAdditionalInfo = pickUpLocation.getAdditionalInformation();
-        String dropOffCity = dropOffLocation.getCity().getCityName();
-        String dropOffStreet = dropOffLocation.getStreet().getStreetName();
+        String dropOffCity = dropOffLocation.getCity().cityName();
+        String dropOffStreet = dropOffLocation.getStreet().streetName();
         String dropOffAdditionalInfo = dropOffLocation.getAdditionalInformation();
 
         actions.andExpect(jsonPath("$.id").value(reservation.getId()))

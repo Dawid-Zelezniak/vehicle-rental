@@ -87,7 +87,7 @@ class VehicleControllerTest {
         String gearType = info.getGearType().toString();
         String status = vehicleWithId5.getStatus().toString();
 
-        mockMvc.perform(get("/vehicles/")
+        mockMvc.perform(get("/vehicles")
                         .header("Authorization", "Bearer " + token)
                         .param("page", String.valueOf(pageable.getPageNumber()))
                         .param("size", String.valueOf(pageable.getPageSize())))
@@ -300,7 +300,7 @@ class VehicleControllerTest {
     }
 
     private double getValueFromMoney(Money totalCost) {
-        BigDecimal value = totalCost.getValue();
+        BigDecimal value = totalCost.value();
         return value.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 }
