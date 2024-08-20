@@ -6,18 +6,14 @@ import lombok.*;
 import java.math.*;
 
 @Embeddable
-@Getter
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor(force = true)
-public class Money {
+public record Money(BigDecimal value) {
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
-    private final BigDecimal value;
 
-    public Money(BigDecimal money) {
-        validate(money);
-        this.value = format(money);
+
+    public Money(BigDecimal value) {
+        validate(value);
+        this.value = format(value);
     }
 
     private void validate(BigDecimal money) {
