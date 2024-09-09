@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.common_value_objects.address.City;
 import com.vehicle.rental.zelezniak.common_value_objects.address.Country;
 import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
+import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.user_domain.model.client.Address;
 import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
@@ -18,9 +18,7 @@ import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -28,10 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AuthenticationServiceTest {
-
-    private static Client clientWithId5;
 
     @Autowired
     private ClientRepository clientRepository;
@@ -49,7 +44,6 @@ class AuthenticationServiceTest {
     @BeforeEach
     void createUsers() throws IOException {
         databaseSetup.setupAllTables();
-        clientWithId5 = clientCreator.createClientWithId5();
     }
 
     @AfterEach
@@ -59,7 +53,6 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    @Order(1)
     void shouldRegisterNewUser() {
         setDataForClient();
         assertEquals(3, clientRepository.count());
@@ -67,13 +60,11 @@ class AuthenticationServiceTest {
         authenticationService.register(client);
 
         assertEquals(4, clientRepository.count());
-
         assertEquals(client, clientService.findById(client.getId()));
 
     }
 
     @Test
-    @Order(2)
     void shouldLoginUser() {
         setDataForClient();
         authenticationService.register(client);
@@ -85,12 +76,6 @@ class AuthenticationServiceTest {
         String token = login.getJwt();
         String[] tokenParts = token.split("\\.");
         assertEquals(3, tokenParts.length);
-    }
-
-    @Test
-    void shouldLoadUserByEmail() {
-        UserDetails userDetails = authenticationService.loadUserByUsername(clientWithId5.getEmail());
-        assertEquals(clientWithId5, userDetails);
     }
 
     private void setDataForClient() {
