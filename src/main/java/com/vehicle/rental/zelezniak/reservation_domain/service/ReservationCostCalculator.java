@@ -27,9 +27,10 @@ public class ReservationCostCalculator {
     private static final BigDecimal TEN_PERCENT_DISCOUNT = BigDecimal.valueOf(0.1);
     private static final int FIVE_DAYS = 5;
     private static final int TEN_DAYS = 10;
+    private static final int END_DAY = 1;
 
     public Reservation calculateAndApplyCosts(Reservation reservation, Set<Vehicle> vehicles) {
-        long duration = calculateRentDuration(reservation);
+        int duration = calculateRentDuration(reservation);
         BigDecimal discountPercentage = determineDiscountPercentage(duration);
         BigDecimal basicRentalCost = calculateBasicCost(duration, vehicles);
         BigDecimal afterDiscount = applyDiscount(basicRentalCost, discountPercentage);
@@ -39,16 +40,15 @@ public class ReservationCostCalculator {
         return reservation;
     }
 
-    private long calculateRentDuration(Reservation reservation) {
+    private int calculateRentDuration(Reservation reservation) {
         var information = reservation.getRentInformation();
         RentDuration rentDuration = information.getRentDuration();
         LocalDateTime rentalStart = rentDuration.getRentalStart();
         LocalDateTime rentalEnd = rentDuration.getRentalEnd();
-        return ChronoUnit.DAYS.between(rentalStart, rentalEnd) + 1;
+        return (int) ChronoUnit.DAYS.between(rentalStart, rentalEnd) + END_DAY;
     }
 
-    private BigDecimal determineDiscountPercentage(
-            long duration) {
+    private BigDecimal determineDiscountPercentage(int duration) {
         if (duration <= FIVE_DAYS) {
             return BigDecimal.ZERO;
         } else if (duration <= TEN_DAYS) {
@@ -56,23 +56,24 @@ public class ReservationCostCalculator {
         } else return TEN_PERCENT_DISCOUNT;
     }
 
-    private BigDecimal calculateBasicCost(long duration, Set<Vehicle> vehicles) {
+    private BigDecimal calculateBasicCost(int duration, Set<Vehicle> vehicles) {
         BigDecimal cost = BigDecimal.ZERO;
         for (Vehicle vehicle : vehicles) {
-            Money pricePerDay = vehicle.getPricePerDay();
-            BigDecimal value = pricePerDay.value();
-            BigDecimal vehicleRentalCost = value.multiply(
-                    BigDecimal.valueOf(duration));
+            BigDecimal vehicleRentalCost = calculateRentalCostForVehicle(vehicle, duration);
             cost = cost.add(vehicleRentalCost);
         }
         return cost;
     }
 
+    private BigDecimal calculateRentalCostForVehicle(Vehicle vehicle, int duration) {
+        Money pricePerDay = vehicle.getPricePerDay();
+        BigDecimal value = pricePerDay.value();
+        return value.multiply(BigDecimal.valueOf(duration));
+    }
+
     private BigDecimal applyDiscount(BigDecimal basicCost, BigDecimal discountPercentage) {
-        BigDecimal discountValue = basicCost.multiply(
-                discountPercentage);
-        return basicCost.subtract(
-                discountValue);
+        BigDecimal discountValue = basicCost.multiply(discountPercentage);
+        return basicCost.subtract(discountValue);
     }
 
     private BigDecimal calculateTotalDeposit(Set<Vehicle> vehicles) {

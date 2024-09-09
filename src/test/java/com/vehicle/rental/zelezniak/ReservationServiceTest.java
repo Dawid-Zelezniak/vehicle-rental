@@ -106,7 +106,7 @@ class ReservationServiceTest {
                 .build());
         Long id = reservation.getId();
 
-        Reservation updated = reservationService.updateReservationLocation(id, reservation);
+        Reservation updated = reservationService.updateLocation(id, reservation);
 
         assertEquals(reservation, updated);
     }
@@ -120,7 +120,7 @@ class ReservationServiceTest {
                 .pickUpLocation(locationCreator.buildTestLocation())
                 .build());
 
-        Reservation updated = reservationService.updateReservationLocation(reservation5Id, reservationWithId5);
+        Reservation updated = reservationService.updateLocation(reservation5Id, reservationWithId5);
 
         assertEquals(reservationWithId5, updated);
     }
@@ -135,7 +135,7 @@ class ReservationServiceTest {
         Long reservation5Id = reservationWithId5.getId();
 
         assertThrows(IllegalArgumentException.class,
-                () -> reservationService.updateReservationLocation(reservation5Id, newData));
+                () -> reservationService.updateLocation(reservation5Id, newData));
     }
 
     @Test
@@ -242,16 +242,14 @@ class ReservationServiceTest {
     @Test
     void shouldCalculateTotalCost() {
         Money totalCost = reservationWithId5.getTotalCost();
-        Money deposit = reservationWithId5.getDepositAmount();
         reservationWithId5.setReservationStatus(Reservation.ReservationStatus.NEW);
         reservationWithId5.setTotalCost(null);
         reservationWithId5.setDepositAmount(null);
         reservationRepository.save(reservationWithId5);
 
-        Reservation reservation = reservationService.calculateCost(reservationWithId5.getId());
+        Money cost = reservationService.calculateCost(reservationWithId5.getId());
 
-        assertEquals(totalCost, reservation.getTotalCost());
-        assertEquals(deposit, reservation.getDepositAmount());
+        assertEquals(totalCost, cost);
     }
 
     @Test

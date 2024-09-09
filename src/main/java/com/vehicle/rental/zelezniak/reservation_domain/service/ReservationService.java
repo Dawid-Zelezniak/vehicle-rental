@@ -1,5 +1,6 @@
 package com.vehicle.rental.zelezniak.reservation_domain.service;
 
+import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.rent_domain.service.RentService;
 import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
@@ -50,11 +51,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation updateReservationLocation(Long id, Reservation newData) {
+    public Reservation updateLocation(Long id, Reservation newData) {
         validateReservationId(id);
         validateReservation(newData);
         Reservation r = findReservation(id);
-        return newReservationService.updateLocation(r, newData);
+        return newReservationService.updateLocationForReservation(r, newData);
     }
 
     @Transactional
@@ -62,7 +63,7 @@ public class ReservationService {
         validateReservationId(id);
         inputValidator.throwExceptionIfObjectIsNull(duration, "Rent duration" + CAN_NOT_BE_NULL);
         Reservation r = findReservation(id);
-        return newReservationService.updateDuration(r, duration);
+        return newReservationService.updateDurationForReservation(r, duration);
     }
 
     @Transactional
@@ -89,7 +90,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation calculateCost(Long id) {
+    public Money calculateCost(Long id) {
         validateReservationId(id);
         Reservation r = findReservation(id);
         return newReservationService.calculateCost(r);

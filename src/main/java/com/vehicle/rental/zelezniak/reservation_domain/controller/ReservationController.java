@@ -1,5 +1,6 @@
 package com.vehicle.rental.zelezniak.reservation_domain.controller;
 
+import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation_domain.model.util.ReservationCreationRequest;
@@ -41,7 +42,7 @@ public class ReservationController {
 
     @PutMapping("/update/location/{id}")
     public Reservation updateLocation(@PathVariable Long id, @RequestBody @Validated Reservation newData) {
-        return service.updateReservationLocation(id, newData);
+        return service.updateLocation(id, newData);
     }
 
     @PutMapping("/update/duration/{id}")
@@ -66,7 +67,7 @@ public class ReservationController {
     }
 
     @GetMapping("/calculate/cost/{id}")
-    public Reservation calculate(@PathVariable Long id) {
+    public Money calculate(@PathVariable Long id) {
         return service.calculateCost(id);
     }
 }

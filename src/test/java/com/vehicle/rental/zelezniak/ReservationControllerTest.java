@@ -370,7 +370,6 @@ class ReservationControllerTest {
         String token = tokenGenerator.generateToken(ROLE_USER);
         Long id = reservationWithId5.getId();
         Money totalCost = reservationWithId5.getTotalCost();
-        Money deposit = reservationWithId5.getDepositAmount();
         reservationWithId5.setReservationStatus(Reservation.ReservationStatus.NEW);
         reservationWithId5.setTotalCost(null);
         reservationWithId5.setDepositAmount(null);
@@ -378,9 +377,7 @@ class ReservationControllerTest {
 
         mockMvc.perform(get("/reservations/calculate/cost/{id}", id)
                         .header("Authorization", "Bearer " + token))
-                .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.totalCost.value").value(getValueFromMoney(totalCost)))
-                .andExpect(jsonPath("$.depositAmount.value").value(getValueFromMoney(deposit)));
+                .andExpect(jsonPath("$.value").value(getValueFromMoney(totalCost)));
     }
 
     @Test
@@ -391,7 +388,8 @@ class ReservationControllerTest {
         mockMvc.perform(get("/reservations/calculate/cost/{id}", id)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("When calculating the total cost, the reservation status should be NEW"));
+                .andExpect(jsonPath("$.message").value(
+                        "When calculating the total cost, the reservation status should be NEW"));
     }
 
     private void performReservationExpectations(ResultActions actions, int size, Reservation expected) throws Exception {

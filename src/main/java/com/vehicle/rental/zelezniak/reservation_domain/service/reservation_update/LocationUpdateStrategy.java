@@ -10,11 +10,11 @@ public class LocationUpdateStrategy implements ReservationUpdateStrategy<Reserva
 
     public Reservation update(Reservation existing, Reservation newData) {
         return existing.toBuilder()
-                .rentInformation(updateRentInformation(existing, newData))
+                .rentInformation(updateLocation(existing, newData))
                 .build();
     }
 
-    private RentInformation updateRentInformation(Reservation existing, Reservation newData) {
+    private RentInformation updateLocation(Reservation existing, Reservation newData) {
         RentInformation rentInformation = existing.getRentInformation();
         RentInformation newRentInformation = newData.getRentInformation();
 

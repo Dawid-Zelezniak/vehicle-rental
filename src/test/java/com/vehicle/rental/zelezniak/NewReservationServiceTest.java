@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -93,7 +92,7 @@ class NewReservationServiceTest {
                 .build());
         Reservation fromDb = findReservationById(reservation.getId());
 
-        Reservation updated = newReservationService.updateLocation(fromDb, reservation);
+        Reservation updated = newReservationService.updateLocationForReservation(fromDb, reservation);
 
         assertEquals(reservation, updated);
     }
@@ -107,7 +106,7 @@ class NewReservationServiceTest {
                 .pickUpLocation(locationCreator.buildTestLocation())
                 .build());
 
-        Reservation updated = newReservationService.updateLocation(fromDb, reservationWithId5);
+        Reservation updated = newReservationService.updateLocationForReservation(fromDb, reservationWithId5);
 
         assertEquals(reservationWithId5, updated);
     }
@@ -121,7 +120,7 @@ class NewReservationServiceTest {
                 .build());
 
         assertThrows(IllegalArgumentException.class,
-                () -> newReservationService.updateLocation(reservationWithId5, newData));
+                () -> newReservationService.updateLocationForReservation(reservationWithId5, newData));
     }
 
     @Test
@@ -132,7 +131,7 @@ class NewReservationServiceTest {
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
         assertEquals(1, vehicles.size());
 
-        Reservation updated = newReservationService.updateDuration(reservationWithId5, durationCreator.createDuration3());
+        Reservation updated = newReservationService.updateDurationForReservation(reservationWithId5, durationCreator.createDuration3());
 
         vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
         assertEquals(0, vehicles.size());
@@ -148,7 +147,7 @@ class NewReservationServiceTest {
         RentDuration duration = durationCreator.createDuration3();
 
         assertThrows(IllegalArgumentException.class,
-                () -> newReservationService.updateDuration(reservationWithId5, duration));
+                () -> newReservationService.updateDurationForReservation(reservationWithId5, duration));
     }
 
     @Test
@@ -225,16 +224,14 @@ class NewReservationServiceTest {
     @Test
     void shouldCalculateTotalCost() {
         Money totalCost = reservationWithId5.getTotalCost();
-        Money deposit = reservationWithId5.getDepositAmount();
         reservationWithId5.setReservationStatus(Reservation.ReservationStatus.NEW);
         reservationWithId5.setTotalCost(null);
         reservationWithId5.setDepositAmount(null);
         reservationRepository.save(reservationWithId5);
 
-        Reservation reservation = newReservationService.calculateCost(reservationWithId5);
+        Money cost = newReservationService.calculateCost(reservationWithId5);
 
-        assertEquals(totalCost, reservation.getTotalCost());
-        assertEquals(deposit, reservation.getDepositAmount());
+        assertEquals(totalCost, cost);
     }
 
     @Test

@@ -12,8 +12,6 @@ public class ReservationUpdateStrategyFactory {
             return (ReservationUpdateStrategy<T>) new LocationUpdateStrategy();
         } else if (type.equals(RentDuration.class)) {
             return (ReservationUpdateStrategy<T>) new RentDurationUpdateStrategy();
-        } else throw new IllegalArgumentException(
-                "Unsupported type for update strategy");
+        } else throw new IllegalArgumentException("Unsupported type for update strategy");
     }
-
 }

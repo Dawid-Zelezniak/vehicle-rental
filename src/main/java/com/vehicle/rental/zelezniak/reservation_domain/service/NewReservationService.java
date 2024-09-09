@@ -1,5 +1,6 @@
 package com.vehicle.rental.zelezniak.reservation_domain.service;
 
+import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation_domain.model.util.NewReservationBuilder;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Service class responsible for managing reservations that are in the NEW status.
@@ -39,10 +39,9 @@ public class NewReservationService {
     }
 
     @Transactional
-    public Reservation updateLocation(Reservation existing, Reservation newData) {
+    public Reservation updateLocationForReservation(Reservation existing, Reservation newData) {
         checkIfStatusIsEqualNEW(existing, "Can not update reservation with status: "
                 + existing.getReservationStatus());
-
         ReservationUpdateStrategy<Reservation> strategy = (ReservationUpdateStrategy<Reservation>)
                 strategyFactory.getStrategy(newData.getClass());
         Reservation updated = strategy.update(existing, newData);
@@ -53,14 +52,12 @@ public class NewReservationService {
      * Updates the duration of an existing reservation and removes any vehicles associated with it.
      */
     @Transactional
-    public Reservation updateDuration(Reservation existing, RentDuration duration) {
+    public Reservation updateDurationForReservation(Reservation existing, RentDuration duration) {
         checkIfStatusIsEqualNEW(existing, "Can not update duration for reservation with status: "
                 + existing.getReservationStatus());
-
         ReservationUpdateStrategy<RentDuration> strategy = (ReservationUpdateStrategy<RentDuration>)
                 strategyFactory.getStrategy(duration.getClass());
         Reservation updated = strategy.update(existing, duration);
-
         updated.setVehicles(null);
         return reservationRepository.save(updated);
     }
@@ -90,11 +87,12 @@ public class NewReservationService {
      * Calculates the total cost and deposit amount for a reservation.
      */
     @Transactional
-    public Reservation calculateCost(Reservation reservation) {
+    public Money calculateCost(Reservation reservation) {
         checkIfStatusIsEqualNEW(reservation, "When calculating the total cost, the reservation status should be NEW");
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservation.getId());
         Reservation updated = calculator.calculateAndApplyCosts(reservation, new HashSet<>(vehicles));
-        return reservationRepository.save(updated);
+        reservationRepository.save(updated);
+        return updated.getTotalCost();
     }
 
     private Reservation buildAndSaveReservation(ReservationCreationRequest request) {

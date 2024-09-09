@@ -50,22 +50,22 @@ public class RentService {
         return rentRepository.findVehiclesByRentId(id, pageable);
     }
 
+    private void validateId(Long id) {
+        inputValidator.throwExceptionIfObjectIsNull(id, RENT_ID_NOT_NULL);
+    }
+
     private Rent findRent(Long id) {
         return rentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(
                         "Rent with id: " + id + " does not exists."));
     }
 
-    private void handleAddRent(Rent rent) {
-        rentRepository.save(rent);
-    }
-
-    private void validateId(Long id) {
-        inputValidator.throwExceptionIfObjectIsNull(id, RENT_ID_NOT_NULL);
-    }
-
     private void validateRent(Rent rent) {
         inputValidator.throwExceptionIfObjectIsNull(rent, RENT_NOT_NULL);
+    }
+
+    private void handleAddRent(Rent rent) {
+        rentRepository.save(rent);
     }
 
     private void validateClientId(Long clientId) {

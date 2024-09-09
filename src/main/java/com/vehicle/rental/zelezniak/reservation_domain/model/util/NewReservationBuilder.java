@@ -10,9 +10,17 @@ import org.springframework.stereotype.Component;
 public class NewReservationBuilder {
 
     public Reservation build(Client client, RentDuration duration) {
-        RentInformation information = RentInformation.builder()
+        RentInformation information = buildRentInformation(duration);
+        return buildReservation(information, client);
+    }
+
+    private RentInformation buildRentInformation(RentDuration duration) {
+        return RentInformation.builder()
                 .rentDuration(duration)
                 .build();
+    }
+
+    private Reservation buildReservation(RentInformation information, Client client) {
         return Reservation.builder()
                 .client(client)
                 .reservationStatus(Reservation.ReservationStatus.NEW)
