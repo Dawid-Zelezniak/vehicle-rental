@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod1() {
         RentDuration duration = durationCreator.createDuration1();
 
-        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(0, availableVehicles.size());
@@ -78,7 +77,7 @@ class AvailableVehiclesRetrieverTest {
         vehicleService.update(6L, motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
-        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(3, availableVehicles.size());
@@ -93,7 +92,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod3() {
         RentDuration duration = durationCreator.createDuration3();
 
-        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(1, availableVehicles.size());

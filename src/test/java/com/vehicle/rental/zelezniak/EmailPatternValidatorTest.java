@@ -2,14 +2,11 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.user_domain.service.authentication.EmailPatternValidator;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
 class EmailPatternValidatorTest {
 
