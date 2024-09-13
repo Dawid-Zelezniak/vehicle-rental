@@ -1,12 +1,15 @@
 package com.vehicle.rental.zelezniak.common_value_objects;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 
 import java.math.*;
 
 @Embeddable
-public record Money(BigDecimal value) {
+public record Money(
+        @Min(value = 0, message = "Money value can not be lower than 0.")
+        BigDecimal value) {
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
 
@@ -14,6 +17,11 @@ public record Money(BigDecimal value) {
     public Money(BigDecimal value) {
         validate(value);
         this.value = format(value);
+    }
+
+    public long convertToCents() {
+        BigDecimal cents = value.multiply(BigDecimal.valueOf(100));
+        return cents.longValueExact();
     }
 
     private void validate(BigDecimal money) {
