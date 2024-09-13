@@ -5,9 +5,7 @@ import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 
 public class MotorcycleUpdateStrategy implements VehicleUpdateStrategy{
 
-    public Motorcycle update(
-            Vehicle existing,
-            Vehicle newData) {
+    public Motorcycle update(Vehicle existing, Vehicle newData) {
         Motorcycle existingMotorcycle = (Motorcycle) existing;
         Motorcycle newMotorcycleData = (Motorcycle) newData;
 
