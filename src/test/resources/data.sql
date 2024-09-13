@@ -1,6 +1,8 @@
 
 -- Add role
-insert into roles (role_id, role_name) values (1, 'USER');
+insert into roles (role_id, role_name) values
+(1, 'USER'),
+(2, 'ADMIN');
 
 -- Add addresses
 insert into addresses (address_id, city, country, flat_number, house_number, postal_code, street) values
