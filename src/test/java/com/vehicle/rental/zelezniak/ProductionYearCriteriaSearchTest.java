@@ -1,25 +1,34 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
+import com.vehicle.rental.zelezniak.config.VehicleCreator;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
+import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
-class VehicleCriteriaSearchTest {
+class ProductionYearCriteriaSearchTest {
 
     private static final Pageable pageable = PageRequest.of(0, 5);
 
+    @Autowired
+    private VehicleService vehicleService;
     @Autowired
     private VehicleCriteriaSearch criteriaSearch;
     @Autowired
@@ -36,10 +45,17 @@ class VehicleCriteriaSearchTest {
     }
 
     @Test
-    void shouldNotFindVehiclesByNonExistentCriteria() {
-        var searchRequest = new CriteriaSearchRequest<>("wheels number", 4);
+    void shouldFindVehiclesByCriteriaProductionYear() {
+        Vehicle vehicle8 = vehicleService.findById(8L);
+        Vehicle vehicle9 = vehicleService.findById(9L);
+        var info = vehicle8.getVehicleInformation();
+        var searchRequest = new CriteriaSearchRequest<>("production year", info.getProductionYear().getYear());
 
-        assertThrows(IllegalArgumentException.class,
-                () -> criteriaSearch.findVehiclesByCriteria(searchRequest, pageable));
+        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
+        List<Vehicle> vehicles = page.getContent();
+
+        assertEquals(2, vehicles.size());
+        assertTrue(vehicles.contains(vehicle8));
+        assertTrue(vehicles.contains(vehicle9));
     }
 }
