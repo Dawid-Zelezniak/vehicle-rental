@@ -1,14 +1,12 @@
 package com.vehicle.rental.zelezniak.user_domain.model.login;
 
-import lombok.*;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@NoArgsConstructor
-public class LoginRequest {
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
 
-    private String email;
-    private String password;
+public record LoginRequest(
+        @NotNull(message = "Email" + CAN_NOT_BE_NULL)
+        String email,
+        @NotNull(message = "Password" + CAN_NOT_BE_NULL)
+        String password) {
 }
