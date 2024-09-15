@@ -9,11 +9,14 @@ import com.vehicle.rental.zelezniak.user_domain.service.ClientValidator;
 import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 class RegistrationService {
 
     private static final String ROLE_USER = "USER";
@@ -24,7 +27,8 @@ class RegistrationService {
     private final RoleRepository roleRepository;
     private final ClientValidator clientValidator;
 
-    Client registerUser(Client client) {
+    @Transactional
+    public Client registerUser(Client client) {
         validateData(client);
         saveClient(client);
         return client;
@@ -38,6 +42,7 @@ class RegistrationService {
 
     private void saveClient(Client client) {
         setRequiredDataAndEncodePassword(client);
+        log.info("Saving new client to database");
         repository.save(client);
     }
 
@@ -45,10 +50,6 @@ class RegistrationService {
         client.setCreatedAt(TimeFormatter.getFormattedActualDateTime());
         String encoded = encoder.encode(client.getPassword());
         client.setCredentials(new UserCredentials(client.getEmail(), encoded));
-        handleAddRoleForUser(client);
-    }
-
-    private void handleAddRoleForUser(Client client) {
         Role roleUser = findOrCreateRoleUser();
         client.addRole(roleUser);
     }
@@ -56,8 +57,8 @@ class RegistrationService {
     private Role findOrCreateRoleUser() {
         Role role = roleRepository.findByRoleName(ROLE_USER);
         if (role == null) {
-            role = new Role(ROLE_USER);
-            roleRepository.save(role);
+            role = roleRepository.save(new Role(ROLE_USER));
+            log.info("Role USER has been created");
         }
         return role;
     }

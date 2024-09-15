@@ -5,6 +5,7 @@ import com.vehicle.rental.zelezniak.user_domain.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.user_domain.service.ClientService;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 class LoginService implements UserDetailsService {
 
     private final InputValidator inputValidator;
@@ -31,8 +33,8 @@ class LoginService implements UserDetailsService {
     }
 
     LoginResponse loginUser(LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
+        String email = loginRequest.email();
+        String password = loginRequest.password();
         return tryLoginUser(email, password);
     }
 
@@ -45,6 +47,7 @@ class LoginService implements UserDetailsService {
         } catch (AuthenticationException e) {
             throwException();
         }
+        log.info("User logged in");
         return new LoginResponse(clientService.findByEmail(email), token);
     }
 
