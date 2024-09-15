@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,21 +31,21 @@ class VehicleValidatorTest {
     private DatabaseSetup databaseSetup;
 
     @BeforeEach
-    void setupDatabase() throws IOException {
+    void setupDatabase() {
         databaseSetup.setupAllTables();
-        vehicleWithId5  = vehicleCreator.createCarWithId5();
-        vehicleWithId6  = vehicleCreator.createMotorcycleWithId6();
+        vehicleWithId5 = vehicleCreator.createCarWithId5();
+        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
     }
 
     @AfterEach
-    void cleanupDatabase(){
+    void cleanupDatabase() {
         databaseSetup.dropAllTables();
     }
 
     @Test
     void shouldTestVehicleCanBeUpdated() {
         assertDoesNotThrow(() -> validator.checkIfVehicleCanBeUpdated(
-                        vehicleWithId5.getRegistrationNumber(), vehicleCreator.createTestCar()));
+                vehicleWithId5.getRegistrationNumber(), vehicleCreator.createTestCar()));
     }
 
     @Test
@@ -75,8 +73,8 @@ class VehicleValidatorTest {
     }
 
     @Test
-    void shouldTestVehicleTypesAreNotSame(){
-       assertThrows(IllegalArgumentException.class,
-               ()-> validator.checkIfVehiclesHasSameTypes(vehicleWithId5,vehicleWithId6));
+    void shouldTestVehicleTypesAreNotSame() {
+        assertThrows(IllegalArgumentException.class,
+                () -> validator.checkIfVehiclesHasSameTypes(vehicleWithId5, vehicleWithId6));
     }
 }

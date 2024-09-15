@@ -73,7 +73,7 @@ class VehicleControllerTest {
     }
 
     @AfterEach
-    void cleanupDatabase(){
+    void cleanupDatabase() {
         databaseSetup.dropAllTables();
     }
 
@@ -153,7 +153,7 @@ class VehicleControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(
-                        "Vehicle with id: " + nonExistentId + " does not exists."));
+                        "Vehicle with id: " + nonExistentId + " does not exist."));
     }
 
     @Test
@@ -178,7 +178,7 @@ class VehicleControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
-                        "Vehicle with registration number : " + n.getRegistration() + " already exists"));
+                        "Vehicle with registration number : " + n.getRegistration() + " already exists."));
     }
 
     @Test
@@ -225,7 +225,7 @@ class VehicleControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
-                        "Vehicle with registration number : " + n.getRegistration() + " already exists"));
+                        "Vehicle with registration number : " + n.getRegistration() + " already exists."));
     }
 
     @Test
@@ -268,7 +268,7 @@ class VehicleControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(
-                        "Vehicle with id: " + notExistingId + " does not exists."));
+                        "Vehicle with id: " + notExistingId + " does not exist."));
 
         assertEquals(5, vehicleRepository.count());
     }
