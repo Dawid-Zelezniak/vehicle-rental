@@ -27,7 +27,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public LoginResponse login(@RequestBody LoginRequest loginRequest){
+    public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest){
        return authService.login(loginRequest);
     }
 }
