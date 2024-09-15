@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -25,6 +26,7 @@ import java.security.interfaces.RSAPublicKey;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableAsync
 public class SecurityConfig {
 
     private static final String ADMIN = "ADMIN";

@@ -61,6 +61,10 @@ public abstract class Vehicle {
         return vehicleInformation.getRegistrationNumber();
     }
 
+    public boolean canBeDeleted() {
+        return Status.UNAVAILABLE == this.status;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;

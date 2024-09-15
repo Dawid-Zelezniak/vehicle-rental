@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface VehicleRepository extends JpaRepository<Vehicle,Long>{
@@ -28,6 +30,9 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Long>{
 
     @Query("SELECT v FROM Vehicle v WHERE v.id NOT IN :idSet AND v.status = 'AVAILABLE'")
     Page<Vehicle> findVehiclesByIdNotIn(@Param("idSet") Set<Long> vehiclesIds, Pageable pageable);
+
+    @Query("SELECT v FROM Vehicle v WHERE v.id NOT IN :idSet AND v.status = 'AVAILABLE'")
+    Collection<Vehicle> findVehiclesByIdNotIn(@Param("idSet") Set<Long> vehiclesIds);
 
     @Modifying
     @Query(nativeQuery = true,value = "DELETE FROM reserved_vehicles rv WHERE rv.vehicle_id = :id")

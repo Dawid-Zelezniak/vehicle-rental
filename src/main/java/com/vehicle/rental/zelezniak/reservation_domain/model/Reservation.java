@@ -7,7 +7,9 @@ import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 

@@ -44,12 +44,10 @@ public class Client implements UserDetails {
     private Address address;
 
     @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE,
-                    CascadeType.DETACH
-            })
-    @JoinTable(name = "clients_roles", joinColumns =
-    @JoinColumn(name = "user_id"), inverseJoinColumns =
-    @JoinColumn(name = "role_id"))
+            cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @JoinTable(name = "clients_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
     public String getEmail() {
@@ -69,8 +67,8 @@ public class Client implements UserDetails {
         return credentials.getEmail();
     }
 
-    public void addRole(Role roleUser) {
-        roles.add(roleUser);
+    public void addRole(Role role) {
+        roles.add(role);
     }
 
     public boolean equals(Object object) {
