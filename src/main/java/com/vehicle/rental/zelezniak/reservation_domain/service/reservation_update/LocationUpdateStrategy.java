@@ -2,13 +2,16 @@ package com.vehicle.rental.zelezniak.reservation_domain.service.reservation_upda
 
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Updates the pickup and drop-off location information in the customer's reservation.
  */
+@Slf4j
 public class LocationUpdateStrategy implements ReservationUpdateStrategy<Reservation> {
 
     public Reservation update(Reservation existing, Reservation newData) {
+        log.info("Updating location for reservation with id : {}", existing.getId());
         return existing.toBuilder()
                 .rentInformation(updateLocation(existing, newData))
                 .build();
