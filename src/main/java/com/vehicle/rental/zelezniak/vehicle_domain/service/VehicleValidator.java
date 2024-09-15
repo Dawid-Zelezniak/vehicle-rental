@@ -4,27 +4,31 @@ import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.R
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class VehicleValidator {
 
     private final VehicleRepository vehicleRepository;
 
     public void throwExceptionIfVehicleExists(RegistrationNumber registrationNumber) {
         if (vehicleRepository.existsByVehicleInformationRegistrationNumber(registrationNumber)) {
-            String message = createMessage(registrationNumber);
-            throwException(message);
+            createMessageAndThrowException(registrationNumber);
         }
     }
 
+    /**
+     Vehicle can not be updated when new vehicle data contains registration number
+     which exists in database (is assigned to other vehicle)
+     */
     public void checkIfVehicleCanBeUpdated(RegistrationNumber registrationNumber, Vehicle newData) {
         RegistrationNumber newDataRegistrationNumber = newData.getRegistrationNumber();
         if (registrationsAreNotSame(registrationNumber, newDataRegistrationNumber)
                 && vehicleRegistrationNumberExists(newDataRegistrationNumber)) {
-            String message = createMessage(newDataRegistrationNumber);
-            throwException(message);
+            createMessageAndThrowException(newDataRegistrationNumber);
         }
     }
 
@@ -34,11 +38,17 @@ public class VehicleValidator {
         }
     }
 
+    private void createMessageAndThrowException(RegistrationNumber registrationNumber) {
+        String message = createMessage(registrationNumber);
+        throwException(message);
+    }
+
     private String createMessage(RegistrationNumber n) {
-        return "Vehicle with registration number : " + n.getRegistration() + " already exists";
+        return "Vehicle with registration number : " + n.getRegistration() + " already exists.";
     }
 
     private void throwException(String message) {
+        log.error("Exception thrown : {}", message);
         throw new IllegalArgumentException(message);
     }
 

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -24,9 +25,14 @@ public class AvailableVehiclesRetriever {
     private final ReservationRepository reservationRepository;
     private final VehicleRepository vehicleRepository;
 
-    public Page<Vehicle> findAvailableVehiclesInPeriod(RentDuration duration, Pageable pageable) {
+    public Page<Vehicle> findVehiclesAvailableInPeriod(RentDuration duration, Pageable pageable) {
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesInPeriod(duration);
         return vehicleRepository.findVehiclesByIdNotIn(unavailableVehiclesIdsInPeriod,pageable);
+    }
+
+    public Collection<Vehicle> findVehiclesAvailableInPeriod(RentDuration duration) {
+        Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesInPeriod(duration);
+        return vehicleRepository.findVehiclesByIdNotIn(unavailableVehiclesIdsInPeriod);
     }
 
     private Set<Long> findReservedAndRentedVehiclesInPeriod(RentDuration duration) {
