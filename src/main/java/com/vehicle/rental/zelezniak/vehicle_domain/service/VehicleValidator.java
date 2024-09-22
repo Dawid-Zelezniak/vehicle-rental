@@ -14,7 +14,7 @@ public class VehicleValidator {
 
     private final VehicleRepository vehicleRepository;
 
-    public void throwExceptionIfVehicleExists(RegistrationNumber registrationNumber) {
+    public void throwExceptionIfVehicleExist(RegistrationNumber registrationNumber) {
         if (vehicleRepository.existsByVehicleInformationRegistrationNumber(registrationNumber)) {
             createMessageAndThrowException(registrationNumber);
         }

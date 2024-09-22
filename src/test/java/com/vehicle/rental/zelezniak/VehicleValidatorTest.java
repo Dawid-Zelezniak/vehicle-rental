@@ -69,7 +69,7 @@ class VehicleValidatorTest {
         RegistrationNumber vehicleWithId5Registration = vehicleWithId5.getRegistrationNumber();
 
         assertThrows(IllegalArgumentException.class,
-                () -> validator.throwExceptionIfVehicleExists(vehicleWithId5Registration));
+                () -> validator.throwExceptionIfVehicleExist(vehicleWithId5Registration));
     }
 
     @Test
