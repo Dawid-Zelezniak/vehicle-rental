@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
-import com.vehicle.rental.zelezniak.user_domain.service.AdminInitializationService;
-import com.vehicle.rental.zelezniak.user_domain.service.ClientService;
+import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.service.AdminInitializationService;
+import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

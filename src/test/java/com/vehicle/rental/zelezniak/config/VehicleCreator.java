@@ -1,13 +1,13 @@
 package com.vehicle.rental.zelezniak.config;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.Engine;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.RegistrationNumber;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.VehicleInformation;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.Year;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Car;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Motorcycle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Engine;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.VehicleInformation;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Year;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Car;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Motorcycle;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

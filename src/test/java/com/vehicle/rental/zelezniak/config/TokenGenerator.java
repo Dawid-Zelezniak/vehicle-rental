@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.user_domain.service.authentication.JWTGenerator;
+import com.vehicle.rental.zelezniak.user.service.authentication.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

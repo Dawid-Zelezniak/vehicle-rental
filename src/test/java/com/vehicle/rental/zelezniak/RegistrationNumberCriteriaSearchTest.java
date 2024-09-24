@@ -1,13 +1,13 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.user_domain.model.client.Role;
-import com.vehicle.rental.zelezniak.vehicle_domain.exception.CriteriaAccessException;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.RegistrationNumber;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
-import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
+import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
+import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

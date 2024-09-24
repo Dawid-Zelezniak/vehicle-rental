@@ -3,12 +3,11 @@ package com.vehicle.rental.zelezniak.config;
 import com.vehicle.rental.zelezniak.common_value_objects.address.City;
 import com.vehicle.rental.zelezniak.common_value_objects.address.Country;
 import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
-import com.vehicle.rental.zelezniak.user_domain.model.client.Address;
-import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
-import com.vehicle.rental.zelezniak.user_domain.model.client.Role;
-import com.vehicle.rental.zelezniak.user_domain.model.client.user_value_objects.UserCredentials;
-import com.vehicle.rental.zelezniak.user_domain.model.client.user_value_objects.UserName;
-import com.vehicle.rental.zelezniak.util.TimeFormatter;
+import com.vehicle.rental.zelezniak.user.model.client.Address;
+import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
+import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;

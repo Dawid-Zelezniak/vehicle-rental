@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.user_domain.service.authentication.RSAKeyProperties;
+import com.vehicle.rental.zelezniak.user.service.authentication.RSAKeyProperties;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;

@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak.exception;
 
-import com.vehicle.rental.zelezniak.vehicle_domain.exception.CriteriaAccessException;
+import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

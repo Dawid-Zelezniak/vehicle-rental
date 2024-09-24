@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.user_domain.service.authentication.EmailPatternValidator;
+import com.vehicle.rental.zelezniak.user.service.authentication.EmailPatternValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.TestPropertySource;
 

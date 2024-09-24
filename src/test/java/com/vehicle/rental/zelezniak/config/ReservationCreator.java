@@ -6,8 +6,8 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.common_value_objects.address.City;
 import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
-import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.reservation.model.Reservation;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

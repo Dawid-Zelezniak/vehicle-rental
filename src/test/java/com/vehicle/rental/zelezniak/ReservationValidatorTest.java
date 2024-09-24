@@ -1,18 +1,16 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.*;
-import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation_domain.repository.ReservationRepository;
-import com.vehicle.rental.zelezniak.reservation_domain.service.ReservationService;
-import com.vehicle.rental.zelezniak.reservation_domain.service.ReservationValidator;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.reservation.model.Reservation;
+import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
+import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
+import com.vehicle.rental.zelezniak.reservation.service.ReservationValidator;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;

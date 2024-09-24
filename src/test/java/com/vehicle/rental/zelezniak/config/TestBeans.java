@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Car;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Motorcycle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Car;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Motorcycle;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
