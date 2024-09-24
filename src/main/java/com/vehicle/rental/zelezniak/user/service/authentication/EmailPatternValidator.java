@@ -9,6 +9,10 @@ public class EmailPatternValidator {
             "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
 
 
+    private EmailPatternValidator(){
+
+    }
+
     public static void validate(String email) {
         if (doesNotMatch(email)) {
             throwException(email);
