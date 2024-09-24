@@ -6,6 +6,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
 import com.vehicle.rental.zelezniak.user.model.client.Address;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class ClientCreator {
         Address address = buildAddress();
         client.setAddress(address);
         client.setRoles(Set.of(buildRoleUser()));
+        client.setPhoneNumber(new PhoneNumber("+48111222333"));
         return client;
     }
 
