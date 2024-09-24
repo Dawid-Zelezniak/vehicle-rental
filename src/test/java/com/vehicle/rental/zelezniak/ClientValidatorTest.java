@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -50,7 +49,7 @@ class ClientValidatorTest {
         String existingEmail = clientWithId5.getEmail();
 
         assertThrows(IllegalArgumentException.class,
-                () -> validator.ifUserExistsThrowException(existingEmail));
+                () -> validator.validateUserDoesNotExists(existingEmail));
     }
 
     @Test
@@ -58,7 +57,7 @@ class ClientValidatorTest {
         Client c = new Client();
         c.setCredentials(new UserCredentials("someuser@gmail.com", "somepass"));
 
-        assertDoesNotThrow(() -> validator.ifUserExistsThrowException(c.getEmail()));
+        assertDoesNotThrow(() -> validator.validateUserDoesNotExists(c.getEmail()));
     }
 
     @Test
@@ -66,7 +65,7 @@ class ClientValidatorTest {
         String userFromDbEmail = clientWithId5.getEmail();
         clientWithId5.setCredentials(new UserCredentials("newemail@gmail.com", "somepass"));
 
-        assertDoesNotThrow(() -> validator.checkIfUserCanBeUpdated(userFromDbEmail, clientWithId5));
+        assertDoesNotThrow(() -> validator.validateUserCanBeUpdated(userFromDbEmail, clientWithId5));
     }
 
     @Test
@@ -75,6 +74,6 @@ class ClientValidatorTest {
         String existingEmail = byId.getEmail();
 
         assertThrows(IllegalArgumentException.class,
-                () -> validator.checkIfUserCanBeUpdated(existingEmail, clientWithId5));
+                () -> validator.validateUserCanBeUpdated(existingEmail, clientWithId5));
     }
 }

@@ -1,13 +1,11 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.user_domain.model.client.Role;
 import com.vehicle.rental.zelezniak.vehicle_domain.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("/application-test.properties")
 class RegistrationNumberCriteriaSearchTest {
 
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private VehicleService vehicleService;
@@ -62,7 +60,7 @@ class RegistrationNumberCriteriaSearchTest {
         RegistrationNumber vehicle8RegistrationNumber = vehicle8.getRegistrationNumber();
         var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
 
-        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
+        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertEquals(1, vehicles.size());
@@ -78,7 +76,7 @@ class RegistrationNumberCriteriaSearchTest {
         var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
 
         assertThrows(CriteriaAccessException.class,
-                () -> criteriaSearch.findVehiclesByCriteria(searchRequest, pageable));
+                () -> criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE));
     }
 
     private void setSecurityContextHolder(String role) {

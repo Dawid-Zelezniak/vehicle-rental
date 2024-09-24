@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClientServiceTest {
 
     private static Client clientWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private Client client;
@@ -55,7 +55,7 @@ class ClientServiceTest {
 
     @Test
     void shouldReturnAllClients() {
-        Page<Client> page = clientService.findAll(pageable);
+        Page<Client> page = clientService.findAll(PAGEABLE);
         List<Client> clients = page.getContent();
 
         assertTrue(clients.contains(clientWithId5));
@@ -110,14 +110,14 @@ class ClientServiceTest {
 
     @Test
     void shouldDeleteClient() {
-        Page<Client> page = clientService.findAll(pageable);
+        Page<Client> page = clientService.findAll(PAGEABLE);
         List<Client> clients = page.getContent();
 
         assertEquals(3, clients.size());
 
         clientService.delete(clientWithId5.getId());
 
-        page = clientService.findAll(pageable);
+        page = clientService.findAll(PAGEABLE);
         clients = page.getContent();
 
         assertEquals(2, clients.size());

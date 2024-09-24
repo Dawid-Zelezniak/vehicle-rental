@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ReservationControllerTest {
 
     private static Reservation reservationWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     private static final String ROLE_USER = "USER";
     private static final String ROLE_ADMIN = "ADMIN";
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
@@ -93,8 +93,8 @@ class ReservationControllerTest {
         String token = tokenGenerator.generateToken(ROLE_ADMIN);
 
         ResultActions actions = mockMvc.perform(get("/reservations")
-                .param("page", String.valueOf(pageable.getPageNumber()))
-                .param("size", String.valueOf(pageable.getPageSize()))
+                .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + token));
         performReservationExpectations(actions, 5, reservationWithId5);
     }
@@ -104,8 +104,8 @@ class ReservationControllerTest {
         String token = tokenGenerator.generateToken(ROLE_USER);
 
         mockMvc.perform(get("/reservations")
-                        .param("page", String.valueOf(pageable.getPageNumber()))
-                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
@@ -125,8 +125,8 @@ class ReservationControllerTest {
         Long clientId = 5L;
 
         ResultActions actions = mockMvc.perform(get("/reservations/client/{id}", clientId)
-                .param("page", String.valueOf(pageable.getPageNumber()))
-                .param("size", String.valueOf(pageable.getPageSize()))
+                .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + token));
         performReservationExpectations(actions, 2, reservationWithId5);
     }
@@ -260,7 +260,7 @@ class ReservationControllerTest {
         Long client5Id = 5L;
         Long id = reservationWithId5.getId();
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         List<Reservation> allByClientId = page.getContent();
         assertEquals(2, allByClientId.size());
 
@@ -268,7 +268,7 @@ class ReservationControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         allByClientId = page.getContent();
         assertEquals(1, allByClientId.size());
 

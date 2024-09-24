@@ -3,10 +3,8 @@ package com.vehicle.rental.zelezniak;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
-import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ModelCriteriaSearchTest {
 
     private static Vehicle vehicleWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private VehicleCriteriaSearch criteriaSearch;
@@ -52,7 +50,7 @@ class ModelCriteriaSearchTest {
         var info = vehicleWithId5.getVehicleInformation();
         var searchRequest = new CriteriaSearchRequest<>("model", info.getModel());
 
-        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
+        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertEquals(1, vehicles.size());

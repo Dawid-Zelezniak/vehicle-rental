@@ -19,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -33,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RentServiceTest {
 
     private static Rent rentWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -61,7 +60,7 @@ class RentServiceTest {
 
     @Test
     void shouldReturnAllRents() {
-        Page<Rent> page =  rentService.findAll(pageable);
+        Page<Rent> page =  rentService.findAll(PAGEABLE);
         List<Rent> rents = page.getContent();
 
         assertEquals(3, rents.size());
@@ -80,7 +79,7 @@ class RentServiceTest {
     void shouldFindAllClientRentsByClientId() {
         Long client5Id = 5L;
 
-        Page<Rent> page = rentService.findAllByClientId(client5Id,pageable);
+        Page<Rent> page = rentService.findAllByClientId(client5Id, PAGEABLE);
         List<Rent> allByClient5Id = page.getContent();
 
         assertTrue(allByClient5Id.contains(rentWithId5));
@@ -91,10 +90,10 @@ class RentServiceTest {
         Long rent5Id = 5L;
         Long rent6Id = 6L;
 
-        Page<Vehicle> p1 = rentService.findVehiclesByRentId(rent5Id,pageable);
+        Page<Vehicle> p1 = rentService.findVehiclesByRentId(rent5Id, PAGEABLE);
         List<Vehicle> vehiclesByRent5Id = p1.getContent();
 
-        Page<Vehicle> p2 = rentService.findVehiclesByRentId(rent6Id,pageable);
+        Page<Vehicle> p2 = rentService.findVehiclesByRentId(rent6Id, PAGEABLE);
         List<Vehicle> vehiclesByRent6Id = p2.getContent();
 
         assertEquals(vehicleCreator.createCarWithId5(), vehiclesByRent5Id.get(0));

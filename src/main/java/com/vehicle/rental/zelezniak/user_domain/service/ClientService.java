@@ -4,6 +4,7 @@ import com.vehicle.rental.zelezniak.user_domain.model.client.Client;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.user_domain.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -26,56 +28,59 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public Client findById(Long id) {
-        validateId(id);
+        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
+        log.debug("Searching for client with id: {}", id);
         return findClient(id);
     }
 
     @Transactional
     public Client update(Long id, Client newData) {
-        validateId(id);
-        validateClient(newData);
+        log.debug("Validating client data before update: {}", newData.getEmail());
+        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
+        validateNotNull(newData, InputValidator.CLIENT_NOT_NULL);
         Client clientFromDb = findClient(id);
         return validateAndUpdateClient(clientFromDb, newData);
     }
 
     @Transactional
     public void delete(Long id) {
-        validateId(id);
+        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
         Client clientToDelete = findClient(id);
+        log.debug("Starting deletion process for client: {}", clientToDelete.getEmail());
         handleDeleteClient(clientToDelete);
     }
 
     @Transactional(readOnly = true)
     public Client findByEmail(String email) {
-        validateEmail(email);
+        validateNotNull(email, InputValidator.CLIENT_EMAIL_NOT_NULL);
         return clientRepository.findByCredentialsEmail(email)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Client with email: " + email + " does not exists."));
+                .orElseThrow(() -> {
+                    log.error("Client with email: {} not found.", email);
+                    return new NoSuchElementException("Client with email: " + email + " does not exist.");
+                });
     }
 
-    private void validateId(Long id) {
-        inputValidator.throwExceptionIfObjectIsNull(id, InputValidator.CLIENT_ID_NOT_NULL);
-    }
-
-    private void validateClient(Client client) {
-        inputValidator.throwExceptionIfObjectIsNull(client, InputValidator.CLIENT_NOT_NULL);
-    }
-
-    private void validateEmail(String email) {
-        inputValidator.throwExceptionIfObjectIsNull(email, InputValidator.CLIENT_EMAIL_NOT_NULL);
+    private void validateNotNull(Object o, String message) {
+        inputValidator.throwExceptionIfObjectIsNull(o, message);
     }
 
     private Client findClient(Long id) {
+        log.debug("Fetching client with id: {}", id);
         return clientRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "User with id: " + id + " does not exist."));
+                .orElseThrow(() -> {
+                    log.error("Client with id: {} not found", id);
+                    return new NoSuchElementException("Client with id: " + id + " does not exist.");
+                });
     }
 
     private Client validateAndUpdateClient(Client clientFromDb, Client newData) {
         String clientEmail = clientFromDb.getEmail();
-        clientValidator.checkIfUserCanBeUpdated(clientEmail, newData);
+        clientValidator.validateUserCanBeUpdated(clientEmail, newData);
+        log.info("Updating client: {}", clientEmail);
         updateClient(clientFromDb, newData);
-        return clientRepository.save(clientFromDb);
+        Client save = clientRepository.save(clientFromDb);
+        log.info("Client: {} has been updated.New email: {}", clientEmail, newData.getEmail());
+        return save;
     }
 
     private void updateClient(Client clientFromDb, Client newData) {
@@ -85,8 +90,11 @@ public class ClientService {
     }
 
     private void handleDeleteClient(Client clientToDelete) {
+        String email = clientToDelete.getEmail();
+        log.info("Deleting client: {}", email);
         removeRoles(clientToDelete);
-       deleteClientFromAllTables(clientToDelete);
+        deleteClientFromAllTables(clientToDelete);
+        log.info("Client: {} has been deleted", email);
     }
 
     private void deleteClientFromAllTables(Client c) {

@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AvailableVehiclesRetrieverTest {
 
     private static Map<Long, Vehicle> vehicleMap;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -64,7 +64,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod1() {
         RentDuration duration = durationCreator.createDuration1();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(0, availableVehicles.size());
@@ -77,7 +77,7 @@ class AvailableVehiclesRetrieverTest {
         vehicleService.update(6L, motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(3, availableVehicles.size());
@@ -92,7 +92,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod3() {
         RentDuration duration = durationCreator.createDuration3();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(1, availableVehicles.size());

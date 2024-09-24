@@ -8,7 +8,6 @@ import com.vehicle.rental.zelezniak.reservation_domain.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation_domain.model.util.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation_domain.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation_domain.service.ReservationService;
-import com.vehicle.rental.zelezniak.user_domain.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReservationServiceTest {
 
     private static Reservation reservationWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -65,7 +64,7 @@ class ReservationServiceTest {
 
     @Test
     void shouldFindAllReservations() {
-        Page<Reservation> all = reservationService.findAll(pageable);
+        Page<Reservation> all = reservationService.findAll(PAGEABLE);
         List<Reservation> reservations = all.getContent();
         assertTrue(reservations.contains(reservationWithId5));
         assertEquals(5, reservations.size());
@@ -75,7 +74,7 @@ class ReservationServiceTest {
     void shouldFindAllReservationsByClientId() {
         Long clientId = 5L;
 
-        Page<Reservation> page = reservationService.findAllByClientId(clientId, pageable);
+        Page<Reservation> page = reservationService.findAllByClientId(clientId, PAGEABLE);
         List<Reservation> reservations = page.getContent();
 
         assertEquals(2, reservations.size());
@@ -86,13 +85,13 @@ class ReservationServiceTest {
     void shouldAddNewReservationForClient() {
         Long client5Id = 5L;
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         List<Reservation> allByClientId = page.getContent();
         assertEquals(2, allByClientId.size());
 
         Reservation reservation = reservationService.addReservation(creationRequest);
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         allByClientId = page.getContent();
         assertEquals(3, allByClientId.size());
         assertTrue(allByClientId.contains(reservation));
@@ -171,13 +170,13 @@ class ReservationServiceTest {
         Long client5Id = 5L;
         setReservationStatusToNew(reservationWithId5);
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         List<Reservation> allByClientId = page.getContent();
         assertEquals(2, allByClientId.size());
 
         reservationService.deleteReservation(reservationWithId5.getId());
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         allByClientId = page.getContent();
         assertEquals(1, allByClientId.size());
     }

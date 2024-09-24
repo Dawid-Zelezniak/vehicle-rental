@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ClientControllerTest {
 
     private static Client clientWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
     private static final String ROLE_ADMIN = "ADMIN";
     private static final String ROLE_USER = "USER";
@@ -79,8 +79,8 @@ class ClientControllerTest {
         var credentials = clientWithId5.getCredentials();
         var name = clientWithId5.getName();
         mockMvc.perform(get("/clients")
-                        .param("page",String.valueOf(pageable.getPageNumber()))
-                        .param("size",String.valueOf(pageable.getPageSize()))
+                        .param("page",String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size",String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
@@ -99,8 +99,8 @@ class ClientControllerTest {
     void shouldNotReturnAllClientsForRoleUser() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
         mockMvc.perform(get("/clients")
-                        .param("page",String.valueOf(pageable.getPageNumber()))
-                        .param("size",String.valueOf(pageable.getPageSize()))
+                        .param("page",String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size",String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
     }
@@ -140,7 +140,7 @@ class ClientControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(
-                        "User with id: " + notExistentId + " does not exist."))
+                        "Client with id: " + notExistentId + " does not exist."))
                 .andExpect(jsonPath("$.code").value(404));
     }
 
@@ -170,7 +170,7 @@ class ClientControllerTest {
     @Test
     void shouldDeleteClientForRoleADMIN() throws Exception {
         Long existingClientId = 5L;
-        Page<Client> page = clientService.findAll(pageable);
+        Page<Client> page = clientService.findAll(PAGEABLE);
         List<Client> clients = page.getContent();
 
         assertEquals(3, clients.size());
@@ -179,7 +179,7 @@ class ClientControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
-        page = clientService.findAll(pageable);
+        page = clientService.findAll(PAGEABLE);
         clients = page.getContent();
         assertEquals(2, clients.size());
     }
@@ -189,7 +189,7 @@ class ClientControllerTest {
         String token = tokenGenerator.generateToken(ROLE_USER);
         Long existingClientId = 5L;
 
-        Page<Client> page = clientService.findAll(pageable);
+        Page<Client> page = clientService.findAll(PAGEABLE);
         List<Client> clients = page.getContent();
 
         assertEquals(3, clients.size());
@@ -224,7 +224,7 @@ class ClientControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(
-                        "Client with email: " + email + " does not exists."));
+                        "Client with email: " + email + " does not exist."));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @TestPropertySource("/application-test.properties")
 class VehicleCriteriaSearchTest {
 
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private VehicleCriteriaSearch criteriaSearch;
@@ -40,6 +40,6 @@ class VehicleCriteriaSearchTest {
         var searchRequest = new CriteriaSearchRequest<>("wheels number", 4);
 
         assertThrows(IllegalArgumentException.class,
-                () -> criteriaSearch.findVehiclesByCriteria(searchRequest, pageable));
+                () -> criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE));
     }
 }

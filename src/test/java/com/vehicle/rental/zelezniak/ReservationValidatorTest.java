@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReservationValidatorTest {
 
     private static Reservation reservationWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
 
     @Autowired
     private ReservationValidator validator;

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class NewReservationServiceTest {
 
     private static Reservation reservationWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -70,14 +70,14 @@ class NewReservationServiceTest {
     void shouldAddReservationForClient() {
         Long client5Id = 5L;
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         Collection<Reservation> allByClientId = page.getContent();
         assertEquals(2, allByClientId.size());
 
         Reservation reservation = newReservationService.addNewReservation(creationRequest);
         Long reservationId = reservation.getId();
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         allByClientId = page.getContent();
         assertEquals(3, allByClientId.size());
         assertEquals(reservation, findReservationById(reservationId));
@@ -155,13 +155,13 @@ class NewReservationServiceTest {
         Long client5Id = 5L;
         setReservationStatusToNew(reservationWithId5);
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         List<Reservation> reservations = page.getContent();
         assertEquals(2, reservations.size());
 
         newReservationService.deleteReservation(reservationWithId5);
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, pageable);
+        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
         reservations = page.getContent();
         assertEquals(1, reservations.size());
     }

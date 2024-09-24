@@ -2,8 +2,7 @@ package com.vehicle.rental.zelezniak.vehicle_domain.service;
 
 import com.vehicle.rental.zelezniak.vehicle_domain.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.util.validation.InputValidator;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.criteria_search.CriteriaSearchStrategyFactory;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.criteria_search.VehicleSearchStrategy;
 import lombok.*;
@@ -14,9 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +67,7 @@ public class VehicleCriteriaSearch {
                     return criteriaType;
                 }
             }
+            log.error("Undefined criteria type: {}", value);
             throw new IllegalArgumentException("Unknown criteria type " + value);
         }
 

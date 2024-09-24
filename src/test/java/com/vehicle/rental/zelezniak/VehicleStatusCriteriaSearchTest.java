@@ -1,9 +1,8 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleCriteriaSearch;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
@@ -26,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestPropertySource("/application-test.properties")
 class VehicleStatusCriteriaSearchTest {
 
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
     private VehicleService vehicleService;
@@ -56,7 +55,7 @@ class VehicleStatusCriteriaSearchTest {
         assertEquals(5, vehicleRepository.count());
         var searchRequest = new CriteriaSearchRequest<>("status", "available");
 
-        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
+        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertFalse(vehicles.contains(unavailableVehicle));
@@ -72,8 +71,7 @@ class VehicleStatusCriteriaSearchTest {
 
         assertEquals(5, vehicleRepository.count());
 
-
-        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
+        Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertTrue(vehicles.contains(unavailableVehicle));

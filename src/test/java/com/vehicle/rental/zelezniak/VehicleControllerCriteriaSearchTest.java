@@ -8,7 +8,7 @@ import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.E
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicle_value_objects.Year;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import org.junit.jupiter.api.AfterEach;
@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.RoundingMode;
@@ -38,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class VehicleControllerCriteriaSearchTest {
 
     private static Vehicle vehicleWithId5;
-    private static final Pageable pageable = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
     private static final String USER = "USER";
     private static final String ADMIN = "ADMIN";
@@ -131,8 +130,8 @@ class VehicleControllerCriteriaSearchTest {
         mockMvc.perform(post("/vehicles/criteria")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
-                        .param("page", String.valueOf(pageable.getPageNumber()))
-                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
@@ -180,8 +179,8 @@ class VehicleControllerCriteriaSearchTest {
         mockMvc.perform(post("/vehicles/criteria")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))
-                        .param("page", String.valueOf(pageable.getPageNumber()))
-                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -208,8 +207,8 @@ class VehicleControllerCriteriaSearchTest {
         mockMvc.perform(post("/vehicles/criteria")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))
-                        .param("page", String.valueOf(pageable.getPageNumber()))
-                        .param("size", String.valueOf(pageable.getPageSize()))
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isForbidden())
