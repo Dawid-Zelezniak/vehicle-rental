@@ -26,11 +26,12 @@ CREATE TABLE addresses (
 );
 
 CREATE TABLE clients (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    client_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255),
     password VARCHAR(255),
+    phone_number VARCHAR(255),
     address_id INT,
     created_at TIMESTAMP,
     FOREIGN KEY (address_id) REFERENCES addresses(address_id)
@@ -77,7 +78,7 @@ CREATE TABLE reservations (
     drop_off_additional_info VARCHAR(255),
     reservation_status VARCHAR(255),
     client_id INT,
-    FOREIGN KEY (client_id) REFERENCES clients(user_id)
+    FOREIGN KEY (client_id) REFERENCES clients(client_id)
 );
 
 CREATE TABLE reserved_vehicles (
@@ -89,11 +90,11 @@ CREATE TABLE reserved_vehicles (
 );
 
 CREATE TABLE clients_roles (
-    user_id INT,
+    client_id INT,
     role_id INT,
-    FOREIGN KEY (user_id) REFERENCES clients(user_id),
+    FOREIGN KEY (client_id) REFERENCES clients(client_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id),
-    PRIMARY KEY (user_id, role_id)
+    PRIMARY KEY (client_id, role_id)
 );
 
 CREATE TABLE motorcycles (
@@ -116,7 +117,7 @@ CREATE TABLE rents (
     drop_off_additional_info VARCHAR(255),
     rent_status VARCHAR(255),
     client_id INT,
-    FOREIGN KEY (client_id) REFERENCES clients(user_id)
+    FOREIGN KEY (client_id) REFERENCES clients(client_id)
 );
 
 CREATE TABLE rented_vehicles (

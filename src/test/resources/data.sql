@@ -11,13 +11,13 @@ insert into addresses (address_id, city, country, flat_number, house_number, pos
 (7, 'Lublin', 'Poland', '10', '18', '21-090', 'teststreet');
 
 -- Add clients
-insert into clients (user_id, first_name, last_name, email, password, address_id) values
-(5, 'UserFive', 'Five', 'userfive@gmail.com', 'somepass', 5),
-(6, 'UserSix', 'Six', 'usersix@gmail.com', 'somepass', 6),
-(7, 'UserSeven', 'Seven', 'userseven@gmail.com', 'somepass', 7);
+insert into clients (client_id, first_name, last_name, email, password, address_id, phone_number) values
+(5, 'UserFive', 'Five', 'userfive@gmail.com', 'somepass', 5, '+48111222333'),
+(6, 'UserSix', 'Six', 'usersix@gmail.com', 'somepass', 6, '+48222333444'),
+(7, 'UserSeven', 'Seven', 'userseven@gmail.com', 'somepass', 7, '+48333444555');
 
 -- Add roles for clients
-insert into clients_roles (user_id, role_id) values
+insert into clients_roles (client_id, role_id) values
 (5, 1),
 (6, 1),
 (7, 1);
