@@ -4,8 +4,10 @@ import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
+import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -39,7 +44,7 @@ class ClientServiceTest {
     @Autowired
     private ClientCreator clientCreator;
     @Autowired
-    private ReservationService reservationService;
+    private PasswordEncoder encoder;
 
     @BeforeEach
     void createUsers() throws IOException {
@@ -87,13 +92,15 @@ class ClientServiceTest {
     @Test
     void shouldUpdateClient() {
         Long client5Id = clientWithId5.getId();
-        client.setId(client5Id);
-        client.setName(new UserName("Uncle", "Bob"));
-        client.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
+        clientWithId5.setName(new UserName("Uncle", "Bob"));
+        clientWithId5.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
 
-        Client updated = clientService.update(client5Id, client);
+        Client updated = clientService.update(client5Id, clientWithId5);
 
-        assertEquals(client, updated);
+        assertEquals(clientWithId5.getEmail(), updated.getEmail());
+        assertEquals(clientWithId5.getUsername(), updated.getUsername());
+
+        assertTrue(encoder.matches(clientWithId5.getPassword(), updated.getPassword()));
     }
 
     @Test
