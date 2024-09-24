@@ -1,6 +1,7 @@
 package com.vehicle.rental.zelezniak.user.model.client;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import jakarta.persistence.*;
@@ -26,7 +27,7 @@ public class Client implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "client_id")
     private Long id;
 
     @Embedded
@@ -34,6 +35,10 @@ public class Client implements UserDetails {
 
     @Embedded
     private UserCredentials credentials;
+
+    @Embedded
+    @AttributeOverride(name = "number", column = @Column(name = "phone_number"))
+    private PhoneNumber phoneNumber;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -46,7 +51,7 @@ public class Client implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER,
             cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "clients_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
@@ -71,6 +76,7 @@ public class Client implements UserDetails {
         roles.add(role);
     }
 
+    @Override
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
@@ -78,14 +84,15 @@ public class Client implements UserDetails {
         return Objects.equals(id, client.id)
                 && Objects.equals(name, client.name)
                 && Objects.equals(credentials, client.credentials)
+                && Objects.equals(phoneNumber, client.phoneNumber)
                 && Objects.equals(createdAt, client.createdAt)
                 && Objects.equals(address, client.address);
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(id,
-                name, credentials,
-                createdAt, address);
+        return Objects.hash(id, name, credentials,
+                phoneNumber, createdAt, address);
     }
 
     @Override
