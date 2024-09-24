@@ -189,7 +189,7 @@ class ReservationControllerTest {
                 .content(mapper.writeValueAsString(reservationWithId5))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + token));
-        performReservationExpectations(actions,reservationWithId5);
+        performReservationExpectations(actions, reservationWithId5);
 
         assertEquals(reservationWithId5, findReservationById(id));
     }
@@ -224,7 +224,7 @@ class ReservationControllerTest {
                 .content(mapper.writeValueAsString(duration))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + token));
-        performReservationExpectations(actions,reservationWithId5);
+        performReservationExpectations(actions, reservationWithId5);
 
         vehicles = reservationRepository.findVehiclesByReservationId(id);
         assertEquals(0, vehicles.size());
@@ -300,7 +300,9 @@ class ReservationControllerTest {
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
         assertEquals(1, vehicles.size());
 
-        mockMvc.perform(put("/reservations/add/vehicle/{reservationId}/{vehicleId}", reservationId, vehicleId)
+        mockMvc.perform(put("/reservations/add/vehicle/")
+                        .param("reservationId", reservationId.toString())
+                        .param("vehicleId", vehicleId.toString())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
@@ -318,7 +320,9 @@ class ReservationControllerTest {
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
         assertEquals(1, vehicles.size());
 
-        mockMvc.perform(put("/reservations/add/vehicle/{reservationId}/{vehicleId}", reservationId, vehicleId)
+        mockMvc.perform(put("/reservations/add/vehicle/")
+                        .param("reservationId", reservationId.toString())
+                        .param("vehicleId", vehicleId.toString())
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not add vehicle to reservation with status: " +
@@ -332,13 +336,15 @@ class ReservationControllerTest {
     void shouldRemoveVehicleFromReservation() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
         setReservationStatusToNew(reservationWithId5);
-        Long vehicleId = 5L;
+        long vehicleId = 5L;
         Long reservationId = reservationWithId5.getId();
 
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
         assertEquals(1, vehicles.size());
 
-        mockMvc.perform(put("/reservations/delete/vehicle/{reservationId}/{vehicleId}", reservationId, vehicleId)
+        mockMvc.perform(put("/reservations/delete/vehicle/")
+                        .param("reservationId", reservationId.toString())
+                        .param("vehicleId", Long.toString(vehicleId))
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
@@ -349,13 +355,15 @@ class ReservationControllerTest {
     @Test
     void shouldNotRemoveVehicleFromReservation() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
-        Long vehicleId = 5L;
+        long vehicleId = 5L;
         Long reservationId = reservationWithId5.getId();
 
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
         assertEquals(1, vehicles.size());
 
-        mockMvc.perform(put("/reservations/delete/vehicle/{reservationId}/{vehicleId}", reservationId, vehicleId)
+        mockMvc.perform(put("/reservations/delete/vehicle/")
+                        .param("reservationId", reservationId.toString())
+                        .param("vehicleId", Long.toString(vehicleId))
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not remove vehicle from reservation with status: " +

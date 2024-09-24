@@ -56,13 +56,13 @@ public class ReservationController {
         service.deleteReservation(id);
     }
 
-    @PutMapping("/add/vehicle/{reservationId}/{vehicleId}")
-    public void addVehicle(@PathVariable Long reservationId, @PathVariable Long vehicleId) {
+    @PutMapping("/add/vehicle/")
+    public void addVehicle(@RequestParam Long reservationId, @RequestParam Long vehicleId) {
         service.addVehicleToReservation(reservationId, vehicleId);
     }
 
-    @PutMapping("/delete/vehicle/{reservationId}/{vehicleId}")
-    public void deleteVhicle(@PathVariable Long reservationId, @PathVariable Long vehicleId) {
+    @PutMapping("/delete/vehicle/")
+    public void deleteVhicle(@RequestParam Long reservationId, @RequestParam Long vehicleId) {
         service.deleteVehicleFromReservation(reservationId, vehicleId);
     }
 
