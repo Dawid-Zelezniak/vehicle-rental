@@ -2,6 +2,7 @@ package com.vehicle.rental.zelezniak.user.model.client.user_value_objects;
 
 import com.vehicle.rental.zelezniak.constants.ValidationMessages;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
