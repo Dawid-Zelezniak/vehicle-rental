@@ -15,7 +15,7 @@ public class ClientValidator {
 
     public void validateUserDoesNotExists(String email) {
         if (userByEmailExists(email)) {
-            log.error("Client with email: {} exist.", email);
+            log.warn("Client with email: {} exist.", email);
             throw new IllegalArgumentException(createMessage(email));
         }
     }

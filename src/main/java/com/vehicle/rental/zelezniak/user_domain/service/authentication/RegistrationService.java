@@ -29,15 +29,18 @@ class RegistrationService {
 
     @Transactional
     public Client registerUser(Client client) {
+        String email = client.getEmail();
+        log.debug("Starting registration process for client: {}", email);
         validateData(client);
         saveClient(client);
+        log.info("Client: {} has been registered", email);
         return client;
     }
 
     private void validateData(Client client) {
         inputValidator.throwExceptionIfObjectIsNull(client, InputValidator.CLIENT_NOT_NULL);
         EmailPatternValidator.validate(client.getEmail());
-        clientValidator.ifUserExistsThrowException(client.getEmail());
+        clientValidator.validateUserDoesNotExists(client.getEmail());
     }
 
     private void saveClient(Client client) {
