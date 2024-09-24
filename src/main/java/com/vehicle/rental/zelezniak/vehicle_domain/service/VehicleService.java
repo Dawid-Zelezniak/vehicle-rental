@@ -4,7 +4,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.vehicle_domain.exception.VehicleDeletionException;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle_domain.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.vehicle_update.VehicleUpdateStrategy;
 import com.vehicle.rental.zelezniak.vehicle_domain.service.vehicle_update.VehicleUpdateStrategyFactory;
@@ -46,7 +46,7 @@ public class VehicleService {
     @Transactional
     public Vehicle addVehicle(Vehicle vehicle) {
         validateNotNull(vehicle, InputValidator.VEHICLE_NOT_NULL);
-        vehicleValidator.throwExceptionIfVehicleExists(vehicle.getRegistrationNumber());
+        vehicleValidator.throwExceptionIfVehicleExist(vehicle.getRegistrationNumber());
         log.info("Saving vehicle to database");
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Vehicle with id: {} has been saved.", saved.getId());

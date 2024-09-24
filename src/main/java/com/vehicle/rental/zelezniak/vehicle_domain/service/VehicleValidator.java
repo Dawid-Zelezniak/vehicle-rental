@@ -44,7 +44,7 @@ public class VehicleValidator {
     }
 
     private String createMessage(RegistrationNumber n) {
-        return "Vehicle with registration number : " + n.getRegistration() + " already exists.";
+        return "Vehicle with registration number : " + n.getRegistration() + " already exist.";
     }
 
     private void throwException(String message) {

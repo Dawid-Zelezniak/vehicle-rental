@@ -2,8 +2,7 @@ package com.vehicle.rental.zelezniak.vehicle_domain.controller;
 
 import com.vehicle.rental.zelezniak.vehicle_domain.service.VehicleService;
 import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle_domain.model.vehicles.util.CriteriaSearchRequest;
-import jakarta.validation.Valid;
+import com.vehicle.rental.zelezniak.vehicle_domain.model.util.CriteriaSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
