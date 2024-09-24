@@ -1,12 +1,14 @@
 package com.vehicle.rental.zelezniak.user.service;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientValidator clientValidator;
     private final InputValidator inputValidator;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public Page<Client> findAll(Pageable pageable) {
@@ -85,7 +88,9 @@ public class ClientService {
 
     private void updateClient(Client clientFromDb, Client newData) {
         clientFromDb.setName(newData.getName());
-        clientFromDb.setCredentials(newData.getCredentials());
+        String password = newData.getPassword();
+        String email = newData.getEmail();
+        clientFromDb.setCredentials(new UserCredentials(email, passwordEncoder.encode(password)));
         clientFromDb.setAddress(newData.getAddress());
     }
 
