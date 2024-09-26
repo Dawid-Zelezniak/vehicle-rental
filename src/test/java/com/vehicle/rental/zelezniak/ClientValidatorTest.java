@@ -39,11 +39,6 @@ class ClientValidatorTest {
         clientWithId5 = clientCreator.createClientWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldThrowExceptionIfClientExists() {
         String existingEmail = clientWithId5.getEmail();
@@ -70,7 +65,7 @@ class ClientValidatorTest {
 
     @Test
     void shouldTestClientCanNotBeUpdated() {
-        Client byId = clientService.findById(6L);
+        Client byId = clientService.findClientById(6L);
         String existingEmail = byId.getEmail();
 
         assertThrows(IllegalArgumentException.class,

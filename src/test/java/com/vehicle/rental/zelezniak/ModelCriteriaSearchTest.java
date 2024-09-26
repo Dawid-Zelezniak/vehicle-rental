@@ -40,11 +40,6 @@ class ModelCriteriaSearchTest {
         vehicleWithId5 = vehicleCreator.createCarWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindVehiclesByCriteriaModel() {
         var info = vehicleWithId5.getVehicleInformation();

@@ -61,11 +61,6 @@ class NewReservationServiceTest {
         reservationWithId5 = reservationCreator.createReservationWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldAddReservationForClient() {
         Long client5Id = 5L;

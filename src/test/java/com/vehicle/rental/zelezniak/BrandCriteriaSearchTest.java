@@ -38,11 +38,6 @@ class BrandCriteriaSearchTest {
         databaseSetup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindVehiclesByCriteriaBrand() {
         Vehicle vehicle7 = vehicleService.findById(7L);

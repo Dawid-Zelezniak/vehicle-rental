@@ -47,11 +47,6 @@ class RegistrationNumberCriteriaSearchTest {
         databaseSetup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     @DisplayName("Admin can search vehicles by registration")
     void shouldFindVehiclesByCriteriaRegistrationNumber() {

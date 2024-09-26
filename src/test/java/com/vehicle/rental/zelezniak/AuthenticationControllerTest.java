@@ -60,11 +60,6 @@ class AuthenticationControllerTest {
         client.setAddress(address);
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldRegisterUser() throws Exception {
         UserName name = client.getName();

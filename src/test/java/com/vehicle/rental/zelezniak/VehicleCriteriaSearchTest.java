@@ -30,11 +30,6 @@ class VehicleCriteriaSearchTest {
         databaseSetup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldNotFindVehiclesByNonExistentCriteria() {
         var searchRequest = new CriteriaSearchRequest<>("wheels number", 4);

@@ -56,7 +56,6 @@ class AvailableVehiclesRetrieverTest {
 
     @AfterEach
     void dropData() {
-        databaseSetup.dropAllTables();
         vehicleMap = null;
     }
 

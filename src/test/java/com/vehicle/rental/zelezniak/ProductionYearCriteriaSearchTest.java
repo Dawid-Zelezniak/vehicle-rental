@@ -38,11 +38,6 @@ class ProductionYearCriteriaSearchTest {
         databaseSetup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindVehiclesByCriteriaProductionYear() {
         Vehicle vehicle8 = vehicleService.findById(8L);

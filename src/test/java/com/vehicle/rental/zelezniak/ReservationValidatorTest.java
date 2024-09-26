@@ -46,7 +46,6 @@ class ReservationValidatorTest {
 
     @AfterEach
     void cleanupDatabase() {
-        databaseSetup.dropAllTables();
         reservation = null;
     }
 

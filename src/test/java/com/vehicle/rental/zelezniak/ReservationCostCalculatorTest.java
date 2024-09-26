@@ -51,11 +51,6 @@ class ReservationCostCalculatorTest {
         reservationWithId5 = reservationCreator.createReservationWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        setup.dropAllTables();
-    }
-
     @ParameterizedTest(name = "{index} => start={0},end={1},totalCost={2},deposit={3}")
     @MethodSource("testCasesForSingleVehicle")
     void shouldCalculateTotalCostForReservationsWithSingleVehicle(

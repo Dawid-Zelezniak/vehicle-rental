@@ -41,11 +41,6 @@ class VehicleStatusCriteriaSearchTest {
         databaseSetup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindVehiclesByCriteriaStatusAvailable() {
         Vehicle unavailableVehicle = vehicleService.findById(6L);

@@ -55,11 +55,6 @@ class VehicleServiceTest {
         vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldReturnPageOf2Vehicles() {
         Pageable pageable = PageRequest.of(0, 2);

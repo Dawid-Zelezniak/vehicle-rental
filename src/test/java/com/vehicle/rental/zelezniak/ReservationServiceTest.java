@@ -57,11 +57,6 @@ class ReservationServiceTest {
         reservationWithId5 = reservationCreator.createReservationWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindAllReservations() {
         Page<Reservation> all = reservationService.findAll(PAGEABLE);

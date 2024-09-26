@@ -72,11 +72,6 @@ class VehicleControllerTest {
         vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldReturnAllVehicles() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);

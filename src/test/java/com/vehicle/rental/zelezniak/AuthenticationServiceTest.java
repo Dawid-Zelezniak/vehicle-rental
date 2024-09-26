@@ -48,7 +48,6 @@ class AuthenticationServiceTest {
 
     @AfterEach
     void cleanupDatabase() {
-        databaseSetup.dropAllTables();
         client = new Client();
     }
 
@@ -60,7 +59,7 @@ class AuthenticationServiceTest {
         authenticationService.register(client);
 
         assertEquals(4, clientRepository.count());
-        assertEquals(client, clientService.findById(client.getId()));
+        assertEquals(client, clientService.findClientById(client.getId()));
 
     }
 

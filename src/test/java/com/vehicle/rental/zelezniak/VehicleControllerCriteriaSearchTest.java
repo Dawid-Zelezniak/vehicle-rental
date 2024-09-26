@@ -63,11 +63,6 @@ class VehicleControllerCriteriaSearchTest {
         vehicleWithId5 = vehicleCreator.createCarWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindVehiclesByCriteriaModel() throws Exception {
         String criteria = "model";

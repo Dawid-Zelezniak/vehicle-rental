@@ -34,16 +34,11 @@ class AdminInitializationServiceTest {
         setup.setupAllTables();
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        setup.dropAllTables();
-    }
-
     @Test
     void shouldFindAdminAfterLoadOfContext() {
         initializationService.createAdmin();
         Long adminId = 1L;
-        Client byId = clientService.findById(adminId);
+        Client byId = clientService.findClientById(adminId);
         assertNotNull(byId);
         assertEquals(email, byId.getEmail());
     }

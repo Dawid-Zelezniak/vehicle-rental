@@ -2,12 +2,11 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@TestPropertySource("/application-test.properties")
+
 class PhoneNumberTest {
 
     @Test

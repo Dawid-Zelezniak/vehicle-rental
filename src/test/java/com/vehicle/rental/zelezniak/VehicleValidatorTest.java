@@ -37,11 +37,6 @@ class VehicleValidatorTest {
         vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldTestVehicleCanBeUpdated() {
         assertDoesNotThrow(() -> validator.checkIfVehicleCanBeUpdated(

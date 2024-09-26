@@ -53,11 +53,6 @@ class RentServiceTest {
         rentWithId5 = rentCreator.createRentWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase(){
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldReturnAllRents() {
         Page<Rent> page =  rentService.findAll(PAGEABLE);

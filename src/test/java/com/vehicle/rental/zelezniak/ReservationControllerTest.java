@@ -83,11 +83,6 @@ class ReservationControllerTest {
         reservationWithId5 = reservationCreator.createReservationWithId5();
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldFindAllReservationsForRoleADMIN() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_ADMIN);
