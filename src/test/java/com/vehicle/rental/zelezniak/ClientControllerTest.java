@@ -10,10 +10,12 @@ import com.vehicle.rental.zelezniak.config.TokenGenerator;
 import com.vehicle.rental.zelezniak.user.model.client.Address;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
+import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,11 +79,6 @@ class ClientControllerTest {
         adminToken = tokenGenerator.generateToken(ROLE_ADMIN);
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        databaseSetup.dropAllTables();
-    }
-
     @Test
     void shouldReturnAllClients() throws Exception {
         var credentials = clientWithId5.getCredentials();
@@ -96,8 +93,7 @@ class ClientControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.content", hasSize(3)))
                 .andExpect(jsonPath("$.content[0].id").value(clientWithId5.getId()))
-                .andExpect(jsonPath("$.content[0].credentials.email").value(credentials.getEmail()))
-                .andExpect(jsonPath("$.content[0].credentials.password").value(credentials.getPassword()))
+                .andExpect(jsonPath("$.content[0].email").value(credentials.getEmail()))
                 .andExpect(jsonPath("$.content[0].name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.content[0].name.lastName").value(name.getLastName()))
                 .andExpect(jsonPath("$.content[0].address.street.streetName").value(clientWithId5.getAddress().getStreet().streetName()))
@@ -128,8 +124,7 @@ class ClientControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(clientWithId5.getId()))
-                .andExpect(jsonPath("$.credentials.email").value(credentials.getEmail()))
-                .andExpect(jsonPath("$.credentials.password").value(credentials.getPassword()))
+                .andExpect(jsonPath("$.email").value(credentials.getEmail()))
                 .andExpect(jsonPath("$.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.name.lastName").value(name.getLastName()))
                 .andExpect(jsonPath("$.address.street.streetName").value(clientWithId5.getAddress().getStreet().streetName()))
@@ -167,7 +162,7 @@ class ClientControllerTest {
 
         performUpdateClient(clientWithId5, userToken);
 
-        Client updated = clientService.findById(clientWithId5.getId());
+        Client updated = clientService.findClientById(clientWithId5.getId());
 
         assertEquals(clientWithId5.getEmail(), updated.getEmail());
         assertEquals(clientWithId5.getUsername(), updated.getUsername());
@@ -182,7 +177,7 @@ class ClientControllerTest {
 
         performUpdateClient(clientWithId5, adminToken);
 
-        Client updated = clientService.findById(clientWithId5.getId());
+        Client updated = clientService.findClientById(clientWithId5.getId());
 
         assertEquals(clientWithId5.getEmail(), updated.getEmail());
         assertEquals(clientWithId5.getUsername(), updated.getUsername());
@@ -192,8 +187,8 @@ class ClientControllerTest {
     @Test
     void shouldDeleteClientForRoleADMIN() throws Exception {
         Long existingClientId = 5L;
-        Page<Client> page = clientService.findAll(PAGEABLE);
-        List<Client> clients = page.getContent();
+        Page<ClientDto> page = clientService.findAll(PAGEABLE);
+        List<ClientDto> clients = page.getContent();
 
         assertEquals(3, clients.size());
 
@@ -211,8 +206,8 @@ class ClientControllerTest {
         String token = tokenGenerator.generateToken(ROLE_USER);
         Long existingClientId = 5L;
 
-        Page<Client> page = clientService.findAll(PAGEABLE);
-        List<Client> clients = page.getContent();
+        Page<ClientDto> page = clientService.findAll(PAGEABLE);
+        List<ClientDto> clients = page.getContent();
 
         assertEquals(3, clients.size());
 

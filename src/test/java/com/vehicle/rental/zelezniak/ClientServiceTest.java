@@ -5,9 +5,11 @@ import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
+import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClientServiceTest {
 
     private static Client clientWithId5;
+    private static ClientDto client5Dto;
     private static final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
@@ -47,46 +50,53 @@ class ClientServiceTest {
     private PasswordEncoder encoder;
 
     @BeforeEach
-    void createUsers() throws IOException {
+    void setup() {
         databaseSetup.setupAllTables();
         clientWithId5 = clientCreator.createClientWithId5();
+        client5Dto = ClientMapper.toDto(clientWithId5);
     }
 
     @AfterEach
     void cleanupDatabase() {
-        databaseSetup.dropAllTables();
         client = new Client();
     }
 
     @Test
     void shouldReturnAllClients() {
-        Page<Client> page = clientService.findAll(PAGEABLE);
-        List<Client> clients = page.getContent();
+        Page<ClientDto> page = clientService.findAll(PAGEABLE);
+        List<ClientDto> clients = page.getContent();
 
-        assertTrue(clients.contains(clientWithId5));
+        assertTrue(clients.contains(client5Dto));
         assertEquals(3, clients.size());
 
-        for (Client client : clients) {
+        for (ClientDto client : clients) {
             assertNotNull(client.getId());
-            assertNotNull(client.getUsername());
-            assertNotNull(client.getCredentials());
+            assertNotNull(client.getName());
+            assertNotNull(client.getEmail());
             assertNotNull(client.getAddress());
         }
     }
 
     @Test
+    void shouldFindClientDtoById() {
+        ClientDto client = clientService.findById((clientWithId5.getId()));
+
+        assertEquals(client5Dto, client);
+    }
+
+    @Test
     void shouldFindClientById() {
-        Client client = clientService.findById(clientWithId5.getId());
+        Client client = clientService.findClientById((clientWithId5.getId()));
 
         assertEquals(clientWithId5, client);
     }
 
     @Test
     void shouldNotFindClientById() {
-        Long nonExistentId = 20L;
+        long nonExistentId = 20L;
 
         assertThrows(NoSuchElementException.class,
-                () -> clientService.findById(nonExistentId));
+                () -> clientService.findClientById((nonExistentId)));
     }
 
     @Test
@@ -99,13 +109,12 @@ class ClientServiceTest {
 
         assertEquals(clientWithId5.getEmail(), updated.getEmail());
         assertEquals(clientWithId5.getUsername(), updated.getUsername());
-
         assertTrue(encoder.matches(clientWithId5.getPassword(), updated.getPassword()));
     }
 
     @Test
     void shouldNotUpdateClient() {
-        Client byId = clientService.findById(6L);
+        ClientDto byId = clientService.findById(6L);
         String existingEmail = byId.getEmail();
         var credentials = new UserCredentials(existingEmail, "somepassword");
         client.setCredentials(credentials);
@@ -117,8 +126,8 @@ class ClientServiceTest {
 
     @Test
     void shouldDeleteClient() {
-        Page<Client> page = clientService.findAll(PAGEABLE);
-        List<Client> clients = page.getContent();
+        Page<ClientDto> page = clientService.findAll(PAGEABLE);
+        List<ClientDto> clients = page.getContent();
 
         assertEquals(3, clients.size());
 
@@ -128,7 +137,7 @@ class ClientServiceTest {
         clients = page.getContent();
 
         assertEquals(2, clients.size());
-        assertFalse(clients.contains(clientWithId5));
+        assertFalse(clients.contains(client5Dto));
     }
 
     @Test
