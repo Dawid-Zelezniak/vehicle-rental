@@ -9,6 +9,7 @@ import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategy;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyFactory;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +97,7 @@ public class NewReservationService {
     }
 
     private Reservation buildAndSaveReservation(ReservationCreationRequest request) {
-        Client client = clientService.findById(request.getClientId());
+        Client client = clientService.findClientById(request.getClientId());
         Reservation reservation = reservationBuilder.build(client, request.getDuration());
         return reservationRepository.save(reservation);
     }

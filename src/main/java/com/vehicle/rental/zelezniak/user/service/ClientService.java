@@ -1,6 +1,7 @@
 package com.vehicle.rental.zelezniak.user.service;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
@@ -25,14 +26,21 @@ public class ClientService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public Page<Client> findAll(Pageable pageable) {
-        return clientRepository.findAll(pageable);
+    public Page<ClientDto> findAll(Pageable pageable) {
+        Page<Client> clients = clientRepository.findAll(pageable);
+        return clients.map(ClientMapper::toDto);
     }
 
     @Transactional(readOnly = true)
-    public Client findById(Long id) {
+    public ClientDto findById(Long id) {
         validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
-        log.debug("Searching for client with id: {}", id);
+        Client client = findClient(id);
+        return ClientMapper.toDto(client);
+    }
+
+    @Transactional(readOnly = true)
+    public Client findClientById(Long id) {
+        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
         return findClient(id);
     }
 
