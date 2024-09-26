@@ -1,6 +1,7 @@
 package com.vehicle.rental.zelezniak.user.controller;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,12 +18,12 @@ public class ClientController {
     private final ClientService clientService;
 
     @GetMapping
-    public Page<Client> findAll(Pageable pageable) {
+    public Page<ClientDto> findAll(Pageable pageable) {
         return clientService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public Client findById(@PathVariable Long id) {
+    public ClientDto findById(@PathVariable Long id) {
         return clientService.findById(id);
     }
 
