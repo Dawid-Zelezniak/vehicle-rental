@@ -1,6 +1,7 @@
 package com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -25,12 +26,14 @@ public class VehicleInformation {
     private final int seatsNumber;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "registration",
             column = @Column(name = "registration_number"))
     private final RegistrationNumber registrationNumber;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "year",
             column = @Column(name = "production_year"))
@@ -40,6 +43,7 @@ public class VehicleInformation {
     private final String description;
 
     @Embedded
+    @Valid
     private final Engine engine;
 
     @Enumerated(EnumType.STRING)

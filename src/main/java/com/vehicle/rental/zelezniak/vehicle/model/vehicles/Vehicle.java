@@ -6,6 +6,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.VehicleInformation;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,15 +38,18 @@ public abstract class Vehicle {
     private Long id;
 
     @Embedded
+    @Valid
     private VehicleInformation vehicleInformation;
 
     @NotNull(message = "Price per day" + CAN_NOT_BE_NULL)
+    @Valid
     @AttributeOverride(
             name = "value",
             column = @Column(name = "price_per_day"))
     private Money pricePerDay;
 
     @NotNull(message = "Deposit" + CAN_NOT_BE_NULL)
+    @Valid
     @AttributeOverride(
             name = "value",
             column = @Column(name = "deposit"))
@@ -96,6 +100,14 @@ public abstract class Vehicle {
                 '}';
     }
 
+    /**
+     * A vehicle marked as AVAILABLE is operational and listed in the rental offer,
+     * even if it is currently rented. This status indicates that the vehicle is
+     * generally ready for use when not in active rental or reservation.
+     * <p>
+     * A vehicle marked as UNAVAILABLE is not operational or requires maintenance,
+     * and thus is excluded from the rental offer until it is repaired and marked as AVAILABLE
+     */
     @RequiredArgsConstructor
     @Getter
     public enum Status {
