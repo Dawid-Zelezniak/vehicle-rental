@@ -10,7 +10,7 @@ import lombok.*;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class UserCredentials {
 
