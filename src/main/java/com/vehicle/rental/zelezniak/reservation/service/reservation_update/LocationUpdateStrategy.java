@@ -8,22 +8,21 @@ import lombok.extern.slf4j.Slf4j;
  * Updates the pickup and drop-off location information in the customer's reservation.
  */
 @Slf4j
-public class LocationUpdateStrategy implements ReservationUpdateStrategy<Reservation> {
+public class LocationUpdateStrategy implements ReservationUpdateStrategy<RentInformation> {
 
-    public Reservation update(Reservation existing, Reservation newData) {
+    public Reservation update(Reservation existing, RentInformation information) {
         log.info("Updating location for reservation with id : {}", existing.getId());
         return existing.toBuilder()
-                .rentInformation(updateLocation(existing, newData))
+                .rentInformation(updateLocation(existing, information))
                 .build();
     }
 
-    private RentInformation updateLocation(Reservation existing, Reservation newData) {
+    private RentInformation updateLocation(Reservation existing, RentInformation information) {
         RentInformation rentInformation = existing.getRentInformation();
-        RentInformation newRentInformation = newData.getRentInformation();
 
         return rentInformation.toBuilder()
-                .pickUpLocation(newRentInformation.getPickUpLocation())
-                .dropOffLocation(newRentInformation.getDropOffLocation())
+                .pickUpLocation(information.getPickUpLocation())
+                .dropOffLocation(information.getDropOffLocation())
                 .build();
     }
 }
