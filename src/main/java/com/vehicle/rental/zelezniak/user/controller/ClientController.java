@@ -3,6 +3,7 @@ package com.vehicle.rental.zelezniak.user.controller;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class ClientController {
     }
 
     @PutMapping("/update/{id}")
-    public Client update(@PathVariable Long id,  @RequestBody @Validated Client newData) {
+    public Client update(@PathVariable Long id,  @RequestBody @Valid Client newData) {
        return clientService.update(id, newData);
     }
 

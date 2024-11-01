@@ -4,6 +4,7 @@ import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.user.service.authentication.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -21,13 +22,13 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Client register(@RequestBody @Validated Client client){
+    public Client register(@RequestBody @Valid Client client){
     return authService.register(client);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest){
+    public LoginResponse login(@RequestBody @Valid LoginRequest loginRequest){
        return authService.login(loginRequest);
     }
 }
