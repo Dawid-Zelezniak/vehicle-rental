@@ -1,8 +1,11 @@
 package com.vehicle.rental.zelezniak.user.service.authentication;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.regex.Pattern;
 
+@Slf4j
 public class EmailPatternValidator {
 
     private static final String EMAIL_PATTERN =
@@ -15,6 +18,7 @@ public class EmailPatternValidator {
 
     public static void validate(String email) {
         if (doesNotMatch(email)) {
+            log.error("Invalid email pattern : {}",email);
             throwException(email);
         }
     }
@@ -26,7 +30,6 @@ public class EmailPatternValidator {
     }
 
     private static void throwException(String email) {
-        throw new IllegalArgumentException(
-                "Email " + email + " has invalid pattern.");
+        throw new IllegalArgumentException("Email " + email + " has invalid pattern.");
     }
 }
