@@ -30,7 +30,7 @@ class RegistrationService {
     @Transactional
     public Client registerUser(Client client) {
         String email = client.getEmail();
-        log.debug("Starting registration process for client: {}", email);
+        log.info("Starting registration process for client: {}", email);
         validateData(client);
         saveClient(client);
         log.info("Client: {} has been registered", email);
