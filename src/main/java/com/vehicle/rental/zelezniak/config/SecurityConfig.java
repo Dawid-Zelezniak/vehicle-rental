@@ -40,7 +40,8 @@ public class SecurityConfig {
             "/vehicles/add",
             "/vehicles/update/**",
             "/vehicles/delete/**",
-            "/reservations"
+            "/reservations",
+            "/reservations/vehicles/from_reservation/**"
     };
 
     private static final String[] USER_AND_ADMIN_ENDPOINTS = {
