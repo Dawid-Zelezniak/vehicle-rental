@@ -20,8 +20,7 @@ public class VehicleRentalApplication {
     }
 
     @Bean
-//    @Profile("!test")
-    public CommandLineRunner createAdmin(AdminInitializationService service, ClientRepository repository, JdbcTemplate jdbc) {
+    public CommandLineRunner commandLineRunner(AdminInitializationService service, ClientRepository repository, JdbcTemplate jdbc) {
         return arg -> {
             String[] queries = new String(Files.readAllBytes(Paths.get("src/main/resources/data.sql"))).split(";");
             for (String query : queries) {

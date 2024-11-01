@@ -1,5 +1,6 @@
 package com.vehicle.rental.zelezniak.common_value_objects;
 
+import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
