@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ class AvailableVehiclesRetrieverTest {
     private VehicleCreator vehicleCreator;
 
     @BeforeEach
-    void setupData() throws IOException {
+    void setupData() {
         vehicleMap = new HashMap<>();
         databaseSetup.setupAllTables();
         vehicleMap.put(5L, vehicleService.findById(5L));
@@ -76,8 +77,8 @@ class AvailableVehiclesRetrieverTest {
         vehicleService.update(6L, motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
-        List<Vehicle> availableVehicles = page.getContent();
+        Collection<Vehicle> vehicles = vehiclesRetriever.findVehiclesAvailableInPeriod(duration);
+        List<Vehicle> availableVehicles = (List<Vehicle>) vehicles;
 
         assertEquals(3, availableVehicles.size());
         assertFalse(availableVehicles.contains(vehicleMap.get(5L)));

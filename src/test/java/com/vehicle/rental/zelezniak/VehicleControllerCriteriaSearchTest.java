@@ -11,7 +11,6 @@ import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,8 +38,8 @@ class VehicleControllerCriteriaSearchTest {
     private static Vehicle vehicleWithId5;
     private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
-    private static final String USER = "USER";
-    private static final String ADMIN = "ADMIN";
+    private static final String ROLE_USER = "USER";
+    private static final String ROLE_ADMIN = "ADMIN";
 
     @Autowired
     private MockMvc mockMvc;
@@ -69,7 +68,7 @@ class VehicleControllerCriteriaSearchTest {
         int resultSize = 1;
         String value = vehicleWithId5.getVehicleInformation().getModel();
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
-                resultSize, vehicleWithId5, USER);
+                resultSize, vehicleWithId5, ROLE_USER);
     }
 
     @Test
@@ -80,7 +79,7 @@ class VehicleControllerCriteriaSearchTest {
         int resultSize = 1;
         String value = info.getBrand();
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
-                resultSize, vehicle7, USER);
+                resultSize, vehicle7, ROLE_USER);
     }
 
     @Test
@@ -92,7 +91,7 @@ class VehicleControllerCriteriaSearchTest {
         RegistrationNumber registrationNumber = vehicle8.getRegistrationNumber();
         String value = registrationNumber.getRegistration();
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
-                resultSize, vehicle8, ADMIN);
+                resultSize, vehicle8, ROLE_ADMIN);
     }
 
     @Test
@@ -113,16 +112,17 @@ class VehicleControllerCriteriaSearchTest {
         int resultSize = 2;
         String value = String.valueOf(info.getProductionYear().getYear());
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value)
-                , resultSize, vehicle8, USER);
+                , resultSize, vehicle8, ROLE_USER);
     }
 
     @Test
     void shouldNotFindVehiclesByNonExistentCriteria() throws Exception {
-        String userToken = tokenGenerator.generateToken(USER);
+        String userToken = tokenGenerator.generateToken(ROLE_USER);
         String criteria = "wheels number";
         String value = "4";
         var request = new CriteriaSearchRequest<>(criteria, value);
-        mockMvc.perform(post("/vehicles/criteria")
+
+        mockMvc.perform(post("/vehicles/criteria/search")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request))
                         .param("page", String.valueOf(PAGEABLE.getPageNumber()))
@@ -143,7 +143,7 @@ class VehicleControllerCriteriaSearchTest {
         int resultSize = 4;
         String value = "available";
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
-                resultSize, vehicleWithId5, USER);
+                resultSize, vehicleWithId5, ROLE_USER);
     }
 
     @Test
@@ -156,7 +156,7 @@ class VehicleControllerCriteriaSearchTest {
         int resultSize = 1;
         String value = "unavailable";
         performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
-                resultSize, vehicle8, USER);
+                resultSize, vehicle8, ROLE_USER);
     }
 
     private <T> void performCriteriaRequest(CriteriaSearchRequest<T> searchRequest,
@@ -171,7 +171,7 @@ class VehicleControllerCriteriaSearchTest {
                 .value().setScale(2, RoundingMode.HALF_UP).doubleValue();
         String status = result.getStatus().toString();
 
-        mockMvc.perform(post("/vehicles/criteria")
+        mockMvc.perform(post("/vehicles/criteria/search")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))
                         .param("page", String.valueOf(PAGEABLE.getPageNumber()))
@@ -198,8 +198,8 @@ class VehicleControllerCriteriaSearchTest {
     }
 
     private <T> void performCriteriaRegistrationNumber(CriteriaSearchRequest<T> searchRequest) throws Exception {
-        String userToken = tokenGenerator.generateToken(USER);
-        mockMvc.perform(post("/vehicles/criteria")
+        String userToken = tokenGenerator.generateToken(ROLE_USER);
+        mockMvc.perform(post("/vehicles/criteria/search")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))
                         .param("page", String.valueOf(PAGEABLE.getPageNumber()))

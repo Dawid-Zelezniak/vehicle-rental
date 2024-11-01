@@ -13,11 +13,9 @@ class ClientMapperTest {
 
     private static Client clientWithId5;
 
-    private ClientCreator clientCreator;
-
     @BeforeEach
     void setupDatabase() {
-        clientCreator = new ClientCreator();
+        ClientCreator clientCreator = new ClientCreator();
         clientWithId5 = clientCreator.createClientWithId5();
     }
 

@@ -142,8 +142,7 @@ class ReservationCostCalculatorTest {
     }
 
 
-    private void updateDurationRentWithId5(
-            RentDuration duration) {
+    private void updateDurationRentWithId5(RentDuration duration) {
         RentInformation rentInformation = reservationWithId5.getRentInformation();
         RentInformation updated = rentInformation.toBuilder()
                 .rentDuration(duration)

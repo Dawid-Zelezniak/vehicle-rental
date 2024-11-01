@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.NoSuchElementException;
 
 import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
+import static com.vehicle.rental.zelezniak.util.validation.InputValidator.VEHICLE_ID_NOT_NULL;
+import static com.vehicle.rental.zelezniak.util.validation.InputValidator.VEHICLE_NOT_NULL;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +35,20 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public Page<Vehicle> findAll(Pageable pageable) {
-        log.debug("Searching all vehicles");
+        log.debug("Searching for all vehicles");
         return vehicleRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     public Vehicle findById(Long id) {
-        validateNotNull(id, InputValidator.VEHICLE_ID_NOT_NULL);
+        log.info("Searching for vehicle with ID : {}", id);
+        validateNotNull(id, VEHICLE_ID_NOT_NULL);
         return findVehicle(id);
     }
 
     @Transactional
     public Vehicle addVehicle(Vehicle vehicle) {
-        validateNotNull(vehicle, InputValidator.VEHICLE_NOT_NULL);
+        validateNotNull(vehicle, VEHICLE_NOT_NULL);
         vehicleValidator.throwExceptionIfVehicleExist(vehicle.getRegistrationNumber());
         log.info("Saving vehicle to database");
         Vehicle saved = vehicleRepository.save(vehicle);
@@ -55,15 +58,15 @@ public class VehicleService {
 
     @Transactional
     public Vehicle update(Long id, Vehicle newData) {
-        validateNotNull(id, InputValidator.VEHICLE_ID_NOT_NULL);
-        validateNotNull(newData, InputValidator.VEHICLE_NOT_NULL);
+        validateNotNull(id, VEHICLE_ID_NOT_NULL);
+        validateNotNull(newData, VEHICLE_NOT_NULL);
         Vehicle vehicleFromDb = findVehicle(id);
         return validateAndUpdateVehicle(vehicleFromDb, newData);
     }
 
     @Transactional
     public void delete(Long id) {
-        validateNotNull(id, InputValidator.VEHICLE_ID_NOT_NULL);
+        validateNotNull(id, VEHICLE_ID_NOT_NULL);
         handleDeleteVehicle(id);
     }
 
@@ -89,8 +92,7 @@ public class VehicleService {
         return vehicleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Vehicle with id: {} not found.", id);
-                    return new NoSuchElementException(
-                            "Vehicle with id: " + id + " does not exist.");
+                    return new NoSuchElementException("Vehicle with id: " + id + " does not exist.");
                 });
     }
 

@@ -24,8 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
@@ -82,40 +81,28 @@ class NewReservationServiceTest {
     void shouldUpdateNewReservationLocation() {
         Reservation reservation = newReservationService.addNewReservation(creationRequest);
         RentInformation rentInformation = reservation.getRentInformation();
-        reservation.setRentInformation(rentInformation.toBuilder()
+        RentInformation updatedLocation = rentInformation.toBuilder()
                 .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
+                .build();
+        reservation.setRentInformation(updatedLocation);
         Reservation fromDb = findReservationById(reservation.getId());
 
-        Reservation updated = newReservationService.updateLocationForReservation(fromDb, reservation);
-
+        Reservation updated = newReservationService.updateLocationForReservation(fromDb, updatedLocation);
         assertEquals(reservation, updated);
-    }
-
-    @Test
-    void shouldUpdateLocation() {
-        setReservationStatusToNew(reservationWithId5);
-        Reservation fromDb = findReservationById(reservationWithId5.getId());
-        RentInformation information = reservationWithId5.getRentInformation();
-        reservationWithId5.setRentInformation(information.toBuilder()
-                .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
-
-        Reservation updated = newReservationService.updateLocationForReservation(fromDb, reservationWithId5);
-
-        assertEquals(reservationWithId5, updated);
     }
 
     @Test
     void shouldNotUpdateLocation() {
         Reservation newData = reservationWithId5;
         RentInformation information = newData.getRentInformation();
-        newData.setRentInformation(information.toBuilder()
+        RentInformation updatedLocation = information.toBuilder()
                 .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
+                .build();
+        newData.setRentInformation(updatedLocation);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> newReservationService.updateLocationForReservation(reservationWithId5, newData));
+        IllegalArgumentException assertion = assertThrows(IllegalArgumentException.class,
+                () -> newReservationService.updateLocationForReservation(reservationWithId5, updatedLocation));
+        assertEquals(assertion.getMessage(), "Can not update reservation with status: " + newData.getReservationStatus());
     }
 
     @Test
