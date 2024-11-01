@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.common_value_objects.address;
+package com.vehicle.rental.zelezniak.common_value_objects.location;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
