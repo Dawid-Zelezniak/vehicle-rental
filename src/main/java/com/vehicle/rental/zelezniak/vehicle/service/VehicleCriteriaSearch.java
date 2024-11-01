@@ -19,36 +19,16 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class VehicleCriteriaSearch {
 
+    // add dynamic queries
+
     private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final CriteriaSearchStrategyFactory searchStrategyFactory;
 
     public <T> Page<Vehicle> findVehiclesByCriteria(CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
         CriteriaType criteria = CriteriaType.getCriteriaFromString(searchRequest.getCriteriaName());
-        checkIfUserCanUseSuchCriteria(criteria);
+        UserAccessValidator.checkIfUserCanSearchBySuchCriteria(criteria);
         VehicleSearchStrategy strategy = searchStrategyFactory.getStrategy(criteria);
         return strategy.findByCriteria(searchRequest.getValue(), pageable);
-    }
-
-    private void checkIfUserCanUseSuchCriteria(CriteriaType criteria) {
-        if (criteria == CriteriaType.REGISTRATION_NUMBER) {
-            validateUserHasAdminRole();
-        }
-    }
-
-    private void validateUserHasAdminRole() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Authentication authentication = context.getAuthentication();
-        boolean hasRoleAdmin = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals(ROLE_ADMIN));
-        if (!hasRoleAdmin) {
-            log.error("User with role CLIENT tried to search vehicles by registration number.");
-            throwCriteriaAccessException();
-        }
-    }
-
-    private void throwCriteriaAccessException() {
-        throw new CriteriaAccessException(
-                "Access denied: Only admins can search by registration number");
     }
 
     @Getter
@@ -72,5 +52,29 @@ public class VehicleCriteriaSearch {
         }
 
         private final String value;
+    }
+
+    private static class UserAccessValidator {
+
+        private static void checkIfUserCanSearchBySuchCriteria(CriteriaType criteria) {
+            if (criteria == CriteriaType.REGISTRATION_NUMBER) {
+                validateUserHasAdminRole();
+            }
+        }
+
+        private static void validateUserHasAdminRole() {
+            SecurityContext context = SecurityContextHolder.getContext();
+            Authentication authentication = context.getAuthentication();
+            boolean hasRoleAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(authority -> authority.getAuthority().equals(ROLE_ADMIN));
+            if (!hasRoleAdmin) {
+                log.error("User with role CLIENT tried to search vehicles by registration number.");
+                throwException();
+            }
+        }
+
+        private static void throwException() {
+            throw new CriteriaAccessException("Access denied: Only admins can search by registration number");
+        }
     }
 }
