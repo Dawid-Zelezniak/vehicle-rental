@@ -1,7 +1,5 @@
-package com.vehicle.rental.zelezniak.common_value_objects;
+package com.vehicle.rental.zelezniak.common_value_objects.location;
 
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
