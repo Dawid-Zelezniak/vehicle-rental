@@ -148,6 +148,7 @@ public class VehicleCreator {
                 .description("Tuned Seat Leon")
                 .engine(engine)
                 .gearType(VehicleInformation.GearType.MANUAL)
+                .seatsNumber(5)
                 .build();
     }
 
