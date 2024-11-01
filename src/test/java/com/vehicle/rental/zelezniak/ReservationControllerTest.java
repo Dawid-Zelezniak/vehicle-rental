@@ -1,7 +1,7 @@
 package com.vehicle.rental.zelezniak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vehicle.rental.zelezniak.common_value_objects.Location;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
@@ -32,9 +32,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -81,6 +80,12 @@ class ReservationControllerTest {
         creationRequest = new ReservationCreationRequest(5L, durationCreator.createDuration2());
         databaseSetup.setupAllTables();
         reservationWithId5 = reservationCreator.createReservationWithId5();
+        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
+    }
+
+    @AfterEach
+    void cleanup() {
+        vehicleWithId6 = null;
     }
 
     @Test
@@ -127,6 +132,33 @@ class ReservationControllerTest {
     }
 
     @Test
+    void shouldFindVehiclesByReservationId() throws Exception {
+        String token = tokenGenerator.generateToken(ROLE_ADMIN);
+        Long reservationId = 6L;
+        Long vehicle7Id = 7L;
+
+        mockMvc.perform(get("/reservations/vehicles/from_reservation/{id}", reservationId)
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(vehicleWithId6.getId()))
+                .andExpect(jsonPath("$.content[1].id").value(vehicle7Id));
+    }
+
+    @Test
+    void shouldReturnEmptyPageOfVehiclesWhenReservationDoesNotExist() throws Exception {
+        String token = tokenGenerator.generateToken(ROLE_ADMIN);
+        Long reservationId = 90L;
+
+        mockMvc.perform(get("/reservations/vehicles/from_reservation/{id}", reservationId)
+                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.content", hasSize(0)));
+    }
+
+    @Test
     void shouldAddNewReservationForClient() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
         Reservation newReservation = reservationCreator.buildNewReservation();
@@ -150,6 +182,25 @@ class ReservationControllerTest {
         assertEquals(6, reservations.size());
     }
 
+    @SuppressWarnings("UnreachableCode")
+    @Test
+    void shouldNotAddReservationWhenRequestIsInvalid() throws Exception {
+        String token = tokenGenerator.generateToken(ROLE_USER);
+        Long invalidId = 0L;
+        ReservationCreationRequest request = new ReservationCreationRequest(invalidId, durationCreator.createDuration2());
+
+        mockMvc.perform(post("/reservations/create")
+                        .content(mapper.writeValueAsString(request))
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("Client id can not be lower than 1")));
+    }
+
+    /**
+     * Create new reservation , then update location
+     */
     @Test
     void shouldUpdateNewReservationLocation() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
@@ -161,7 +212,7 @@ class ReservationControllerTest {
         Location pickUpLocation = information.getPickUpLocation();
 
         mockMvc.perform(put("/reservations/update/location/{id}", id)
-                        .content(mapper.writeValueAsString(reservation))
+                        .content(mapper.writeValueAsString(information))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(jsonPath("$.reservationStatus").value(reservation.getReservationStatus().toString()))
@@ -174,34 +225,41 @@ class ReservationControllerTest {
     }
 
     @Test
-    void shouldUpdateLocation() throws Exception {
+    void shouldNotUpdateNewReservationLocationWhen() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
-        setReservationStatusToNew(reservationWithId5);
-        Long id = reservationWithId5.getId();
-        updateLocation(reservationWithId5);
+        Reservation reservation = reservationService.addReservation(creationRequest);
+        updateLocation(reservation);
+        Long id = reservation.getId();
+        RentInformation information = reservation.getRentInformation();
+        RentDuration rentDuration = information.getRentDuration();
+        Location pickUpLocation = information.getPickUpLocation();
 
-        ResultActions actions = mockMvc.perform(put("/reservations/update/location/{id}", id)
-                .content(mapper.writeValueAsString(reservationWithId5))
-                .contentType(APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token));
-        performReservationExpectations(actions, reservationWithId5);
+        mockMvc.perform(put("/reservations/update/location/{id}", id)
+                        .content(mapper.writeValueAsString(information))
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.reservationStatus").value(reservation.getReservationStatus().toString()))
+                .andExpect(jsonPath("$.rentInformation.rentDuration.rentalStart").value(rentDuration.getRentalStart().format(formatter)))
+                .andExpect(jsonPath("$.rentInformation.rentDuration.rentalEnd").value(rentDuration.getRentalEnd().format(formatter)))
+                .andExpect(jsonPath("$.rentInformation.pickUpLocation.city.cityName").value(pickUpLocation.getCity().cityName()))
+                .andExpect(jsonPath("$.rentInformation.pickUpLocation.street.streetName").value(pickUpLocation.getStreet().streetName()));
 
-        assertEquals(reservationWithId5, findReservationById(id));
+        assertEquals(reservation, findReservationById(id));
     }
 
     @Test
-    void shouldNotUpdateLocation() throws Exception {
+    void shouldNotUpdateLocationWhenStatusIsInvalid() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);
         Reservation newData = reservationWithId5;
         updateLocation(newData);
 
         mockMvc.perform(put("/reservations/update/location/{id}", reservationWithId5.getId())
-                        .content(mapper.writeValueAsString(newData))
+                        .content(mapper.writeValueAsString(newData.getRentInformation()))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not update reservation with status: "
-                        + reservationWithId5.getReservationStatus()));
+                        + newData.getReservationStatus()));
     }
 
     @Test

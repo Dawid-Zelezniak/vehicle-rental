@@ -6,6 +6,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,9 +32,14 @@ public class ReservationController {
         return service.findById(id);
     }
 
-    @GetMapping("/client/{id}")
-    public Page<Reservation> findAllByClientId(@PathVariable Long id, Pageable pageable) {
-        return service.findAllByClientId(id, pageable);
+    @GetMapping("/client/{clientId}")
+    public Page<Reservation> findAllByClientId(@PathVariable Long clientId, Pageable pageable) {
+        return service.findAllByClientId(clientId, pageable);
+    }
+
+    @GetMapping("/vehicles/from_reservation/{id}")
+    public Page<Vehicle> findVehiclesByReservation(@PathVariable Long id, Pageable pageable) {
+        return service.findVehiclesByReservationId(id, pageable);
     }
 
     @PostMapping("/create")

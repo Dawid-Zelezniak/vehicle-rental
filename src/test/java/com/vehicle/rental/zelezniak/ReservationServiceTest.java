@@ -12,6 +12,9 @@ import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -22,6 +25,8 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,6 +82,25 @@ class ReservationServiceTest {
     }
 
     @Test
+    void shouldFindVehiclesByReservationId() {
+        Long reservationId = 6L;
+
+        Page<Vehicle> page = reservationService.findVehiclesByReservationId(reservationId, PAGEABLE);
+        List<Vehicle> vehicles = page.getContent();
+
+        assertEquals(2, vehicles.size());
+    }
+
+    @Test
+    void shouldReturnEmptyPageOfVehiclesWhenReservationDoesNotExist() {
+        Long reservationId = 90L;
+
+        Page<Vehicle> page = reservationService.findVehiclesByReservationId(reservationId, PAGEABLE);
+
+        assertTrue(page.isEmpty());
+    }
+
+    @Test
     void shouldAddNewReservationForClient() {
         Long client5Id = 5L;
 
@@ -96,41 +120,30 @@ class ReservationServiceTest {
     void shouldUpdateNewReservationLocation() {
         Reservation reservation = reservationService.addReservation(creationRequest);
         RentInformation information = reservation.getRentInformation();
-        reservation.setRentInformation(information.toBuilder()
+        RentInformation updatedLocation = information.toBuilder()
                 .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
+                .build();
+        reservation.setRentInformation(updatedLocation);
         Long id = reservation.getId();
 
-        Reservation updated = reservationService.updateLocation(id, reservation);
+        Reservation updated = reservationService.updateLocation(id, updatedLocation);
 
         assertEquals(reservation, updated);
-    }
-
-    @Test
-    void shouldUpdateLocation() {
-        setReservationStatusToNew(reservationWithId5);
-        Long reservation5Id = reservationWithId5.getId();
-        RentInformation information = reservationWithId5.getRentInformation();
-        reservationWithId5.setRentInformation(information.toBuilder()
-                .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
-
-        Reservation updated = reservationService.updateLocation(reservation5Id, reservationWithId5);
-
-        assertEquals(reservationWithId5, updated);
     }
 
     @Test
     void shouldNotUpdateLocation() {
         Reservation newData = reservationWithId5;
         RentInformation information = newData.getRentInformation();
-        newData.setRentInformation(information.toBuilder()
+        RentInformation updatedLocation = information.toBuilder()
                 .pickUpLocation(locationCreator.buildTestLocation())
-                .build());
+                .build();
+        newData.setRentInformation(updatedLocation);
         Long reservation5Id = reservationWithId5.getId();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.updateLocation(reservation5Id, newData));
+        IllegalArgumentException assertion = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.updateLocation(reservation5Id, updatedLocation));
+        assertEquals(assertion.getMessage(), "Can not update reservation with status: " + newData.getReservationStatus());
     }
 
     @Test
@@ -250,8 +263,7 @@ class ReservationServiceTest {
     @Test
     void shouldNotCalculateTotalCost() {
         Long id = reservationWithId5.getId();
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.calculateCost(id));
+        assertThrows(IllegalArgumentException.class, () -> reservationService.calculateCost(id));
     }
 
     private void setReservationStatusToNew(Reservation reservation) {
