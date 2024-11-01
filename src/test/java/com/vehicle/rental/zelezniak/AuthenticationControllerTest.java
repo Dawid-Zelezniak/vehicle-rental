@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Country;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
+import com.vehicle.rental.zelezniak.common_value_objects.location.City;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.user.model.client.Address;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
@@ -12,7 +12,6 @@ import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserNam
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.service.authentication.AuthenticationService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,6 +84,48 @@ class AuthenticationControllerTest {
     }
 
     @Test
+    void shouldNotRegisterUserWhenNameIsInvalid() throws Exception {
+        client.setName(new UserName("Ab", "L"));
+        mockMvc.perform(post("/auth/register")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(client)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors", hasSize(2)))
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("First name must contains at least 3 characters",
+                                "Last name must contains at least 2 characters"
+                        )));
+    }
+
+    @Test
+    void shouldNotRegisterUserWhenCredentialsInvalid() throws Exception {
+        client.setCredentials(new UserCredentials(client.getEmail(), "a"));
+        mockMvc.perform(post("/auth/register")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(client)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("Password must contains at least 5 characters."
+                        )));
+    }
+
+    @Test
+    void shouldNotRegisterUserWhenAddressInvalid() throws Exception {
+        Address address = client.getAddress();
+        address.setStreet(new Street(""));
+        address.setCountry(new Country(""));
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(client)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("Street name can not be blank.",
+                                "Country name can not be blank."
+                        )));
+    }
+
+    @Test
     void shouldLoginUser() throws Exception {
         authService.register(client);
         String email = client.getEmail();
@@ -107,6 +150,19 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.client.address.postalCode").value(address.getPostalCode()))
                 .andExpect(jsonPath("$.client.address.country.countryName").value(address.getCountry().countryName()))
                 .andExpect(jsonPath("$.jwt").isNotEmpty());
+    }
+
+    @Test
+    void shouldNotLoginUserWhenRequestIsInvalid() throws Exception {
+        LoginRequest loginRequest = new LoginRequest(null, null);
+
+        mockMvc.perform(post("/auth/login")
+                        .contentType(APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("Email can not be null.",
+                                "Password can not be null.")));
     }
 
     @Test

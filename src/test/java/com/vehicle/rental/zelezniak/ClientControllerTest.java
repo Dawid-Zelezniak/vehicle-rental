@@ -1,23 +1,16 @@
 package com.vehicle.rental.zelezniak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Country;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
 import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.TokenGenerator;
-import com.vehicle.rental.zelezniak.user.model.client.Address;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
-import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -246,7 +238,7 @@ class ClientControllerTest {
                 .andExpect(jsonPath("$.message").value(
                         "Client with email: " + email + " does not exist."));
     }
-
+ 
     @Test
     void shouldNotFindClientByEmailForRoleUser() throws Exception {
         String token = tokenGenerator.generateToken(ROLE_USER);

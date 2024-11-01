@@ -7,6 +7,7 @@ import com.vehicle.rental.zelezniak.config.TokenGenerator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Engine;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.VehicleInformation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Year;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
@@ -30,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -162,6 +164,28 @@ class VehicleControllerTest {
 
         assertEquals(6, vehicleRepository.count());
         assertTrue(vehicleRepository.existsByVehicleInformationRegistrationNumber(testCar.getRegistrationNumber()));
+    }
+
+    @Test
+    void shouldNotAddVehicleWhenDataInvalid() throws Exception {
+        Vehicle testCar = vehicleCreator.createTestCar();
+        VehicleInformation vehicleInformation = testCar.getVehicleInformation();
+        VehicleInformation invalid = vehicleInformation.toBuilder()
+                .brand("")
+                .model("")
+                .seatsNumber(0)
+                .build();
+        testCar.setVehicleInformation(invalid);
+
+        mockMvc.perform(post("/vehicles/add")
+                        .content(objectMapper.writeValueAsString(testCar))
+                        .contentType(APPLICATION_JSON)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldValidationErrors").value(
+                        containsInAnyOrder("Brand can not be blank.",
+                                "Model can not be blank.",
+                                "Seats number can not be lower than 1")));
     }
 
     @Test
