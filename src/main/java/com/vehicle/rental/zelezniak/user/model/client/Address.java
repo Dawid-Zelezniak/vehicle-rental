@@ -1,15 +1,17 @@
 package com.vehicle.rental.zelezniak.user.model.client;
 
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Country;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
+import com.vehicle.rental.zelezniak.common_value_objects.location.City;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 @Entity
 @Builder
 @Table(name = "addresses")
 @Getter
+@Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -21,6 +23,7 @@ public class Address {
     private Long id;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "streetName",
             column = @Column(name = "street"))
@@ -33,6 +36,7 @@ public class Address {
     private String flatNumber;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "cityName",
             column = @Column(name = "city"))
@@ -42,6 +46,7 @@ public class Address {
     private String postalCode;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "countryName",
             column = @Column(name = "country"))

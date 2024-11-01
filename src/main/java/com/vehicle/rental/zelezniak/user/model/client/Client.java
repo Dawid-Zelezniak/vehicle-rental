@@ -5,6 +5,7 @@ import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNu
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,13 +32,16 @@ public class Client implements UserDetails {
     private Long id;
 
     @Embedded
+    @Valid
     private UserName name;
 
     @Embedded
+    @Valid
     private UserCredentials credentials;
 
     @Embedded
     @AttributeOverride(name = "number", column = @Column(name = "phone_number"))
+    @Valid
     private PhoneNumber phoneNumber;
 
     @CreationTimestamp
@@ -46,6 +50,7 @@ public class Client implements UserDetails {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
+    @Valid
     private Address address;
 
     @ManyToMany(fetch = FetchType.EAGER,
