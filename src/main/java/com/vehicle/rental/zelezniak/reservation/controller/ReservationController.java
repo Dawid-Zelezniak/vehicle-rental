@@ -2,9 +2,11 @@ package com.vehicle.rental.zelezniak.reservation.controller;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
+import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,13 +38,13 @@ public class ReservationController {
 
     @PostMapping("/create")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Reservation add(@RequestBody @Validated ReservationCreationRequest request) {
+    public Reservation add(@RequestBody @Valid ReservationCreationRequest request) {
         return service.addReservation(request);
     }
 
     @PutMapping("/update/location/{id}")
-    public Reservation updateLocation(@PathVariable Long id, @RequestBody @Validated Reservation newData) {
-        return service.updateLocation(id, newData);
+    public Reservation updateLocation(@PathVariable Long id, @RequestBody @Validated RentInformation updatedLocation) {
+        return service.updateLocation(id, updatedLocation);
     }
 
     @PutMapping("/update/duration/{id}")
