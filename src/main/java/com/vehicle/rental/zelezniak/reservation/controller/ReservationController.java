@@ -49,12 +49,12 @@ public class ReservationController {
     }
 
     @PutMapping("/update/location/{id}")
-    public Reservation updateLocation(@PathVariable Long id, @RequestBody @Validated RentInformation updatedLocation) {
+    public Reservation updateLocation(@PathVariable Long id, @RequestBody @Valid RentInformation updatedLocation) {
         return service.updateLocation(id, updatedLocation);
     }
 
     @PutMapping("/update/duration/{id}")
-    public Reservation updateDuration(@PathVariable Long id, @RequestBody @Validated RentDuration duration) {
+    public Reservation updateDuration(@PathVariable Long id, @RequestBody @Valid RentDuration duration) {
         return service.updateDuration(id, duration);
     }
 
