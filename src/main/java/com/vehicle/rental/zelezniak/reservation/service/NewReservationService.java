@@ -2,6 +2,7 @@ package com.vehicle.rental.zelezniak.reservation.service;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
+import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.model.util.NewReservationBuilder;
 import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
@@ -9,10 +10,10 @@ import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategy;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyFactory;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ import java.util.HashSet;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NewReservationService {
 
     private final ClientService clientService;
@@ -40,10 +42,10 @@ public class NewReservationService {
     }
 
     @Transactional
-    public Reservation updateLocationForReservation(Reservation existing, Reservation newData) {
-        checkIfStatusIsEqualNEW(existing, "Can not update reservation with status: "
-                + existing.getReservationStatus());
-        ReservationUpdateStrategy<Reservation> strategy = (ReservationUpdateStrategy<Reservation>)
+    public Reservation updateLocationForReservation(Reservation existing, RentInformation newData) {
+        log.debug("Updating location for reservation with ID : {}", existing.getId());
+        checkIfStatusIsEqualNEW(existing, "Can not update reservation with status: " + existing.getReservationStatus());
+        ReservationUpdateStrategy<RentInformation> strategy = (ReservationUpdateStrategy<RentInformation>)
                 strategyFactory.getStrategy(newData.getClass());
         Reservation updated = strategy.update(existing, newData);
         return reservationRepository.save(updated);
@@ -54,33 +56,33 @@ public class NewReservationService {
      */
     @Transactional
     public Reservation updateDurationForReservation(Reservation existing, RentDuration duration) {
+        log.debug("Updating duration for reservation with ID : {}", existing.getId());
         checkIfStatusIsEqualNEW(existing, "Can not update duration for reservation with status: "
                 + existing.getReservationStatus());
         ReservationUpdateStrategy<RentDuration> strategy = (ReservationUpdateStrategy<RentDuration>)
                 strategyFactory.getStrategy(duration.getClass());
         Reservation updated = strategy.update(existing, duration);
-        updated.setVehicles(null);
-        return reservationRepository.save(updated);
+        return removeVehiclesAndSave(updated);
     }
 
     @Transactional
-    public void deleteReservation(Reservation reservation) {
-        checkIfStatusIsEqualNEW(reservation, "Can not remove reservation with status: "
-                + reservation.getReservationStatus());
-        handleRemove(reservation);
+    public void deleteReservation(Reservation r) {
+        checkIfStatusIsEqualNEW(r, "Can not remove reservation with status: " + r.getReservationStatus());
+        handleRemove(r);
     }
 
     @Transactional
-    public void addVehicleToReservation(Reservation reservation, Long vehicleId) {
-        checkIfStatusIsEqualNEW(reservation, "Can not add vehicle to reservation with status: " +
-                reservation.getReservationStatus());
-        reservationRepository.addVehicleToReservation(vehicleId, reservation.getId());
+    public void addVehicleToReservation(Reservation r, Long vehicleId) {
+        checkIfStatusIsEqualNEW(r, "Can not add vehicle to reservation with status: " + r.getReservationStatus());
+        log.warn("Adding vehicle with ID : {} to reservation with ID : {}", vehicleId, r.getId());
+        //add check if vehicle is still available
+        reservationRepository.addVehicleToReservation(vehicleId, r.getId());
     }
 
     @Transactional
     public void deleteVehicleFromReservation(Reservation r, Long vehicleId) {
-        checkIfStatusIsEqualNEW(r, "Can not remove vehicle from reservation with status: "
-                + r.getReservationStatus());
+        checkIfStatusIsEqualNEW(r, "Can not remove vehicle from reservation with status: " + r.getReservationStatus());
+        log.warn("Deleting vehicle with ID : {} from reservation with ID : {}", vehicleId, r.getId());
         reservationRepository.deleteVehicleFromReservation(r.getId(), vehicleId);
     }
 
@@ -88,29 +90,39 @@ public class NewReservationService {
      * Calculates the total cost and deposit amount for a reservation.
      */
     @Transactional
-    public Money calculateCost(Reservation reservation) {
-        checkIfStatusIsEqualNEW(reservation, "When calculating the total cost, the reservation status should be NEW");
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservation.getId());
-        Reservation updated = calculator.calculateAndApplyCosts(reservation, new HashSet<>(vehicles));
+    public Money calculateCost(Reservation r) {
+        checkIfStatusIsEqualNEW(r, "When calculating the total cost, the reservation status should be NEW");
+        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(r.getId());
+        log.info("Calculating cost for reservation with ID : {}", r.getId());
+        Reservation updated = calculator.calculateAndApplyCosts(r, new HashSet<>(vehicles));
         reservationRepository.save(updated);
+        log.info("Reservation with calculated cost has been saved.");
         return updated.getTotalCost();
     }
 
     private Reservation buildAndSaveReservation(ReservationCreationRequest request) {
-        Client client = clientService.findClientById(request.getClientId());
-        Reservation reservation = reservationBuilder.build(client, request.getDuration());
-        return reservationRepository.save(reservation);
+        Client client = clientService.findClientById(request.clientId());
+        Reservation reservation = reservationBuilder.build(client, request.duration());
+        Reservation saved = reservationRepository.save(reservation);
+        log.info("New reservation with ID : {} has been saved", saved.getId());
+        return saved;
     }
 
-    private void checkIfStatusIsEqualNEW(Reservation reservation, String message) {
-        if (reservation.getReservationStatus() != Reservation.ReservationStatus.NEW) {
+    private void checkIfStatusIsEqualNEW(Reservation r, String message) {
+        if (r.getReservationStatus() != Reservation.ReservationStatus.NEW) {
             throw new IllegalArgumentException(message);
         }
     }
 
-    private void handleRemove(Reservation reservation) {
-        reservation.setClient(null);
-        reservation.setVehicles(null);
-        reservationRepository.deleteById(reservation.getId());
+    private Reservation removeVehiclesAndSave(Reservation r) {
+        r.setVehicles(null);
+        return reservationRepository.save(r);
+    }
+
+    private void handleRemove(Reservation r) {
+        log.warn("Deleting reservation with ID : {}", r.getId());
+        r.setClient(null);
+        r.setVehicles(null);
+        reservationRepository.deleteById(r.getId());
     }
 }
