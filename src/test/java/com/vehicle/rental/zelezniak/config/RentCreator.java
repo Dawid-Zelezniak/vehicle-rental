@@ -1,11 +1,11 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.common_value_objects.Location;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
+import com.vehicle.rental.zelezniak.common_value_objects.location.City;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.rent.model.Rent;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;

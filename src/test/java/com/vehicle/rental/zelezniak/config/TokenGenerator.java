@@ -21,7 +21,6 @@ public class TokenGenerator {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority(role));
         UserDetails userDetails = new User(role.toLowerCase(), "password", authorities);
-        return jwtGenerator.generateJWT(new UsernamePasswordAuthenticationToken(
-                userDetails, null, authorities));
+        return jwtGenerator.generateJWT(new UsernamePasswordAuthenticationToken(userDetails, null, authorities));
     }
 }

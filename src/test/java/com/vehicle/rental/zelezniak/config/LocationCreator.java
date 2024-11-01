@@ -1,8 +1,8 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.common_value_objects.Location;
-import com.vehicle.rental.zelezniak.common_value_objects.address.City;
-import com.vehicle.rental.zelezniak.common_value_objects.address.Street;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
+import com.vehicle.rental.zelezniak.common_value_objects.location.City;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import org.springframework.stereotype.Component;
 
 @Component
