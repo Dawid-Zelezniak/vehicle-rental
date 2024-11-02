@@ -21,7 +21,6 @@ public class VehicleCriteriaSearch {
 
     // add dynamic queries
 
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
     private final CriteriaSearchStrategyFactory searchStrategyFactory;
 
     public <T> Page<Vehicle> findVehiclesByCriteria(CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
@@ -55,6 +54,8 @@ public class VehicleCriteriaSearch {
     }
 
     private static class UserAccessValidator {
+
+        private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
         private static void checkIfUserCanSearchBySuchCriteria(CriteriaType criteria) {
             if (criteria == CriteriaType.REGISTRATION_NUMBER) {
