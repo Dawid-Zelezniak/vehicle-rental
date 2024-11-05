@@ -24,7 +24,7 @@ public class ClientCreator {
         Address address = buildAddress();
         client.setAddress(address);
         client.setRoles(Set.of(buildRoleUser()));
-        client.setPhoneNumber(new PhoneNumber("+48111222333"));
+        client.setPhoneNumber(new PhoneNumber("+48 111222333"));
         return client;
     }
 

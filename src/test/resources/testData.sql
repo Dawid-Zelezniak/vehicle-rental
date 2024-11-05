@@ -12,9 +12,9 @@ insert into addresses (address_id, city, country, flat_number, house_number, pos
 
 -- Add clients
 insert into clients (client_id, first_name, last_name, email, password, address_id, phone_number) values
-(5, 'UserFive', 'Five', 'userfive@gmail.com', 'somepass', 5, '+48111222333'),
-(6, 'UserSix', 'Six', 'usersix@gmail.com', 'somepass', 6, '+48222333444'),
-(7, 'UserSeven', 'Seven', 'userseven@gmail.com', 'somepass', 7, '+48333444555');
+(5, 'UserFive', 'Five', 'userfive@gmail.com', 'somepass', 5, '+48 111222333'),
+(6, 'UserSix', 'Six', 'usersix@gmail.com', 'somepass', 6, '+48 222333444'),
+(7, 'UserSeven', 'Seven', 'userseven@gmail.com', 'somepass', 7, '+48 333444555');
 
 -- Add roles for clients
 insert into clients_roles (client_id, role_id) values

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode
 public class PhoneNumber {
 
-    private static final String E164_REGEX = "^\\+(?:[0-9] ?){6,14}[0-9]$";
+    private static final String E164_REGEX = "^\\+\\d{1,3}\\s\\d{7,15}$";
     private String number;
 
     public PhoneNumber(String number) {
