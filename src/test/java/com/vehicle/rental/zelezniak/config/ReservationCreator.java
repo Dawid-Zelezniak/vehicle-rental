@@ -24,22 +24,22 @@ public class ReservationCreator {
     @Autowired
     private VehicleCreator vehicleCreator;
 
-    public Reservation createReservationWithId5() {
+    public Reservation createReservationWithId2() {
         return Reservation.builder()
-                .id(5L)
+                .id(2L)
                 .reservationStatus(Reservation.ReservationStatus.COMPLETED)
                 .totalCost(new Money(BigDecimal.valueOf(1200.00)))
                 .depositAmount(new Money(BigDecimal.valueOf(1000.00)))
                 .rentInformation(buildRentInformation())
-                .vehicles(addVehicleWithId5())
-                .client(clientCreator.createClientWithId5())
+                .vehicles(addVehicleWithId1())
+                .client(clientCreator.createClientWithId2())
                 .build();
     }
 
     public Reservation buildNewReservation() {
         return Reservation.builder()
                 .reservationStatus(Reservation.ReservationStatus.NEW)
-                .client(clientCreator.createClientWithId5())
+                .client(clientCreator.createClientWithId2())
                 .rentInformation(buildNewRentInfo())
                 .build();
     }
@@ -63,9 +63,9 @@ public class ReservationCreator {
                 .build();
     }
 
-    private Set<Vehicle> addVehicleWithId5() {
+    private Set<Vehicle> addVehicleWithId1() {
         Set<Vehicle> vehicles = new HashSet<>();
-        vehicles.add(vehicleCreator.createCarWithId5());
+        vehicles.add(vehicleCreator.createCarWithId1());
         return vehicles;
     }
 

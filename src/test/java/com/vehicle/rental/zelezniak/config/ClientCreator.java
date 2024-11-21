@@ -9,35 +9,52 @@ import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
+import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Set;
+
+import static com.vehicle.rental.zelezniak.constants.Roles.USER;
 
 @Component
 public class ClientCreator {
 
-    public Client createClientWithId5() {
+    public static Client createTestClient() {
         Client client = new Client();
-        client.setId(5L);
-        client.setName(new UserName("UserFive", "Five"));
-        client.setCredentials(new UserCredentials("userfive@gmail.com", "somepass"));
-        Address address = buildAddress();
+        client.setName(new UserName("Uncle", "Bob"));
+        client.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
+        client.setCreatedAt(TimeFormatter.getFormattedActualDateTime());
+        Address address = new Address(null, new Street("teststreet"),
+                "5", "150", new City("Warsaw"),
+                "00-001", new Country("Poland"));
         client.setAddress(address);
-        client.setRoles(Set.of(buildRoleUser()));
+        return client;
+    }
+
+    public Client createClientWithId2() {
+        Client client = new Client();
+        client.setId(2L);
+        client.setName(new UserName("UserTwo", "Two"));
+        client.setCredentials(new UserCredentials("usertwo@gmail.com", "$2a$10$53viTAvUEN.0LdWJ9Hwbq.uyqFWiyhSVkMa//Blhi9Zk12SqePz5a"));
+        Address address = buildAddress();
+        client.setCreatedAt(LocalDateTime.of(2024, 1, 2, 13, 0, 0));
+        client.setAddress(address);
+        client.setRoles(Set.of(createRoleUser()));
         client.setPhoneNumber(new PhoneNumber("+48 111222333"));
         return client;
     }
 
-    private Role buildRoleUser() {
+    private Role createRoleUser() {
         Role role = new Role();
         role.setId(1);
-        role.setRoleName("USER");
+        role.setRoleName(USER);
         return role;
     }
 
-    private Address buildAddress(){
+    private Address buildAddress() {
         return Address.builder()
-                .id(5L)
+                .id(2L)
                 .street(new Street("teststreet"))
                 .houseNumber("5")
                 .flatNumber("150")

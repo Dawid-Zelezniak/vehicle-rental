@@ -17,11 +17,11 @@ import java.util.Set;
 @Component
 public class VehicleCreator {
 
-    public Vehicle createCarWithId5() {
+    public Vehicle createCarWithId1() {
         Engine engine = buildCarEngine();
         var information = buildCarInformation(engine);
         return Car.builder()
-                .id(5L)
+                .id(1L)
                 .vehicleInformation(information)
                 .bodyType(Car.BodyType.HATCHBACK)
                 .status(Vehicle.Status.AVAILABLE)
@@ -32,11 +32,11 @@ public class VehicleCreator {
                 .build();
     }
 
-    public Vehicle createMotorcycleWithId6() {
+    public Vehicle createMotorcycleWithId2() {
         Engine engine = buildMotorcycleEngine();
         var information = buildMotorcycleInformation(engine);
         return Motorcycle.builder()
-                .id(6L)
+                .id(2L)
                 .vehicleInformation(information)
                 .motorcycleType(Motorcycle.MotorcycleType.SPORT)
                 .status(Vehicle.Status.AVAILABLE)
@@ -45,11 +45,11 @@ public class VehicleCreator {
                 .build();
     }
 
-    public Vehicle buildVehicle5WithDifferentData() {
+    public Vehicle buildVehicle1WithDifferentData() {
         Engine engine = updateEngine();
         VehicleInformation information = updateInformation(engine);
         return Car.builder()
-                .id(5L)
+                .id(1L)
                 .vehicleInformation(information)
                 .bodyType(Car.BodyType.HATCHBACK)
                 .status(Vehicle.Status.AVAILABLE)
@@ -76,8 +76,8 @@ public class VehicleCreator {
 
     public Set<Vehicle> createSetWithVehicle5And6(){
         Set<Vehicle> vehicles = new HashSet<>();
-        vehicles.add(createCarWithId5());
-        vehicles.add(createMotorcycleWithId6());
+        vehicles.add(createCarWithId1());
+        vehicles.add(createMotorcycleWithId2());
         return vehicles;
     }
 

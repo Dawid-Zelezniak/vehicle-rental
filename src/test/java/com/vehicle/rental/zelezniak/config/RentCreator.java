@@ -24,15 +24,15 @@ public class RentCreator {
     @Autowired
     private VehicleCreator vehicleCreator;
 
-    public Rent createRentWithId5() {
+    public Rent createRentWithId1() {
         return Rent.builder()
-                .id(5L)
+                .id(1L)
                 .rentStatus(Rent.RentStatus.COMPLETED)
                 .totalCost(new Money(BigDecimal.valueOf(1200.00)))
                 .depositAmount(new Money(BigDecimal.valueOf(1000.00)))
                 .rentInformation(buildRentInformation())
                 .vehicles(addVehicleWithId5())
-                .client(clientCreator.createClientWithId5())
+                .client(clientCreator.createClientWithId2())
                 .build();
     }
 
@@ -57,7 +57,7 @@ public class RentCreator {
 
     private Set<Vehicle> addVehicleWithId5() {
         Set<Vehicle> vehicles = new HashSet<>();
-        vehicles.add(vehicleCreator.createCarWithId5());
+        vehicles.add(vehicleCreator.createCarWithId1());
         return vehicles;
     }
 }
