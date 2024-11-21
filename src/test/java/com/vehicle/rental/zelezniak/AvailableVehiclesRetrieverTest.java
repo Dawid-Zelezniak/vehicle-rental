@@ -1,16 +1,15 @@
 package com.vehicle.rental.zelezniak;
 
+import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
-import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
-//import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -18,20 +17,24 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AvailableVehiclesRetrieverTest {
 
-    private static Map<Long, Vehicle> vehicleMap;
-    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
+    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1 = 0;
+    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 = 3;
+    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3 = 1;
+    private Map<Long, Vehicle> vehicleMap;
+    private final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -44,20 +47,15 @@ class AvailableVehiclesRetrieverTest {
     @Autowired
     private VehicleCreator vehicleCreator;
 
-    @BeforeEach
+    @BeforeAll
     void setupData() {
         vehicleMap = new HashMap<>();
         databaseSetup.setupAllTables();
-        vehicleMap.put(5L, vehicleService.findById(5L));
-        vehicleMap.put(6L, vehicleService.findById(6L));
-        vehicleMap.put(7L, vehicleService.findById(7L));
-        vehicleMap.put(8L, vehicleService.findById(8L));
-        vehicleMap.put(9L, vehicleService.findById(9L));
-    }
-
-    @AfterEach
-    void dropData() {
-        vehicleMap = null;
+        vehicleMap.put(VEHICLE_1_ID, vehicleService.findById(VEHICLE_1_ID));
+        vehicleMap.put(VEHICLE_2_ID, vehicleService.findById(VEHICLE_2_ID));
+        vehicleMap.put(VEHICLE_3_ID, vehicleService.findById(VEHICLE_3_ID));
+        vehicleMap.put(VEHICLE_4_ID, vehicleService.findById(VEHICLE_4_ID));
+        vehicleMap.put(VEHICLE_5_ID, vehicleService.findById(VEHICLE_5_ID));
     }
 
     @Test
@@ -67,25 +65,25 @@ class AvailableVehiclesRetrieverTest {
         Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
-        assertEquals(0, availableVehicles.size());
+        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1, availableVehicles.size());
     }
 
     @Test
     void shouldFindAvailableVehiclesInPeriod2() {
-        Vehicle motorcycle = vehicleCreator.createMotorcycleWithId6();
+        Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
         motorcycle.setStatus(Vehicle.Status.UNAVAILABLE);
-        vehicleService.update(6L, motorcycle);
+        vehicleService.update(motorcycle.getId(), motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
         Collection<Vehicle> vehicles = vehiclesRetriever.findVehiclesAvailableInPeriod(duration);
         List<Vehicle> availableVehicles = (List<Vehicle>) vehicles;
 
-        assertEquals(3, availableVehicles.size());
-        assertFalse(availableVehicles.contains(vehicleMap.get(5L)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(6L)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(7L)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(8L)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(9L)));
+        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2, availableVehicles.size());
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_1_ID)));
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_2_ID)));
+        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
+        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_4_ID)));
+        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_5_ID)));
     }
 
     @Test
@@ -95,11 +93,11 @@ class AvailableVehiclesRetrieverTest {
         Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
-        assertEquals(1, availableVehicles.size());
-        assertTrue(availableVehicles.contains(vehicleMap.get(5L)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(6L)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(7L)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(8L)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(9L)));
+        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3, availableVehicles.size());
+        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_1_ID)));
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_2_ID)));
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_4_ID)));
+        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_5_ID)));
     }
 }

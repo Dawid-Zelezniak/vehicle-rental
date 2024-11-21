@@ -11,24 +11,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClientMapperTest {
 
-    private static Client clientWithId5;
+    private static Client clientWithId2;
 
     @BeforeEach
     void setupDatabase() {
         ClientCreator clientCreator = new ClientCreator();
-        clientWithId5 = clientCreator.createClientWithId5();
+        clientWithId2 = clientCreator.createClientWithId2();
     }
 
     @Test
     void shouldMapClientToDto() {
-        ClientDto client5Dto = ClientMapper.toDto(clientWithId5);
+        ClientDto client5Dto = ClientMapper.toDto(clientWithId2);
 
-        assertEquals(client5Dto.getId(), clientWithId5.getId());
-        assertEquals(client5Dto.getName(), clientWithId5.getName());
-        assertEquals(client5Dto.getEmail(), clientWithId5.getEmail());
-        assertEquals(client5Dto.getCreatedAt(), clientWithId5.getCreatedAt());
-        assertEquals(client5Dto.getPhoneNumber(), clientWithId5.getPhoneNumber());
-        assertEquals(client5Dto.getAddress(), clientWithId5.getAddress());
-        assertEquals(client5Dto.getRoles(), clientWithId5.getRoles());
+        assertEquals(client5Dto.getId(), clientWithId2.getId());
+        assertEquals(client5Dto.getName(), clientWithId2.getName());
+        assertEquals(client5Dto.getEmail(), clientWithId2.getEmail());
+        assertEquals(client5Dto.getCreatedAt(), clientWithId2.getCreatedAt());
+        assertEquals(client5Dto.getPhoneNumber(), clientWithId2.getPhoneNumber());
+        assertEquals(client5Dto.getAddress(), clientWithId2.getAddress());
+        assertEquals(client5Dto.getRoles(), clientWithId2.getRoles());
     }
 }

@@ -3,7 +3,7 @@ package com.vehicle.rental.zelezniak;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.config.TokenGenerator;
+import com.vehicle.rental.zelezniak.config.UserLogin;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Engine;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
@@ -12,14 +12,12 @@ import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Year;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -31,6 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_VEHICLES;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,13 +41,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class VehicleControllerTest {
 
-    private static Vehicle vehicleWithId5;
-    private static Vehicle vehicleWithId6;
-
-    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
+    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
-    private static final String ROLE_ADMIN = "ADMIN";
-    private static final String ROLE_USER = "USER";
+
+    private static Vehicle vehicleWithId1;
+    private static Vehicle vehicleWithId2;
+    private static String adminToken;
+    private static String userToken;
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -63,35 +63,36 @@ class VehicleControllerTest {
     @Autowired
     private DatabaseSetup databaseSetup;
     @Autowired
-    private TokenGenerator tokenGenerator;
-    private String adminToken;
+    private UserLogin login;
 
     @BeforeEach
     void setupDatabase() throws IOException {
         databaseSetup.setupAllTables();
-        adminToken = tokenGenerator.generateToken(ROLE_ADMIN);
-        vehicleWithId5 = vehicleCreator.createCarWithId5();
-        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
+        vehicleWithId1 = vehicleCreator.createCarWithId1();
+        vehicleWithId2 = vehicleCreator.createMotorcycleWithId2();
+        if (adminToken == null && userToken == null) {
+            adminToken = generateToken("admin@gmail.com", "admin1234");
+            userToken = generateToken("usertwo@gmail.com", "somepass");
+        }
     }
 
     @Test
     void shouldReturnAllVehicles() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
-        var info = vehicleWithId5.getVehicleInformation();
+        var info = vehicleWithId1.getVehicleInformation();
         Year productionYear = info.getProductionYear();
         Engine engine = info.getEngine();
         String fuelType = engine.getFuelType().toString();
         String gearType = info.getGearType().toString();
-        String status = vehicleWithId5.getStatus().toString();
+        String status = vehicleWithId1.getStatus().toString();
 
         mockMvc.perform(get("/vehicles")
-                        .header("Authorization", "Bearer " + token)
+                        .header("Authorization", "Bearer " + userToken)
                         .param("page", String.valueOf(PAGEABLE.getPageNumber()))
                         .param("size", String.valueOf(PAGEABLE.getPageSize())))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(5)))
-                .andExpect(jsonPath("$.content[0].id").value(vehicleWithId5.getId()))
+                .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_VEHICLES)))
+                .andExpect(jsonPath("$.content[0].id").value(vehicleWithId1.getId()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.model").value(info.getModel()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.brand").value(info.getBrand()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.registrationNumber.registration").value(info.getRegistrationNumber().getRegistration()))
@@ -104,26 +105,25 @@ class VehicleControllerTest {
                 .andExpect(jsonPath("$.content[0].vehicleInformation.engine.horsepower").value(engine.getHorsepower()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.gearType").value(gearType))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.seatsNumber").value(info.getSeatsNumber()))
-                .andExpect(jsonPath("$.content[0].pricePerDay.value").value(getValueFromMoney(vehicleWithId5.getPricePerDay())))
-                .andExpect(jsonPath("$.content[0].deposit.value").value(getValueFromMoney(vehicleWithId5.getDeposit())))
+                .andExpect(jsonPath("$.content[0].pricePerDay.value").value(getValueFromMoney(vehicleWithId1.getPricePerDay())))
+                .andExpect(jsonPath("$.content[0].deposit.value").value(getValueFromMoney(vehicleWithId1.getDeposit())))
                 .andExpect(jsonPath("$.content[0].status").value(status));
     }
 
     @Test
     void shouldFindVehicleById() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
-        var info = vehicleWithId5.getVehicleInformation();
+        var info = vehicleWithId1.getVehicleInformation();
         Year productionYear = info.getProductionYear();
         Engine engine = info.getEngine();
         String fuelType = engine.getFuelType().toString();
         String gearType = info.getGearType().toString();
-        String status = vehicleWithId5.getStatus().toString();
+        String status = vehicleWithId1.getStatus().toString();
 
-        mockMvc.perform(get("/vehicles/{id}", vehicleWithId5.getId())
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(get("/vehicles/{id}", vehicleWithId1.getId())
+                        .header("Authorization", "Bearer " + userToken))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(vehicleWithId5.getId()))
+                .andExpect(jsonPath("$.id").value(vehicleWithId1.getId()))
                 .andExpect(jsonPath("$.vehicleInformation.brand").value(info.getBrand()))
                 .andExpect(jsonPath("$.vehicleInformation.model").value(info.getModel()))
                 .andExpect(jsonPath("$.vehicleInformation.registrationNumber.registration").value(info.getRegistrationNumber().getRegistration()))
@@ -136,17 +136,16 @@ class VehicleControllerTest {
                 .andExpect(jsonPath("$.vehicleInformation.engine.horsepower").value(engine.getHorsepower()))
                 .andExpect(jsonPath("$.vehicleInformation.gearType").value(gearType))
                 .andExpect(jsonPath("$.vehicleInformation.seatsNumber").value(info.getSeatsNumber()))
-                .andExpect(jsonPath("$.pricePerDay.value").value(getValueFromMoney(vehicleWithId5.getPricePerDay())))
-                .andExpect(jsonPath("$.deposit.value").value(getValueFromMoney(vehicleWithId5.getDeposit())))
+                .andExpect(jsonPath("$.pricePerDay.value").value(getValueFromMoney(vehicleWithId1.getPricePerDay())))
+                .andExpect(jsonPath("$.deposit.value").value(getValueFromMoney(vehicleWithId1.getDeposit())))
                 .andExpect(jsonPath("$.status").value(status));
     }
 
     @Test
     void shouldNotFindVehicleById() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
         Long nonExistentId = 20L;
         mockMvc.perform(get("/vehicles/{id}", nonExistentId)
-                        .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + userToken))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(
@@ -154,7 +153,7 @@ class VehicleControllerTest {
     }
 
     @Test
-    void shouldAddVehicleForRoleADMIN() throws Exception {
+    void shouldAddVehicleWhenUserHasRoleADMIN() throws Exception {
         Vehicle testCar = vehicleCreator.createTestCar();
         mockMvc.perform(post("/vehicles/add")
                         .content(objectMapper.writeValueAsString(testCar))
@@ -162,7 +161,7 @@ class VehicleControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isCreated());
 
-        assertEquals(6, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES + 1, vehicleRepository.count());
         assertTrue(vehicleRepository.existsByVehicleInformationRegistrationNumber(testCar.getRegistrationNumber()));
     }
 
@@ -190,55 +189,53 @@ class VehicleControllerTest {
 
     @Test
     void shouldNotAddVehicleWithExistingRegistrationNumber() throws Exception {
-        RegistrationNumber n = vehicleWithId5.getRegistrationNumber();
         mockMvc.perform(post("/vehicles/add")
-                        .content(objectMapper.writeValueAsString(vehicleWithId5))
+                        .content(objectMapper.writeValueAsString(vehicleWithId1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
-                        "Vehicle with registration number : " + n.getRegistration() + " already exist."));
+                        "Vehicle with registration number : " + vehicleWithId1.getRegistrationValue() + " already exist."));
     }
 
     @Test
     void shouldNotAddVehicleForRoleUSER() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
         Vehicle testCar = vehicleCreator.createTestCar();
         mockMvc.perform(post("/vehicles/add")
                         .content(objectMapper.writeValueAsString(testCar))
                         .contentType(APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + token))
+                        .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    void shouldUpdateVehicle() throws Exception {
-        Long vehicle5Id = vehicleWithId5.getId();
-        Vehicle newData = vehicleCreator.buildVehicle5WithDifferentData();
+    void shouldUpdateVehicleWhenDataIsCorrect() throws Exception {
+        Long vehicleToUpdateId = vehicleWithId1.getId();
+        Vehicle newData = vehicleCreator.buildVehicle1WithDifferentData();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicle5Id)
+        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
                 .content(objectMapper.writeValueAsString(newData))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminToken)
         ).andExpect(status().isOk());
 
-        Vehicle updated = vehicleService.findById(vehicle5Id);
+        Vehicle updated = vehicleService.findById(vehicleToUpdateId);
         assertEquals(newData, updated);
     }
 
     @Test
     @DisplayName("Should not update vehicle when new data contains an existing registration number")
     void shouldNotUpdateVehicle() throws Exception {
-        RegistrationNumber n = vehicleWithId6.getRegistrationNumber();
-        Vehicle newData = vehicleCreator.buildVehicle5WithDifferentData();
+        RegistrationNumber n = vehicleWithId2.getRegistrationNumber();
+        Vehicle newData = vehicleCreator.buildVehicle1WithDifferentData();
         var vehicleInformation = newData.getVehicleInformation();
         var infoWithExistentRegistration = vehicleInformation.toBuilder()
                 .registrationNumber(n)
                 .build();
         newData.setVehicleInformation(infoWithExistentRegistration);
-        Long vehicle5Id = vehicleWithId5.getId();
+        Long vehicleToUpdateId = vehicleWithId1.getId();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicle5Id)
+        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
                         .content(objectMapper.writeValueAsString(newData))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
@@ -248,74 +245,73 @@ class VehicleControllerTest {
     }
 
     @Test
-    void shouldUpdateVehicleForRoleUSER() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
-        Long vehicle5Id = vehicleWithId5.getId();
-        Vehicle newData = vehicleCreator.buildVehicle5WithDifferentData();
+    void shouldNotUpdateVehicleForRoleUSER() throws Exception {
+        Long vehicleToUpdateId = vehicleWithId1.getId();
+        Vehicle newData = vehicleCreator.buildVehicle1WithDifferentData();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicle5Id)
+        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
                 .content(objectMapper.writeValueAsString(newData))
                 .contentType(APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token)
+                .header("Authorization", "Bearer " + userToken)
         ).andExpect(status().isForbidden());
     }
 
     @Test
-    void shouldDeleteVehicle() throws Exception {
-        vehicleWithId5.setStatus(Vehicle.Status.UNAVAILABLE);
-        vehicleRepository.save(vehicleWithId5);
+    void shouldDeleteWhenVehicleStatusIsUNAVAILABLE() throws Exception {
+        vehicleWithId1.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicleRepository.save(vehicleWithId1);
 
-        assertEquals(5, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId5.getId())
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
-        assertEquals(4, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES - 1, vehicleRepository.count());
 
-        Pageable pageable = PageRequest.of(0, 5);
-        Page<Vehicle> page = vehicleService.findAll(pageable);
-        List<Vehicle> list = page.get().toList();
-        assertFalse(list.contains(vehicleWithId5));
+        List<Vehicle> list = vehicleRepository.findAll();
+        assertFalse(list.contains(vehicleWithId1));
     }
 
     @Test
-    void shouldNotDeleteVehicleForNotExistingId() throws Exception {
+    void shouldNotDeleteVehicleWhenDoesNotExists() throws Exception {
         Long notExistingId = 20L;
 
-        assertEquals(5, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
         mockMvc.perform(delete("/vehicles/delete/{id}", notExistingId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value(
-                        "Vehicle with id: " + notExistingId + " does not exist."));
+                .andExpect(jsonPath("$.message").value("Vehicle with id: " + notExistingId + " does not exist."));
 
-        assertEquals(5, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
     }
 
     @Test
     void shouldNotDeleteVehicleForRoleUSER() throws Exception {
-        String token = tokenGenerator.generateToken(ROLE_USER);
-        vehicleWithId5.setStatus(Vehicle.Status.UNAVAILABLE);
-        vehicleRepository.save(vehicleWithId5);
+        vehicleWithId1.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicleRepository.save(vehicleWithId1);
 
-        assertEquals(5, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId5.getId())
-                        .header("Authorization", "Bearer " + token))
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
+                        .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void shouldNotDeleteVehicleWithStatusAvailable() throws Exception {
-        Long id = vehicleWithId5.getId();
+        Long vehicleToDeleteId = vehicleWithId1.getId();
 
-        assertEquals(5, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", id)
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleToDeleteId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
                         "Vehicle must be in status UNAVAILABLE before it can be deleted."));
 
-        assertEquals(5, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+    }
+
+    private String generateToken(String email, String password) {
+        return login.loginUser(email, password);
     }
 
     private double getValueFromMoney(Money totalCost) {

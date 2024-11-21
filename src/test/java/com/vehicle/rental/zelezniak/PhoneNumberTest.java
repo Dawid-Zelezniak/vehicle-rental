@@ -50,7 +50,6 @@ class PhoneNumberTest {
 
         for (String invalidNumber : invalidNumbers) {
             assertThrows(IllegalArgumentException.class, () -> {
-                System.out.println(invalidNumber);
                 new PhoneNumber(invalidNumber);
             });
         }

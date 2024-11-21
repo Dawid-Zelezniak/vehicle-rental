@@ -10,8 +10,9 @@ import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationCostCalculator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestPropertySource("/application-test.properties")
 class ReservationCostCalculatorTest {
 
-    private static Reservation reservationWithId5;
+    private static Reservation reservationWithId2;
 
     @Autowired
     private DatabaseSetup setup;
@@ -46,19 +47,19 @@ class ReservationCostCalculatorTest {
     private ReservationRepository reservationRepository;
 
     @BeforeEach
-    void setupDatabase() throws IOException {
+    void initializeTestData() {
         setup.setupAllTables();
-        reservationWithId5 = reservationCreator.createReservationWithId5();
+        reservationWithId2 = reservationCreator.createReservationWithId2();
     }
 
     @ParameterizedTest(name = "{index} => start={0},end={1},totalCost={2},deposit={3}")
     @MethodSource("testCasesForSingleVehicle")
     void shouldCalculateTotalCostForReservationsWithSingleVehicle(
             LocalDateTime start, LocalDateTime end, Money totalCost, Money deposit) {
-        updateDurationRentWithId5(new RentDuration(start, end));
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
+        updateDuration(new RentDuration(start, end));
+        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId2.getId());
 
-        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId5, new HashSet<>(vehicles));
+        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
 
         assertEquals(totalCost, reservation.getTotalCost());
         assertEquals(deposit, reservation.getDepositAmount());
@@ -68,11 +69,11 @@ class ReservationCostCalculatorTest {
     @MethodSource("testCasesForTwoVehicles")
     void shouldCalculateTotalCostForReservationsWithTwoVehicles(
             LocalDateTime start, LocalDateTime end, Money totalCost, Money deposit) {
-        setVehiclesForReservation5();
-        updateDurationRentWithId5(new RentDuration(start, end));
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
+        setVehiclesForReservation();
+        updateDuration(new RentDuration(start, end));
+        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId2.getId());
 
-        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId5, new HashSet<>(vehicles));
+        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
 
         assertEquals(totalCost, reservation.getTotalCost());
         assertEquals(deposit, reservation.getDepositAmount());
@@ -136,17 +137,17 @@ class ReservationCostCalculatorTest {
         );
     }
 
-    private void setVehiclesForReservation5() {
-        reservationWithId5.setVehicles(vehicleCreator.createSetWithVehicle5And6());
-        reservationRepository.save(reservationWithId5);
+    private void setVehiclesForReservation() {
+        reservationWithId2.setVehicles(vehicleCreator.createSetWithVehicle5And6());
+        reservationRepository.save(reservationWithId2);
     }
 
 
-    private void updateDurationRentWithId5(RentDuration duration) {
-        RentInformation rentInformation = reservationWithId5.getRentInformation();
+    private void updateDuration(RentDuration duration) {
+        RentInformation rentInformation = reservationWithId2.getRentInformation();
         RentInformation updated = rentInformation.toBuilder()
                 .rentDuration(duration)
                 .build();
-        reservationWithId5.setRentInformation(updated);
+        reservationWithId2.setRentInformation(updated);
     }
 }

@@ -2,11 +2,10 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,33 +43,33 @@ class VehicleStatusCriteriaSearchTest {
 
     @Test
     void shouldFindVehiclesByCriteriaStatusAvailable() {
-        Vehicle unavailableVehicle = vehicleService.findById(6L);
+        Vehicle unavailableVehicle = vehicleService.findById(VEHICLE_2_ID);
         unavailableVehicle.setStatus(Vehicle.Status.UNAVAILABLE);
         vehicleRepository.save(unavailableVehicle);
 
-        assertEquals(5, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
         var searchRequest = new CriteriaSearchRequest<>("status", "available");
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertFalse(vehicles.contains(unavailableVehicle));
-        assertEquals(4, vehicles.size());
+        assertEquals(NUMBER_OF_AVAILABLE_VEHICLES - 1, vehicles.size());
     }
 
     @Test
     void shouldFindVehiclesByCriteriaStatusUnavailable() {
-        Vehicle unavailableVehicle = vehicleService.findById(6L);
+        Vehicle unavailableVehicle = vehicleService.findById(VEHICLE_2_ID);
         unavailableVehicle.setStatus(Vehicle.Status.UNAVAILABLE);
         vehicleRepository.save(unavailableVehicle);
         var searchRequest = new CriteriaSearchRequest<>("status", "unavailable");
 
-        assertEquals(5, vehicleRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertTrue(vehicles.contains(unavailableVehicle));
-        assertEquals(1, vehicles.size());
+        assertEquals(NUMBER_OF_UNAVAILABLE_VEHICLES + 1, vehicles.size());
     }
 }

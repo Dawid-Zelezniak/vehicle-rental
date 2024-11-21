@@ -9,7 +9,6 @@ import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.rent.repository.RentRepository;
 import com.vehicle.rental.zelezniak.rent.service.RentService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,8 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestPropertySource("/application-test.properties")
 class RentServiceTest {
 
-    private static Rent rentWithId5;
-    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
+    public static final int EXPECTED_NUMBER_OF_UNAVAILABLE_VEHICLES_FOR_DURATION_1 = 4;
+    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RENTS);
+
+    private static Rent rentWithId1;
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -50,64 +52,78 @@ class RentServiceTest {
     @BeforeEach
     void setupDatabase() throws IOException {
         databaseSetup.setupAllTables();
-        rentWithId5 = rentCreator.createRentWithId5();
+        rentWithId1 = rentCreator.createRentWithId1();
     }
 
     @Test
     void shouldReturnAllRents() {
-        Page<Rent> page =  rentService.findAll(PAGEABLE);
+        Page<Rent> page = rentService.findAll(PAGEABLE);
         List<Rent> rents = page.getContent();
 
-        assertEquals(3, rents.size());
+        assertEquals(EXPECTED_NUMBER_OF_RENTS, rents.size());
         rents.forEach(Assertions::assertNotNull);
-        assertTrue(rents.contains(rentWithId5));
+        assertTrue(rents.contains(rentWithId1));
     }
 
     @Test
     void shouldFindRentById() {
-        Rent byId = rentService.findById(rentWithId5.getId());
+        Rent byId = rentService.findById(rentWithId1.getId());
 
-        assertEquals(rentWithId5, byId);
+        assertEquals(rentWithId1, byId);
     }
 
     @Test
     void shouldFindAllClientRentsByClientId() {
-        Long client5Id = 5L;
+        Long clientId = CLIENT_2_ID;
 
-        Page<Rent> page = rentService.findAllByClientId(client5Id, PAGEABLE);
+        Page<Rent> page = rentService.findAllByClientId(clientId, PAGEABLE);
         List<Rent> allByClient5Id = page.getContent();
 
-        assertTrue(allByClient5Id.contains(rentWithId5));
+        assertTrue(allByClient5Id.contains(rentWithId1));
     }
 
     @Test
-    void shouldFindVehiclesByRentId(){
-        Long rent5Id = 5L;
-        Long rent6Id = 6L;
+    void shouldFindVehiclesByIdForRent1() {
+        Long rentId = RENT_1_ID;
 
-        Page<Vehicle> p1 = rentService.findVehiclesByRentId(rent5Id, PAGEABLE);
-        List<Vehicle> vehiclesByRent5Id = p1.getContent();
+        List<Vehicle> vehicles = findVehiclesByRentIdAndAssertSize(rentId, VEHICLES_IN_RENT_1);
 
-        Page<Vehicle> p2 = rentService.findVehiclesByRentId(rent6Id, PAGEABLE);
-        List<Vehicle> vehiclesByRent6Id = p2.getContent();
-
-        assertEquals(vehicleCreator.createCarWithId5(), vehiclesByRent5Id.get(0));
-
-        assertEquals(vehicleCreator.createMotorcycleWithId6(), vehiclesByRent6Id.get(0));
-        assertEquals(2,vehiclesByRent6Id.size());
+        assertEquals(VEHICLES_IN_RENT_1, vehicles.size());
+        assertTrue(vehicles.contains(vehicleCreator.createCarWithId1()));
     }
 
     @Test
-    void shouldFindUnavailableVehicleIdsForRentInPeriod(){
+    void shouldFindVehiclesByIdForRent2() {
+        Long rentId = RENT_2_ID;
+
+        List<Vehicle> vehicles = findVehiclesByRentIdAndAssertSize(rentId, VEHICLES_IN_RENT_2);
+
+        assertEquals(VEHICLES_IN_RENT_2, vehicles.size());
+        assertTrue(vehicles.contains(vehicleCreator.createMotorcycleWithId2()));
+    }
+
+    /**
+     * testing method from repository,
+     * this method is not used in service
+     */
+    @Test
+    void shouldFindUnavailableVehicleIdsForRentInPeriod() {
         RentDuration duration = durationCreator.createDuration1();
 
         Collection<Long> unavailableIds = rentRepository.findUnavailableVehicleIdsForRentInPeriod(
                 duration.getRentalStart(), duration.getRentalEnd());
 
-        assertEquals(4,unavailableIds.size());
-        assertTrue(unavailableIds.contains(6L));
-        assertTrue(unavailableIds.contains(7L));
-        assertTrue(unavailableIds.contains(8L));
-        assertTrue(unavailableIds.contains(9L));
+        assertEquals(EXPECTED_NUMBER_OF_UNAVAILABLE_VEHICLES_FOR_DURATION_1, unavailableIds.size());
+        assertTrue(unavailableIds.contains(VEHICLE_2_ID));
+        assertTrue(unavailableIds.contains(VEHICLE_3_ID));
+        assertTrue(unavailableIds.contains(VEHICLE_4_ID));
+        assertTrue(unavailableIds.contains(VEHICLE_5_ID));
+    }
+
+    private List<Vehicle> findVehiclesByRentIdAndAssertSize(Long rentId, int expectedSize) {
+        Page<Vehicle> p1 = rentService.findVehiclesByRentId(rentId, PAGEABLE);
+        List<Vehicle> vehicles = p1.getContent();
+        assertEquals(expectedSize, vehicles.size());
+        return vehicles;
     }
 }

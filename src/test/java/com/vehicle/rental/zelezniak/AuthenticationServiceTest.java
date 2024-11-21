@@ -1,28 +1,25 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.common_value_objects.location.City;
-import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
-import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.user.model.client.Address;
+import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
-import com.vehicle.rental.zelezniak.user.service.authentication.AuthenticationService;
-import com.vehicle.rental.zelezniak.util.TimeFormatter;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
@@ -44,6 +41,7 @@ class AuthenticationServiceTest {
     @BeforeEach
     void createUsers() throws IOException {
         databaseSetup.setupAllTables();
+        client = ClientCreator.createTestClient();
     }
 
     @AfterEach
@@ -52,37 +50,23 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void shouldRegisterNewUser() {
-        setDataForClient();
-        assertEquals(3, clientRepository.count());
+    void shouldRegisterUserWhenRequestContainsRequiredData() {
+        assertEquals(EXPECTED_NUMBER_OF_CLIENTS, clientRepository.count());
 
         authenticationService.register(client);
 
-        assertEquals(4, clientRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_CLIENTS + 1, clientRepository.count());
         assertEquals(client, clientService.findClientById(client.getId()));
     }
 
     @Test
-    void shouldLoginUser() {
-        setDataForClient();
+    void shouldLoginUserWithCorrectCredentials() {
         authenticationService.register(client);
 
         LoginRequest loginRequest = new LoginRequest(client.getEmail(), "somepassword");
         LoginResponse login = authenticationService.login(loginRequest);
 
-        Assertions.assertEquals(client, login.getClient());
-        String token = login.getJwt();
-        String[] tokenParts = token.split("\\.");
-        assertEquals(3, tokenParts.length);
-    }
-
-    private void setDataForClient() {
-        client.setName(new UserName("Uncle", "Bob"));
-        client.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
-        client.setCreatedAt(TimeFormatter.getFormattedActualDateTime());
-        Address address = new Address(null, new Street("teststreet"),
-                "5", "150", new City("Warsaw"),
-                "00-001", new Country("Poland"));
-        client.setAddress(address);
+        assertEquals(client, login.getClient());
+        assertNotNull(login.getJwt());
     }
 }

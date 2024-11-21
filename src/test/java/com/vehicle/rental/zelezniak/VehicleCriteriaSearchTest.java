@@ -1,9 +1,8 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

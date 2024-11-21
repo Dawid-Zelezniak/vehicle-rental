@@ -2,13 +2,10 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
-import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
 import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
@@ -22,21 +19,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.CLIENT_3_ID;
+import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
 class ClientServiceTest {
 
-    private static Client clientWithId5;
-    private static ClientDto client5Dto;
-    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
+    private static Client clientWithId2;
+    private static ClientDto client2Dto;
+    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_CLIENTS);
 
     @Autowired
     private Client client;
@@ -52,8 +48,8 @@ class ClientServiceTest {
     @BeforeEach
     void setup() {
         databaseSetup.setupAllTables();
-        clientWithId5 = clientCreator.createClientWithId5();
-        client5Dto = ClientMapper.toDto(clientWithId5);
+        clientWithId2 = clientCreator.createClientWithId2();
+        client2Dto = ClientMapper.toDto(clientWithId2);
     }
 
     @AfterEach
@@ -63,11 +59,10 @@ class ClientServiceTest {
 
     @Test
     void shouldReturnAllClients() {
-        Page<ClientDto> page = clientService.findAll(PAGEABLE);
-        List<ClientDto> clients = page.getContent();
+        List<ClientDto> clients = findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
 
-        assertTrue(clients.contains(client5Dto));
-        assertEquals(3, clients.size());
+        assertTrue(clients.contains(client2Dto));
+        assertEquals(EXPECTED_NUMBER_OF_CLIENTS, clients.size());
 
         for (ClientDto client : clients) {
             assertNotNull(client.getId());
@@ -79,81 +74,82 @@ class ClientServiceTest {
 
     @Test
     void shouldFindClientDtoById() {
-        ClientDto client = clientService.findById((clientWithId5.getId()));
+        ClientDto clientDto = clientService.findById((clientWithId2.getId()));
 
-        assertEquals(client5Dto, client);
+        assertEquals(client2Dto, clientDto);
     }
 
     @Test
     void shouldFindClientById() {
-        Client client = clientService.findClientById((clientWithId5.getId()));
+        Client client = clientService.findClientById((clientWithId2.getId()));
 
-        assertEquals(clientWithId5, client);
+        assertEquals(clientWithId2, client);
     }
 
     @Test
-    void shouldNotFindClientById() {
+    void shouldNotFindClientByIdWhenDoesNotExist() {
         long nonExistentId = 20L;
 
-        assertThrows(NoSuchElementException.class,
-                () -> clientService.findClientById((nonExistentId)));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> clientService.findClientById((nonExistentId)));
+        assertEquals("Client with id: " + nonExistentId + " does not exist.", exception.getMessage());
     }
 
     @Test
-    void shouldUpdateClient() {
-        Long client5Id = clientWithId5.getId();
-        clientWithId5.setName(new UserName("Uncle", "Bob"));
-        clientWithId5.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
+    void shouldUpdateClientWhenEmailUnique() {
+        Long client5Id = clientWithId2.getId();
+        clientWithId2.setName(new UserName("Uncle", "Bob"));
+        clientWithId2.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
 
-        Client updated = clientService.update(client5Id, clientWithId5);
+        Client updated = clientService.update(client5Id, clientWithId2);
 
-        assertEquals(clientWithId5.getEmail(), updated.getEmail());
-        assertEquals(clientWithId5.getUsername(), updated.getUsername());
-        assertTrue(encoder.matches(clientWithId5.getPassword(), updated.getPassword()));
+        assertEquals(clientWithId2.getEmail(), updated.getEmail());
+        assertEquals(clientWithId2.getUsername(), updated.getUsername());
+        assertTrue(encoder.matches(clientWithId2.getPassword(), updated.getPassword()));
     }
 
     @Test
-    void shouldNotUpdateClient() {
-        ClientDto byId = clientService.findById(6L);
-        String existingEmail = byId.getEmail();
+    void shouldNotUpdateClientWhenEmailNotUnique() {
+        ClientDto existingClient = clientService.findById(CLIENT_3_ID);
+        String existingEmail = existingClient.getEmail();
         var credentials = new UserCredentials(existingEmail, "somepassword");
         client.setCredentials(credentials);
 
-        Long client5Id = clientWithId5.getId();
-        assertThrows(IllegalArgumentException.class,
-                () -> clientService.update(client5Id, client));
+        Long existingClientId = clientWithId2.getId();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> clientService.update(existingClientId, client));
+        assertEquals("Client with email : " + existingEmail + " already exist", exception.getMessage());
     }
 
     @Test
-    void shouldDeleteClient() {
-        Page<ClientDto> page = clientService.findAll(PAGEABLE);
-        List<ClientDto> clients = page.getContent();
+    void shouldDeleteClientWhenDataCorrect() {
+        findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
 
-        assertEquals(3, clients.size());
+        clientService.delete(clientWithId2.getId());
 
-        clientService.delete(clientWithId5.getId());
-
-        page = clientService.findAll(PAGEABLE);
-        clients = page.getContent();
-
-        assertEquals(2, clients.size());
-        assertFalse(clients.contains(client5Dto));
+        List<ClientDto> clients = findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS - 1);
+        assertFalse(clients.contains(client2Dto));
     }
 
     @Test
     void shouldFindClientByEmail() {
-        String client5Email = clientWithId5.getEmail();
+        String client5Email = clientWithId2.getEmail();
 
         Client byEmail = clientService.findByEmail(client5Email);
 
-        assertEquals(clientWithId5, byEmail);
+        assertEquals(clientWithId2, byEmail);
     }
 
     @Test
-    void shouldNotFindClientByEmail() {
+    void shouldNotFindClientByEmailWhenDoesNotExist() {
         String email = "nonexistingemail@gmail.com";
 
-        assertThrows(NoSuchElementException.class,
-                () -> clientService.findByEmail(email));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> clientService.findByEmail(email));
+        assertEquals("Client with email: " + email + " does not exist.", exception.getMessage());
+    }
+
+    private List<ClientDto> findAllClientsAndAssertSize(int expectedSize) {
+        Page<ClientDto> page = clientService.findAll(PAGEABLE);
+        List<ClientDto> clients = page.getContent();
+        assertEquals(expectedSize, clients.size());
+        return clients;
     }
 }

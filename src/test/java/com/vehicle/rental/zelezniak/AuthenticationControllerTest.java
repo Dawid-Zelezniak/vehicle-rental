@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.rental.zelezniak.common_value_objects.location.City;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
+import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.user.model.client.Address;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
@@ -11,7 +12,8 @@ import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCre
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
-import com.vehicle.rental.zelezniak.user.service.authentication.AuthenticationService;
+import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
+import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,24 +50,20 @@ class AuthenticationControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private DatabaseSetup databaseSetup;
-
+    @Autowired
     private Client client;
 
     @BeforeEach
     void setupDatabase() throws IOException {
         databaseSetup.setupAllTables();
-        client = new Client();
-        client.setName(new UserName("Uncle", "Bob"));
-        client.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
-        Address address = new Address(null, new Street("teststreet"), "5",
-                "150", new City("Warsaw"), "00-001", new Country("Poland"));
-        client.setAddress(address);
+        client = ClientCreator.createTestClient();
     }
 
     @Test
-    void shouldRegisterUser() throws Exception {
+    void shouldRegisterUserWhenRequestContainsRequiredData() throws Exception {
         UserName name = client.getName();
         Address address = client.getAddress();
+
         mockMvc.perform(post("/auth/register")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(client)))
@@ -80,17 +79,19 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.address.postalCode").value(address.getPostalCode()))
                 .andExpect(jsonPath("$.address.country.countryName").value(address.getCountry().countryName()));
 
-        assertEquals(4, clientRepository.count());
+        assertEquals(EXPECTED_NUMBER_OF_CLIENTS + 1, clientRepository.count());
     }
 
     @Test
     void shouldNotRegisterUserWhenNameIsInvalid() throws Exception {
-        client.setName(new UserName("Ab", "L"));
+        client.setName(new UserName("aa", "a"));
+        int expectedErrors = 2;
+
         mockMvc.perform(post("/auth/register")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(client)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.fieldValidationErrors", hasSize(2)))
+                .andExpect(jsonPath("$.fieldValidationErrors", hasSize(expectedErrors)))
                 .andExpect(jsonPath("$.fieldValidationErrors").value(
                         containsInAnyOrder("First name must contains at least 3 characters",
                                 "Last name must contains at least 2 characters"
@@ -100,6 +101,7 @@ class AuthenticationControllerTest {
     @Test
     void shouldNotRegisterUserWhenCredentialsInvalid() throws Exception {
         client.setCredentials(new UserCredentials(client.getEmail(), "a"));
+
         mockMvc.perform(post("/auth/register")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(client)))
@@ -126,7 +128,7 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    void shouldLoginUser() throws Exception {
+    void shouldLoginUserWithCorrectCredentials() throws Exception {
         authService.register(client);
         String email = client.getEmail();
         LoginRequest loginRequest = new LoginRequest(email, "somepassword");
@@ -169,6 +171,7 @@ class AuthenticationControllerTest {
     void shouldTestInvalidEmailPattern() throws Exception {
         client.setCredentials(new UserCredentials("wrongemail@com", "somepassword"));
         String email = client.getEmail();
+
         mockMvc.perform(post("/auth/register")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(client)))

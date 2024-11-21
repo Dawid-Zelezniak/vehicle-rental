@@ -5,10 +5,9 @@ import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,23 +50,23 @@ class RegistrationNumberCriteriaSearchTest {
     @DisplayName("Admin can search vehicles by registration")
     void shouldFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_ADMIN");
-        Vehicle vehicle8 = vehicleService.findById(8L);
-        RegistrationNumber vehicle8RegistrationNumber = vehicle8.getRegistrationNumber();
+        Vehicle vehicle4 = vehicleService.findById(4L);
+        RegistrationNumber vehicle8RegistrationNumber = vehicle4.getRegistrationNumber();
         var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertEquals(1, vehicles.size());
-        assertTrue(vehicles.contains(vehicle8));
+        assertTrue(vehicles.contains(vehicle4));
     }
 
     @Test
     @DisplayName("Client can't search vehicles by registration")
     void shouldNotFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_USER");
-        Vehicle vehicle8 = vehicleService.findById(8L);
-        RegistrationNumber vehicle8RegistrationNumber = vehicle8.getRegistrationNumber();
+        Vehicle vehicle4 = vehicleService.findById(4L);
+        RegistrationNumber vehicle8RegistrationNumber = vehicle4.getRegistrationNumber();
         var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
 
         assertThrows(CriteriaAccessException.class,

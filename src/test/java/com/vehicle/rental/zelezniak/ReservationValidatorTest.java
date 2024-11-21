@@ -4,24 +4,28 @@ import com.vehicle.rental.zelezniak.config.*;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
-import com.vehicle.rental.zelezniak.reservation.service.ReservationValidator;
+import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationValidator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReservationValidatorTest {
 
-    private static Reservation reservationWithId5;
+    private static Reservation reservationWithId2;
+    private static final int EXPECTED_NUMBER_OF_VEHICLES = 0;
 
     @Autowired
     private ReservationValidator validator;
@@ -36,22 +40,21 @@ class ReservationValidatorTest {
     @Autowired
     private VehicleCreator vehicleCreator;
 
-    Reservation reservation;
+    private Reservation reservation;
 
-    @BeforeEach
-    void setupDatabase() throws IOException {
+    @BeforeAll
+    void setupDatabase() {
         databaseSetup.setupAllTables();
-        reservationWithId5 = reservationCreator.createReservationWithId5();
+        reservationWithId2 = reservationCreator.createReservationWithId2();
     }
 
-    @AfterEach
-    void cleanupDatabase() {
-        reservation = null;
+    @BeforeEach
+    void initializeNewReservation() {
+        reservation = reservationCreator.buildNewReservation();
     }
 
     @Test
     void shouldValidateSuccessfullyForReservationWithStatusNEW() {
-        reservation = reservationCreator.buildNewReservation();
         Reservation saved = reservationRepository.save(reservation);
         addAvailableVehicleToReservation(reservation.getId());
         assertDoesNotThrow(() -> validator.validateReservationDataBeforePayment(saved.getId()));
@@ -59,7 +62,7 @@ class ReservationValidatorTest {
 
     @Test
     void shouldThrowExceptionWhenReservationStatusIsNotNEW() {
-        Long id = reservationWithId5.getId();
+        Long id = reservationWithId2.getId();
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> validator.validateReservationDataBeforePayment(id));
         assertEquals("Payments are unavailable for reservations with status other than NEW.", e.getMessage());
@@ -67,7 +70,6 @@ class ReservationValidatorTest {
 
     @Test
     void shouldThrowExceptionIfVehiclesAreEmpty() {
-        reservation = reservationCreator.buildNewReservation();
         Reservation saved = reservationRepository.save(reservation);
         Long id = saved.getId();
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
@@ -76,24 +78,33 @@ class ReservationValidatorTest {
     }
 
     @Test
+    @Transactional
     void shouldThrowExceptionWhenVehicleIsAlreadyReserved() {
-        reservation = reservationCreator.buildNewReservation();
         Reservation saved = reservationRepository.save(reservation);
         Long id = saved.getId();
+
         addAvailableVehicleToReservation(id);
-        addAlreadyReservedVehicleToReservation(id);
+        simulateSomeoneReservedAvailableVehicle();
+
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> validator.validateReservationDataBeforePayment(id));
         assertEquals("Someone already reserved vehicle that you tried to reserve.Pick vehicles one more time.", e.getMessage());
+
+        Collection<Vehicle> vehiclesByReservationId = reservationRepository.findVehiclesByReservationId(id);
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES,vehiclesByReservationId.size());
     }
 
     private void addAvailableVehicleToReservation(Long id) {
-        Vehicle motorcycleWithId6 = vehicleCreator.createMotorcycleWithId6();
-        reservationService.addVehicleToReservation(id, motorcycleWithId6.getId());
+        Vehicle vehicle = vehicleCreator.createMotorcycleWithId2();
+        reservationService.addVehicleToNewReservation(id, vehicle.getId());
     }
 
-    private void addAlreadyReservedVehicleToReservation(Long id) {
-        Vehicle carWithId5 = vehicleCreator.createCarWithId5();
-        reservationService.addVehicleToReservation(id, carWithId5.getId());
+    private void simulateSomeoneReservedAvailableVehicle() {
+        Reservation reservation = reservationCreator.buildNewReservation();
+        Reservation saved = reservationRepository.save(reservation);
+        Vehicle vehicle = vehicleCreator.createMotorcycleWithId2();
+        reservationService.addVehicleToNewReservation(saved.getId(), vehicle.getId());
+        saved.setReservationStatus(Reservation.ReservationStatus.ACTIVE);
+        reservationRepository.save(saved);
     }
 }

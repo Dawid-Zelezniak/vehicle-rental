@@ -5,10 +5,11 @@ import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.VehicleInformation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleValidator;
-import org.junit.jupiter.api.AfterEach;
+import com.vehicle.rental.zelezniak.vehicle.service.validation.VehicleValidator;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -18,10 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VehicleValidatorTest {
 
-    private static Vehicle vehicleWithId5;
-    private static Vehicle vehicleWithId6;
+    private Vehicle vehicleWithId1;
+    private Vehicle vehicleWithId2;
 
     @Autowired
     private VehicleValidator validator;
@@ -30,22 +32,21 @@ class VehicleValidatorTest {
     @Autowired
     private DatabaseSetup databaseSetup;
 
-    @BeforeEach
+    @BeforeAll
     void setupDatabase() {
         databaseSetup.setupAllTables();
-        vehicleWithId5 = vehicleCreator.createCarWithId5();
-        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
+        vehicleWithId1 = vehicleCreator.createCarWithId1();
+        vehicleWithId2 = vehicleCreator.createMotorcycleWithId2();
     }
 
     @Test
     void shouldTestVehicleCanBeUpdated() {
-        assertDoesNotThrow(() -> validator.checkIfVehicleCanBeUpdated(
-                vehicleWithId5.getRegistrationNumber(), vehicleCreator.createTestCar()));
+        assertDoesNotThrow(() -> validator.validateVehicleUpdate(vehicleWithId1.getRegistrationNumber(), vehicleCreator.createTestCar()));
     }
 
     @Test
     void shouldTestVehicleCanNotBeUpdated() {
-        RegistrationNumber existingRegistration = vehicleWithId6.getRegistrationNumber();
+        RegistrationNumber existingRegistration = vehicleWithId2.getRegistrationNumber();
         Vehicle newCarData = vehicleCreator.createTestCar();
         VehicleInformation information = newCarData
                 .getVehicleInformation()
@@ -53,23 +54,20 @@ class VehicleValidatorTest {
                 .registrationNumber(existingRegistration)
                 .build();
         newCarData.setVehicleInformation(information);
-        RegistrationNumber vehicleWithId5Registration = vehicleWithId5.getRegistrationNumber();
+        RegistrationNumber registration = vehicleWithId1.getRegistrationNumber();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> validator.checkIfVehicleCanBeUpdated(vehicleWithId5Registration, newCarData));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateVehicleUpdate(registration, newCarData));
     }
 
     @Test
     void shouldThrowExceptionIfVehicleExists() {
-        RegistrationNumber vehicleWithId5Registration = vehicleWithId5.getRegistrationNumber();
+        RegistrationNumber registration = vehicleWithId1.getRegistrationNumber();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> validator.throwExceptionIfVehicleExist(vehicleWithId5Registration));
+        assertThrows(IllegalArgumentException.class, () -> validator.ensureVehicleDoesNotExist(registration));
     }
 
     @Test
     void shouldTestVehicleTypesAreNotSame() {
-        assertThrows(IllegalArgumentException.class,
-                () -> validator.checkIfVehiclesHasSameTypes(vehicleWithId5, vehicleWithId6));
+        assertThrows(IllegalArgumentException.class, () -> validator.validateVehicleTypeConsistency(vehicleWithId1, vehicleWithId2));
     }
 }

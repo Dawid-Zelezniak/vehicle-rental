@@ -5,24 +5,26 @@ import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
-import com.vehicle.rental.zelezniak.user.service.ClientValidator;
-import org.junit.jupiter.api.AfterEach;
+import com.vehicle.rental.zelezniak.user.service.validation.ClientValidator;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.vehicle.rental.zelezniak.config.TestConstants.CLIENT_3_ID;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClientValidatorTest {
 
-    private static Client clientWithId5;
+    private static Client clientWithId2;
 
     @Autowired
     private ClientValidator validator;
@@ -33,22 +35,26 @@ class ClientValidatorTest {
     @Autowired
     private ClientService clientService;
 
-    @BeforeEach
+    @BeforeAll
     void setupDatabase() throws IOException {
         databaseSetup.setupAllTables();
-        clientWithId5 = clientCreator.createClientWithId5();
+    }
+
+    @BeforeEach
+    void initializeTestData() {
+        clientWithId2 = clientCreator.createClientWithId2();
     }
 
     @Test
-    void shouldThrowExceptionIfClientExists() {
-        String existingEmail = clientWithId5.getEmail();
+    void shouldThrowExceptionWhenClientExist() {
+        String existingEmail = clientWithId2.getEmail();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> validator.validateUserDoesNotExists(existingEmail));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> validator.validateUserDoesNotExists(existingEmail));
+        assertEquals("Client with email : " + existingEmail + " already exist", exception.getMessage());
     }
 
     @Test
-    void shouldNotThrowExceptionIfClientNotExists() {
+    void shouldNotThrowExceptionWhenClientDoesNotExist() {
         Client c = new Client();
         c.setCredentials(new UserCredentials("someuser@gmail.com", "somepass"));
 
@@ -56,19 +62,19 @@ class ClientValidatorTest {
     }
 
     @Test
-    void shouldTestClientCanBeUpdated() {
-        String userFromDbEmail = clientWithId5.getEmail();
-        clientWithId5.setCredentials(new UserCredentials("newemail@gmail.com", "somepass"));
+    void shouldTestClientCanBeUpdatedWhenUniqueEmail() {
+        String userFromDbEmail = clientWithId2.getEmail();
+        clientWithId2.setCredentials(new UserCredentials("newemail@gmail.com", "somepass"));
 
-        assertDoesNotThrow(() -> validator.validateUserCanBeUpdated(userFromDbEmail, clientWithId5));
+        assertDoesNotThrow(() -> validator.validateUserCanBeUpdated(userFromDbEmail, clientWithId2));
     }
 
     @Test
-    void shouldTestClientCanNotBeUpdated() {
-        Client byId = clientService.findClientById(6L);
+    void shouldTestClientCanNotBeUpdatedWhenEmailNotUnique() {
+        Client byId = clientService.findClientById(CLIENT_3_ID);
         String existingEmail = byId.getEmail();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> validator.validateUserCanBeUpdated(existingEmail, clientWithId5));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> validator.validateUserCanBeUpdated(existingEmail, clientWithId2));
+        assertEquals("Client with email : " + clientWithId2.getEmail() + " already exist", exception.getMessage());
     }
 }

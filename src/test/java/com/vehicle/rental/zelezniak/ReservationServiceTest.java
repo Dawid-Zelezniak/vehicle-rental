@@ -5,16 +5,13 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.config.*;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
+import com.vehicle.rental.zelezniak.reservation.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -25,17 +22,17 @@ import org.springframework.test.context.TestPropertySource;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
 class ReservationServiceTest {
 
-    private static Reservation reservationWithId5;
-    private static final Pageable PAGEABLE = PageRequest.of(0, 5);
+
+    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RESERVATIONS);
+    private static Reservation reservationWithId2;
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -53,71 +50,57 @@ class ReservationServiceTest {
     private LocationCreator locationCreator;
 
     private ReservationCreationRequest creationRequest;
-    private Vehicle vehicleWithId6;
+    private Vehicle vehicleWithId2;
 
     @BeforeEach
     void setupDatabase() throws IOException {
-        creationRequest = new ReservationCreationRequest(5L, durationCreator.createDuration2());
+        creationRequest = new ReservationCreationRequest(CLIENT_2_ID, durationCreator.createDuration2());
         databaseSetup.setupAllTables();
-        reservationWithId5 = reservationCreator.createReservationWithId5();
+        reservationWithId2 = reservationCreator.createReservationWithId2();
     }
 
     @Test
     void shouldFindAllReservations() {
         Page<Reservation> all = reservationService.findAll(PAGEABLE);
         List<Reservation> reservations = all.getContent();
-        assertTrue(reservations.contains(reservationWithId5));
-        assertEquals(5, reservations.size());
+
+        assertEquals(EXPECTED_NUMBER_OF_RESERVATIONS, reservations.size());
+        assertTrue(reservations.contains(reservationWithId2));
     }
 
     @Test
     void shouldFindAllReservationsByClientId() {
-        Long clientId = 5L;
+        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
 
-        Page<Reservation> page = reservationService.findAllByClientId(clientId, PAGEABLE);
-        List<Reservation> reservations = page.getContent();
-
-        assertEquals(2, reservations.size());
-        assertTrue(reservations.contains(reservationWithId5));
+        assertEquals(EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS, reservations.size());
+        assertTrue(reservations.contains(reservationWithId2));
     }
 
     @Test
     void shouldFindVehiclesByReservationId() {
-        Long reservationId = 6L;
-
-        Page<Vehicle> page = reservationService.findVehiclesByReservationId(reservationId, PAGEABLE);
-        List<Vehicle> vehicles = page.getContent();
-
-        assertEquals(2, vehicles.size());
+        findVehiclesByReservationIdAssertSize(RESERVATION_3_ID, VEHICLES_IN_RESERVATION_3);
     }
 
     @Test
     void shouldReturnEmptyPageOfVehiclesWhenReservationDoesNotExist() {
         Long reservationId = 90L;
+        int expectedSize = 0;
 
-        Page<Vehicle> page = reservationService.findVehiclesByReservationId(reservationId, PAGEABLE);
-
-        assertTrue(page.isEmpty());
+        findVehiclesByReservationIdAssertSize(reservationId, expectedSize);
     }
 
     @Test
-    void shouldAddNewReservationForClient() {
-        Long client5Id = 5L;
-
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
-        List<Reservation> allByClientId = page.getContent();
-        assertEquals(2, allByClientId.size());
+    void shouldAddNewReservationForClientWhenDataCorrect() {
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         Reservation reservation = reservationService.addReservation(creationRequest);
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
-        allByClientId = page.getContent();
-        assertEquals(3, allByClientId.size());
-        assertTrue(allByClientId.contains(reservation));
+        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
+        assertTrue(reservations.contains(reservation));
     }
 
     @Test
-    void shouldUpdateNewReservationLocation() {
+    void shouldUpdateNewReservationLocationWhenDataCorrect() {
         Reservation reservation = reservationService.addReservation(creationRequest);
         RentInformation information = reservation.getRentInformation();
         RentInformation updatedLocation = information.toBuilder()
@@ -126,149 +109,168 @@ class ReservationServiceTest {
         reservation.setRentInformation(updatedLocation);
         Long id = reservation.getId();
 
-        Reservation updated = reservationService.updateLocation(id, updatedLocation);
+        Reservation updated = reservationService.updateLocationForNewReservation(id, updatedLocation);
 
         assertEquals(reservation, updated);
     }
 
     @Test
-    void shouldNotUpdateLocation() {
-        Reservation newData = reservationWithId5;
+    void shouldNotUpdateLocationWhenStatusInvalid() {
+        Reservation newData = reservationWithId2;
         RentInformation information = newData.getRentInformation();
         RentInformation updatedLocation = information.toBuilder()
                 .pickUpLocation(locationCreator.buildTestLocation())
                 .build();
         newData.setRentInformation(updatedLocation);
-        Long reservation5Id = reservationWithId5.getId();
+        Long reservationToUpdateId = reservationWithId2.getId();
 
         IllegalArgumentException assertion = assertThrows(IllegalArgumentException.class,
-                () -> reservationService.updateLocation(reservation5Id, updatedLocation));
+                () -> reservationService.updateLocationForNewReservation(reservationToUpdateId, updatedLocation));
         assertEquals(assertion.getMessage(), "Can not update reservation with status: " + newData.getReservationStatus());
     }
 
     @Test
-    void shouldUpdateDuration() {
-        Long reservationId = reservationWithId5.getId();
-        setReservationStatusToNew(reservationWithId5);
+    void shouldUpdateDurationWhenStatusCorrect() {
+        Long reservationToUpdateId = reservationWithId2.getId();
+        setReservationStatusToNew(reservationWithId2);
 
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
-        assertEquals(1, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationToUpdateId, VEHICLES_IN_RESERVATION_2);
 
-        Reservation updated = reservationService.updateDuration(reservationId, durationCreator.createDuration3());
+        Reservation updated = reservationService.updateDurationForNewReservation(reservationToUpdateId, durationCreator.createDuration3());
 
-        vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
-        assertEquals(0, vehicles.size());
-        assertEquals(updated, findReservationById(reservationId));
+        findVehiclesByReservationIdAssertSize(reservationToUpdateId, VEHICLES_IN_RESERVATION_2 - 1);
+        assertEquals(updated, findReservationById(reservationToUpdateId));
     }
 
     @Test
-    void shouldNotUpdateDuration() {
-        Long reservationId = reservationWithId5.getId();
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
+    void shouldNotUpdateDurationWhenReservationStatusInvalid() {
+        Long reservationToUpdateId = reservationWithId2.getId();
+        findVehiclesByReservationIdAssertSize(reservationToUpdateId, VEHICLES_IN_RESERVATION_2);
 
-        assertEquals(1, vehicles.size());
         RentDuration duration = durationCreator.createDuration3();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.updateDuration(reservationId, duration));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.updateDurationForNewReservation(reservationToUpdateId, duration));
+        assertEquals("Can not update duration for reservation with status: " + reservationWithId2.getReservationStatus(), exception.getMessage());
     }
 
     @Test
-    void shouldDeleteReservation() {
-        Long client5Id = 5L;
-        setReservationStatusToNew(reservationWithId5);
+    void shouldDeleteReservationWhenDataCorrect() {
+        setReservationStatusToNew(reservationWithId2);
 
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
-        List<Reservation> allByClientId = page.getContent();
-        assertEquals(2, allByClientId.size());
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
 
-        reservationService.deleteReservation(reservationWithId5.getId());
+        reservationService.deleteReservation(reservationWithId2.getId());
 
-        page = reservationRepository.findAllReservationsByClientId(client5Id, PAGEABLE);
-        allByClientId = page.getContent();
-        assertEquals(1, allByClientId.size());
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
     }
 
     @Test
     void shouldNotDeleteReservation() {
-        Long id = reservationWithId5.getId();
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.deleteReservation(id));
+        Long reservationToDeleteId = reservationWithId2.getId();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.deleteReservation(reservationToDeleteId));
+        assertEquals("Can not remove reservation with status: " + reservationWithId2.getReservationStatus(), exception.getMessage());
     }
 
     @Test
-    void shouldAddVehicleToReservation() {
-        Long reservationId = reservationWithId5.getId();
-        setReservationStatusToNew(reservationWithId5);
+    void shouldAddVehicleToReservationWhenDataCorrect() {
+        Long reservationId = reservationWithId2.getId();
+        setReservationStatusToNew(reservationWithId2);
 
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
-        assertEquals(1, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationId, VEHICLES_IN_RESERVATION_2);
 
-        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
-        reservationService.addVehicleToReservation(reservationId, vehicleWithId6.getId());
+        vehicleWithId2 = vehicleCreator.createMotorcycleWithId2();
+        reservationService.addVehicleToNewReservation(reservationId, vehicleWithId2.getId());
 
-        vehicles = reservationRepository.findVehiclesByReservationId(reservationId);
-        assertEquals(2, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationId, VEHICLES_IN_RESERVATION_2 + 1);
     }
 
     @Test
     void shouldNotAddVehicleToReservation() {
-        vehicleWithId6 = vehicleCreator.createMotorcycleWithId6();
-        Long vehicle6Id = vehicleWithId6.getId();
-        Long reservation5Id = reservationWithId5.getId();
+        vehicleWithId2 = vehicleCreator.createMotorcycleWithId2();
+        Long vehicleId = vehicleWithId2.getId();
+        Long reservationId = reservationWithId2.getId();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.addVehicleToReservation(reservation5Id, vehicle6Id));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.addVehicleToNewReservation(reservationId, vehicleId));
+        assertEquals("Can not add vehicle to reservation with status: " + reservationWithId2.getReservationStatus(), exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Don't add vehicle to reservation when it is already rented or reserved")
+    void shouldThrowExceptionWhenVehicleIsAlreadyReserved() {
+        Reservation reservation = reservationCreator.buildNewReservation();
+        Reservation saved = reservationRepository.save(reservation);
+        Long id = saved.getId();
+        Vehicle car = vehicleCreator.createCarWithId1();
+        Long carId = car.getId();
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.addVehicleToNewReservation(id, carId));
+        assertEquals("Vehicle with id: " + carId + " is already rented or reserved.", e.getMessage());
     }
 
     @Test
     void shouldRemoveVehicleFromReservation() {
-        Long vehicle5Id = 5L;
-        setReservationStatusToNew(reservationWithId5);
+        Long vehicleId = VEHICLE_1_ID;
+        setReservationStatusToNew(reservationWithId2);
 
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
-        assertEquals(1, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        reservationService.deleteVehicleFromReservation(reservationWithId5.getId(), vehicle5Id);
+        reservationService.deleteVehicleFromNewReservation(reservationWithId2.getId(), vehicleId);
 
-        vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
-        assertEquals(0, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2 - 1);
     }
 
     @Test
     void shouldNotRemoveVehicleFromReservation() {
-        Long vehicle5Id = 5L;
-        Long reservation5Id = reservationWithId5.getId();
+        Long vehicleId = VEHICLE_1_ID;
+        Long reservationId = reservationWithId2.getId();
 
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId5.getId());
-        assertEquals(1, vehicles.size());
+        findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> reservationService.deleteVehicleFromReservation(reservation5Id, vehicle5Id));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> reservationService.deleteVehicleFromNewReservation(reservationId, vehicleId));
+        assertEquals("Can not remove vehicle from reservation with status: " + reservationWithId2.getReservationStatus(), exception.getMessage());
     }
 
     @Test
-    void shouldCalculateTotalCost() {
-        Money totalCost = reservationWithId5.getTotalCost();
-        reservationWithId5.setReservationStatus(Reservation.ReservationStatus.NEW);
-        reservationWithId5.setTotalCost(null);
-        reservationWithId5.setDepositAmount(null);
-        reservationRepository.save(reservationWithId5);
+    void shouldCalculateReservationTotalCost() {
+        Money totalCost = reservationWithId2.getTotalCost();
+        reservationWithId2.setReservationStatus(Reservation.ReservationStatus.NEW);
+        reservationWithId2.setTotalCost(null);
+        reservationWithId2.setDepositAmount(null);
+        reservationRepository.save(reservationWithId2);
 
-        Money cost = reservationService.calculateCost(reservationWithId5.getId());
+        Money cost = reservationService.calculateNewReservationCost(reservationWithId2.getId());
 
         assertEquals(totalCost, cost);
     }
 
     @Test
     void shouldNotCalculateTotalCost() {
-        Long id = reservationWithId5.getId();
-        assertThrows(IllegalArgumentException.class, () -> reservationService.calculateCost(id));
+        Long reservationId = reservationWithId2.getId();
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> reservationService.calculateNewReservationCost(reservationId));
+        assertEquals("When calculating the total cost, the reservation status should be NEW", exception.getMessage());
     }
 
     private void setReservationStatusToNew(Reservation reservation) {
         reservation.setReservationStatus(Reservation.ReservationStatus.NEW);
         reservationRepository.save(reservation);
+    }
+
+    private List<Reservation> findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
+        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(clientId, PAGEABLE);
+        List<Reservation> content = page.getContent();
+        assertEquals(expectedSize, content.size());
+        return content;
+    }
+
+    private void findVehiclesByReservationIdAssertSize(Long reservationId, int expectedSize) {
+        Page<Vehicle> page = reservationRepository.findVehiclesByReservationId(reservationId, PAGEABLE);
+        List<Vehicle> content = page.getContent();
+        assertEquals(expectedSize, content.size());
     }
 
     private Reservation findReservationById(Long reservationId) {
