@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class AuthenticationService {
 
     private final RegistrationService registrationService;
     private final LoginService loginService;
 
+    @Transactional
     public Client register(Client client) {
       return registrationService.registerUser(client);
     }
