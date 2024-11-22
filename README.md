@@ -20,7 +20,7 @@ Vehicle sharing application jest systemem, który umożliwia użytkownikom wypo�
 
 - Rejestracja i logowanie użytkownika przy użyciu JWT.
 - Pobieranie dostępnych w danym przedziale czasowym pojazdów.
-- Operacje typu CRUD oraz niezbędna walidacja do zachowania spójności danych na pojazdach, rezerwacjach,wypożyczeniach oraz użytkownikach.
+- Operacje typu CRUD oraz niezbędna walidacja do zachowania spójności danych na pojazdach, rezerwacjach,wypożyczeniach i użytkownikach.
 - Ograniczenie dostępu do poszczególnych części aplikacji na podstawie ról użytkowników.
 - Szukanie pojazdów po kryteriach takich jak marka, model, rok produkcji, etc.
 - Użytkownik ma dostęp do informacji o tym, jakich dokonał rezerwacji i jakie pojazdy znajdowały się w każdej z nich.
