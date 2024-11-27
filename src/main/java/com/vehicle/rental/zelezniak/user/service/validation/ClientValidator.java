@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.user.service;
+package com.vehicle.rental.zelezniak.user.service.validation;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;

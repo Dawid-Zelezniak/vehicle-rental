@@ -3,6 +3,7 @@ package com.vehicle.rental.zelezniak.user.service;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
+import com.vehicle.rental.zelezniak.user.service.validation.ClientValidator;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
+
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,29 +36,30 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public ClientDto findById(Long id) {
-        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
+        validateNotNull(id, CLIENT_ID_NOT_NULL);
         Client client = findClient(id);
         return ClientMapper.toDto(client);
     }
 
+    // let the client search for himself by id
     @Transactional(readOnly = true)
     public Client findClientById(Long id) {
-        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
+        validateNotNull(id,CLIENT_ID_NOT_NULL);
         return findClient(id);
     }
 
     @Transactional
     public Client update(Long id, Client newData) {
         log.debug("Validating client data before update: {}", newData.getEmail());
-        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
-        validateNotNull(newData, InputValidator.CLIENT_NOT_NULL);
+        validateNotNull(id, CLIENT_ID_NOT_NULL);
+        validateNotNull(newData, CLIENT_NOT_NULL);
         Client clientFromDb = findClient(id);
         return validateAndUpdateClient(clientFromDb, newData);
     }
 
     @Transactional
     public void delete(Long id) {
-        validateNotNull(id, InputValidator.CLIENT_ID_NOT_NULL);
+        validateNotNull(id, CLIENT_ID_NOT_NULL);
         Client clientToDelete = findClient(id);
         log.debug("Starting deletion process for client: {}", clientToDelete.getEmail());
         handleDeleteClient(clientToDelete);
@@ -63,7 +67,7 @@ public class ClientService {
 
     @Transactional(readOnly = true)
     public Client findByEmail(String email) {
-        validateNotNull(email, InputValidator.CLIENT_EMAIL_NOT_NULL);
+        validateNotNull(email, CLIENT_EMAIL_NOT_NULL);
         return clientRepository.findByCredentialsEmail(email)
                 .orElseThrow(() -> {
                     log.error("Client with email: {} not found.", email);
@@ -105,7 +109,8 @@ public class ClientService {
     private void handleDeleteClient(Client clientToDelete) {
         String email = clientToDelete.getEmail();
         log.info("Deleting client: {}", email);
-        removeRoles(clientToDelete);
+        clientToDelete.setRoles(null);
+        clientRepository.save(clientToDelete);
         deleteClientFromAllTables(clientToDelete);
         log.info("Client: {} has been deleted", email);
     }
@@ -114,10 +119,6 @@ public class ClientService {
         clientRepository.removeClientFromReservations(c.getId());
         clientRepository.removeClientFromRents(c.getId());
         clientRepository.delete(c);
-    }
-
-    private void removeRoles(Client userToDelete) {
-        userToDelete.setRoles(null);
     }
 }
 

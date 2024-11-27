@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.security.authentication;
+package com.vehicle.rental.zelezniak.util.validation;
 
 
 import lombok.extern.slf4j.Slf4j;
