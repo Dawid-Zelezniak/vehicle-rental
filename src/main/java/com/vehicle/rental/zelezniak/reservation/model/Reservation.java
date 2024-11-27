@@ -1,10 +1,12 @@
 package com.vehicle.rental.zelezniak.reservation.model;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
+import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.util.Objects;
@@ -24,18 +26,21 @@ public class Reservation {
     private Long id;
 
     @Embedded
+    @Valid
     private RentInformation rentInformation;
 
     @Embedded
     @AttributeOverride(
             name = "value",
             column = @Column(name = "total_cost"))
+    @Valid
     private Money totalCost;
 
     @Embedded
     @AttributeOverride(
             name = "value",
             column = @Column(name = "deposit_amount"))
+    @Valid
     private Money depositAmount;
 
     @Enumerated(EnumType.STRING)
@@ -45,6 +50,7 @@ public class Reservation {
             CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.REFRESH})
     @JoinColumn(name = "client_id")
+    @Valid
     private Client client;
 
     @ManyToMany(cascade = {
@@ -54,6 +60,7 @@ public class Reservation {
             name = "reserved_vehicles",
             joinColumns = @JoinColumn(name = "reservation_id"),
             inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
+    @Valid
     private Set<Vehicle> vehicles;
 
     public enum ReservationStatus {
@@ -61,6 +68,10 @@ public class Reservation {
         ACTIVE,
         CANCELLED,
         COMPLETED
+    }
+
+    public RentDuration getDuration() {
+        return rentInformation.getRentDuration();
     }
 
     @Override
