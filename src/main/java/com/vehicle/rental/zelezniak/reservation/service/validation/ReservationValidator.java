@@ -1,37 +1,37 @@
-package com.vehicle.rental.zelezniak.reservation.service;
+package com.vehicle.rental.zelezniak.reservation.service.validation;
 
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
+import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationValidator {
 
     private final AvailableVehiclesRetriever vehiclesRetriever;
-    private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
 
-    @Transactional()
+    /**
+     * This method validates the reservation data before proceeding with the payment:
+     * - The reservation must have status 'NEW'.
+     * - The reservation must contain at least one vehicle.
+     * - It must be ensured that none of the selected vehicles have been already reserved or rented.
+     */
     public void validateReservationDataBeforePayment(Long id) {
-        Reservation reservationToPay = findReservation(id);
+        Reservation reservationToPay = reservationService.findById(id);
         validateReservationStatus(reservationToPay.getReservationStatus());
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationToPay.getId());
+        Collection<Vehicle> vehicles = reservationService.findVehiclesByReservationId(reservationToPay.getId());
         checkIfReservationContainsVehicles(vehicles.size());
         checkIfNobodyReservedAnyPickedVehicle(reservationToPay, vehicles);
-    }
-
-    private Reservation findReservation(Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Reservation with id " + id + " does not exist."));
     }
 
     private void validateReservationStatus(Reservation.ReservationStatus status) {
@@ -51,13 +51,12 @@ public class ReservationValidator {
         RentDuration rentDuration = information.getRentDuration();
         Collection<Vehicle> availableVehiclesInPeriod = vehiclesRetriever.findVehiclesAvailableInPeriod(rentDuration);
         if (!availableVehiclesInPeriod.containsAll(pickedVehicles)) {
-            removeVehiclesAndThrowException(reservation);
+            removeVehiclesAndThrowException(reservation.getId());
         }
     }
 
-    private void removeVehiclesAndThrowException(Reservation reservation) {
-        reservation.setVehicles(null);
-        reservationRepository.save(reservation);
+    private void removeVehiclesAndThrowException(Long reservationId) {
+       reservationService.deleteVehiclesFromReservation(reservationId);
         throw new IllegalArgumentException(
                 "Someone already reserved vehicle that you tried to reserve.Pick vehicles one more time.");
     }
