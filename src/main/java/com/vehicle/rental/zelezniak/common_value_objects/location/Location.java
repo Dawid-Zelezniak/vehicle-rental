@@ -4,6 +4,7 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
+import jakarta.validation.Valid;
 import lombok.*;
 
 @Embeddable
@@ -19,12 +20,14 @@ public class Location {
     @AttributeOverride(
             name = "cityName",
             column = @Column(name = "city"))
+    @Valid
     private final City city;
 
     @Embedded
     @AttributeOverride(
             name = "streetName",
             column = @Column(name = "street"))
+    @Valid
     private final Street street;
 
     private final String additionalInformation;
