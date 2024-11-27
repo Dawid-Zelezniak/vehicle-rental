@@ -1,5 +1,6 @@
 package com.vehicle.rental.zelezniak.user.controller;
 
+import com.vehicle.rental.zelezniak.security.AccessValidator;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
@@ -8,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
 
     private final ClientService clientService;
+    private final AccessValidator validator;
 
     @GetMapping
     public Page<ClientDto> findAll(Pageable pageable) {
@@ -28,9 +31,11 @@ public class ClientController {
         return clientService.findById(id);
     }
 
+
     @PutMapping("/update/{id}")
-    public Client update(@PathVariable Long id,  @RequestBody @Valid Client newData) {
-       return clientService.update(id, newData);
+    public Client update(@PathVariable Long id, @RequestBody @Valid Client newData, Principal principal) {
+        validator.validateClientAccess(id, principal);
+        return clientService.update(id, newData);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -40,7 +45,7 @@ public class ClientController {
     }
 
     @GetMapping("/email/{email}")
-    public Client findByEmail(@PathVariable String email){
+    public Client findByEmail(@PathVariable String email) {
         return clientService.findByEmail(email);
     }
 }
