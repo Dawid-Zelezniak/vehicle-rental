@@ -5,10 +5,13 @@ import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.rent.repository.RentRepository;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -19,6 +22,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AvailableVehiclesRetriever {
 
     private final RentRepository rentRepository;
@@ -27,7 +31,7 @@ public class AvailableVehiclesRetriever {
 
     public Page<Vehicle> findVehiclesAvailableInPeriod(RentDuration duration, Pageable pageable) {
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesInPeriod(duration);
-        return vehicleRepository.findVehiclesByIdNotIn(unavailableVehiclesIdsInPeriod,pageable);
+        return vehicleRepository.findVehiclesByIdNotIn(unavailableVehiclesIdsInPeriod, pageable);
     }
 
     public Collection<Vehicle> findVehiclesAvailableInPeriod(RentDuration duration) {

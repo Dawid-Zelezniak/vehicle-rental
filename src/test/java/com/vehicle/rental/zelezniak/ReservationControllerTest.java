@@ -6,7 +6,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import com.vehicle.rental.zelezniak.config.*;
-import com.vehicle.rental.zelezniak.reservation.dto.ReservationCreationRequest;
+import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;

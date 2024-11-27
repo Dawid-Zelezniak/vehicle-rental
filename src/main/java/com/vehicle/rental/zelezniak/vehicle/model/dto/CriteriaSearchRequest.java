@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.vehicle.model.util;
+package com.vehicle.rental.zelezniak.vehicle.model.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

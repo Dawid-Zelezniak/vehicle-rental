@@ -35,9 +35,9 @@ public interface VehicleRepository extends JpaRepository<Vehicle,Long>{
 
     @Modifying
     @Query(nativeQuery = true,value = "DELETE FROM reserved_vehicles rv WHERE rv.vehicle_id = :id")
-    void removeVehicleFromReservedVehicles(Long id);
+    void deleteFromReservedVehicles(Long id);
 
     @Modifying
     @Query(nativeQuery = true,value = "DELETE FROM rented_vehicles rv WHERE rv.vehicle_id = :id")
-    void removeVehicleFromRentedVehicles(Long id);
+    void deleteFromRentedVehicles(Long id);
 }

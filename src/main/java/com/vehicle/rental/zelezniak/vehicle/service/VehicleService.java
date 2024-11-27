@@ -3,9 +3,10 @@ package com.vehicle.rental.zelezniak.vehicle.service;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.vehicle.exception.VehicleDeletionException;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
+import com.vehicle.rental.zelezniak.vehicle.service.validation.VehicleValidator;
 import com.vehicle.rental.zelezniak.vehicle.service.vehicle_update.VehicleUpdateStrategy;
 import com.vehicle.rental.zelezniak.vehicle.service.vehicle_update.VehicleUpdateStrategyFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
-import static com.vehicle.rental.zelezniak.util.validation.InputValidator.VEHICLE_ID_NOT_NULL;
-import static com.vehicle.rental.zelezniak.util.validation.InputValidator.VEHICLE_NOT_NULL;
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +48,7 @@ public class VehicleService {
     @Transactional
     public Vehicle addVehicle(Vehicle vehicle) {
         validateNotNull(vehicle, VEHICLE_NOT_NULL);
-        vehicleValidator.throwExceptionIfVehicleExist(vehicle.getRegistrationNumber());
+        vehicleValidator.ensureVehicleDoesNotExist(vehicle.getRegistrationNumber());
         log.info("Saving vehicle to database");
         Vehicle saved = vehicleRepository.save(vehicle);
         log.info("Vehicle with id: {} has been saved.", saved.getId());
@@ -104,8 +103,8 @@ public class VehicleService {
     private void validateVehicleBeforeUpdate(Vehicle vehicleFromDb, Vehicle newData) {
         log.debug("Validating vehicle before update. vehicleFromDb id: {}, newData registration: {}",
                 vehicleFromDb.getId(), newData.getRegistrationNumber());
-        vehicleValidator.checkIfVehiclesHasSameTypes(vehicleFromDb, newData);
-        vehicleValidator.checkIfVehicleCanBeUpdated(vehicleFromDb.getRegistrationNumber(), newData);
+        vehicleValidator.validateVehicleTypeConsistency(vehicleFromDb, newData);
+        vehicleValidator.validateVehicleUpdate(vehicleFromDb.getRegistrationNumber(), newData);
     }
 
     private Vehicle getStrategyAndUpdate(Vehicle vehicleFromDb, Vehicle newData) {
@@ -121,7 +120,7 @@ public class VehicleService {
         Vehicle vehicle = findVehicle(id);
         if (vehicle.canBeDeleted()) {
             log.info("Deleting vehicle with id: {}", id);
-            deleteVehicleFromAllTablesInDb(vehicle);
+            removeFromDatabase(vehicle);
             log.info("Vehicle with id: {} has been deleted.", id);
         } else {
             log.info("Attempt to delete vehicle with id: {} failed. Status is not UNAVAILABLE", id);
@@ -129,19 +128,19 @@ public class VehicleService {
         }
     }
 
-    private void deleteVehicleFromAllTablesInDb(Vehicle v) {
-        Long id = v.getId();
+    private void removeFromDatabase(Vehicle vehicle) {
+        Long id = vehicle.getId();
         try {
-            deleteVehicleData(id);
-            vehicleRepository.delete(v);
+            removeVehicleAssociations(id);
+            vehicleRepository.delete(vehicle);
         } catch (Exception e) {
             log.error("Exception while deleting vehicle with id: {}", id, e);
             throw new VehicleDeletionException("Could not delete vehicle with id: " + id);
         }
     }
 
-    private void deleteVehicleData(Long id) {
-        vehicleRepository.removeVehicleFromReservedVehicles(id);
-        vehicleRepository.removeVehicleFromRentedVehicles(id);
+    private void removeVehicleAssociations(Long id) {
+        vehicleRepository.deleteFromReservedVehicles(id);
+        vehicleRepository.deleteFromRentedVehicles(id);
     }
 }

@@ -5,7 +5,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.config.*;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation.dto.ReservationCreationRequest;
+import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import static com.vehicle.rental.zelezniak.config.TestConstants.*;

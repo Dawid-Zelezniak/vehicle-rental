@@ -2,7 +2,7 @@ package com.vehicle.rental.zelezniak.vehicle.service;
 
 import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.util.CriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.CriteriaSearchStrategyFactory;
 import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.VehicleSearchStrategy;
 import lombok.*;
@@ -25,7 +25,7 @@ public class VehicleCriteriaSearch {
 
     public <T> Page<Vehicle> findVehiclesByCriteria(CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
         CriteriaType criteria = CriteriaType.getCriteriaFromString(searchRequest.getCriteriaName());
-        UserAccessValidator.checkIfUserCanSearchBySuchCriteria(criteria);
+        CriteriaAccessValidator.checkIfUserCanSearchBySuchCriteria(criteria);
         VehicleSearchStrategy strategy = searchStrategyFactory.getStrategy(criteria);
         return strategy.findByCriteria(searchRequest.getValue(), pageable);
     }
@@ -53,7 +53,7 @@ public class VehicleCriteriaSearch {
         private final String value;
     }
 
-    private static class UserAccessValidator {
+    private static class CriteriaAccessValidator {
 
         private static final String ROLE_ADMIN = "ROLE_ADMIN";
 

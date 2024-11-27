@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.vehicle.service;
+package com.vehicle.rental.zelezniak.vehicle.service.validation;
 
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;

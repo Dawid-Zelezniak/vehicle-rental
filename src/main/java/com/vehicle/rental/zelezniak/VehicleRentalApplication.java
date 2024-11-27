@@ -2,7 +2,6 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.service.AdminInitializationService;
-import jakarta.annotation.PostConstruct;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

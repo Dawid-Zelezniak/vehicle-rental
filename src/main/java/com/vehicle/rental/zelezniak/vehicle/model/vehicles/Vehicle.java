@@ -65,6 +65,10 @@ public abstract class Vehicle {
         return vehicleInformation.getRegistrationNumber();
     }
 
+    public String getRegistrationValue() {
+        return getRegistrationNumber().getRegistration();
+    }
+
     public boolean canBeDeleted() {
         return Status.UNAVAILABLE == this.status;
     }
@@ -107,6 +111,7 @@ public abstract class Vehicle {
      * <p>
      * A vehicle marked as UNAVAILABLE is not operational or requires maintenance,
      * and thus is excluded from the rental offer until it is repaired and marked as AVAILABLE
+     * Vehicle must be UNAVAILABLE before removal.
      */
     @RequiredArgsConstructor
     @Getter
