@@ -5,6 +5,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 import java.util.Objects;
@@ -23,15 +24,18 @@ public class Rent {
     private Long id;
 
     @Embedded
+    @Valid
     private RentInformation rentInformation;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "value",
             column = @Column(name = "total_cost"))
     private Money totalCost;
 
     @Embedded
+    @Valid
     @AttributeOverride(
             name = "value",
             column = @Column(name = "deposit_amount"))
@@ -44,6 +48,7 @@ public class Rent {
             CascadeType.MERGE, CascadeType.DETACH,
             CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "client_id")
+    @Valid
     private Client client;
 
     @ManyToMany(cascade = {
@@ -53,6 +58,7 @@ public class Rent {
             name = "rented_vehicles",
             joinColumns = @JoinColumn(name = "rent_id"),
             inverseJoinColumns = @JoinColumn(name = "vehicle_id"))
+    @Valid
     private Set<Vehicle> vehicles;
 
     public enum RentStatus {
