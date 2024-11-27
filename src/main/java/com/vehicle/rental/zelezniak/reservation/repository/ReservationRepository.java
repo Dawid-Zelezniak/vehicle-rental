@@ -20,6 +20,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT v FROM Reservation r JOIN r.vehicles v WHERE r.id = :id")
     Collection<Vehicle> findVehiclesByReservationId(Long id);
 
+    @Query("SELECT v.id FROM Reservation r JOIN r.vehicles v WHERE r.id = :id")
+    Collection<Long> findVehiclesIdsByReservationId(Long id);
+
     @Query("SELECT v FROM Reservation r JOIN r.vehicles v WHERE r.id = :id")
     Page<Vehicle> findVehiclesByReservationId(Long id, Pageable pageable);
 
@@ -31,13 +34,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     Set<Long> unavailableVehicleIdsForReservationInPeriod(LocalDateTime start, LocalDateTime end);
 
     @Modifying
-    @Query(nativeQuery = true,value = "DELETE FROM reserved_vehicles " +
+    @Query(nativeQuery = true, value = "DELETE FROM reserved_vehicles " +
             "WHERE reservation_id = :reservationId AND vehicle_id = :vehicleId")
     void deleteVehicleFromReservation(Long reservationId, Long vehicleId);
 
     @Modifying
-    @Query(nativeQuery = true,value = "INSERT INTO reserved_vehicles " +
+    @Query(nativeQuery = true, value = "DELETE FROM reserved_vehicles " +
+            "WHERE vehicle_id IN (:vehicleIds)")
+    void deleteVehiclesFromReservation(Collection<Long> vehicleIds);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "INSERT INTO reserved_vehicles " +
             "(reservation_id,vehicle_id) values (:reservationId,:vehicleId)")
     void addVehicleToReservation(Long vehicleId, Long reservationId);
 
+    @Modifying
+    @Query(nativeQuery = true, value = "UPDATE reservations SET reservation_status = 'ACTIVE' WHERE id = :id")
+    void updateReservationStatusAsActive(Long id);
 }
