@@ -2,6 +2,7 @@ package com.vehicle.rental.zelezniak.common_value_objects;
 
 import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import lombok.*;
 
 /**
@@ -17,6 +18,7 @@ import lombok.*;
 public class RentInformation {
 
     @Embedded
+    @Valid
     private final RentDuration rentDuration;
 
     @Embedded
@@ -25,6 +27,7 @@ public class RentInformation {
             @AttributeOverride(name = "street.streetName", column = @Column(name = "pick_up_street")),
             @AttributeOverride(name = "additionalInformation", column = @Column(name = "pick_up_additional_info"))
     })
+    @Valid
     private final Location pickUpLocation;
 
     @Embedded
@@ -33,5 +36,6 @@ public class RentInformation {
             @AttributeOverride(name = "street.streetName", column = @Column(name = "drop_off_street")),
             @AttributeOverride(name = "additionalInformation", column = @Column(name = "drop_off_additional_info"))
     })
+    @Valid
     private final Location dropOffLocation;
 }
