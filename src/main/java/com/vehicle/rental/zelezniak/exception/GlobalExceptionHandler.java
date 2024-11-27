@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,6 +62,12 @@ public class GlobalExceptionHandler {
         constraintViolations.forEach(constraintViolation -> errors.add(constraintViolation.getMessage()));
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(new ErrorInformation(status.value(), errors));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorInformation> handleException(AccessDeniedException exception) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        return createResponse(status, exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
