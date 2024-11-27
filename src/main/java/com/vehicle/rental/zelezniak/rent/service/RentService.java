@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
-import static com.vehicle.rental.zelezniak.util.validation.InputValidator.*;
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,47 +28,38 @@ public class RentService {
 
     @Transactional(readOnly = true)
     public Rent findById(Long id) {
-        validateId(id);
+        validateNotNull(id, RENT_ID_NOT_NULL);
         return findRent(id);
     }
 
     @Transactional
     public void add(Rent rent) {
-        validateRent(rent);
+        validateNotNull(rent, RENT_NOT_NULL);
         handleAddRent(rent);
     }
 
     @Transactional(readOnly = true)
     public Page<Rent> findAllByClientId(Long id, Pageable pageable) {
-        validateClientId(id);
+        validateNotNull(id, CLIENT_ID_NOT_NULL);
         return rentRepository.findAllByClientId(id, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Vehicle> findVehiclesByRentId(Long id, Pageable pageable) {
-        validateId(id);
+        validateNotNull(id, RENT_ID_NOT_NULL);
         return rentRepository.findVehiclesByRentId(id, pageable);
     }
 
-    private void validateId(Long id) {
-        inputValidator.throwExceptionIfObjectIsNull(id, RENT_ID_NOT_NULL);
+    private void validateNotNull(Object o, String message) {
+        inputValidator.throwExceptionIfObjectIsNull(o, message);
     }
 
     private Rent findRent(Long id) {
         return rentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Rent with id: " + id + " does not exists."));
-    }
-
-    private void validateRent(Rent rent) {
-        inputValidator.throwExceptionIfObjectIsNull(rent, RENT_NOT_NULL);
+                .orElseThrow(() -> new NoSuchElementException("Rent with id: " + id + " does not exists."));
     }
 
     private void handleAddRent(Rent rent) {
         rentRepository.save(rent);
-    }
-
-    private void validateClientId(Long clientId) {
-        inputValidator.throwExceptionIfObjectIsNull(clientId, CLIENT_ID_NOT_NULL);
     }
 }
