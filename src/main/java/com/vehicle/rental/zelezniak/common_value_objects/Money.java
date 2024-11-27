@@ -12,7 +12,7 @@ public record Money(
         BigDecimal value) {
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
-
+    private static final int ONE_HUNDRED_CENTS = 100;
 
     public Money(BigDecimal value) {
         validate(value);
@@ -20,7 +20,7 @@ public record Money(
     }
 
     public long convertToCents() {
-        BigDecimal cents = value.multiply(BigDecimal.valueOf(100));
+        BigDecimal cents = value.multiply(BigDecimal.valueOf(ONE_HUNDRED_CENTS));
         return cents.longValueExact();
     }
 
@@ -35,8 +35,7 @@ public record Money(
     }
 
     private void throwException() {
-        throw new IllegalArgumentException(
-                "Money value is incorrect");
+        throw new IllegalArgumentException("Money value is incorrect");
     }
 
     private BigDecimal format(BigDecimal money) {
