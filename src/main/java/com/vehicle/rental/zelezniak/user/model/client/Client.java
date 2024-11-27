@@ -53,11 +53,11 @@ public class Client implements UserDetails {
     @Valid
     private Address address;
 
-    @ManyToMany(fetch = FetchType.EAGER,
-            cascade = {CascadeType.MERGE, CascadeType.DETACH})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.DETACH})
     @JoinTable(name = "clients_roles",
             joinColumns = @JoinColumn(name = "client_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Valid
     private Set<Role> roles = new HashSet<>();
 
     public String getEmail() {

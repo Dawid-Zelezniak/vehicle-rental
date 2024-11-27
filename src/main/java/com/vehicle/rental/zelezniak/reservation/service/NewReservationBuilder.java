@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.reservation.model.util;
+package com.vehicle.rental.zelezniak.reservation.service;
 
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;

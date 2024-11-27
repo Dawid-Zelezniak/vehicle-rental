@@ -1,7 +1,7 @@
 package com.vehicle.rental.zelezniak.payment.service;
 
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
-import com.vehicle.rental.zelezniak.reservation.service.ReservationValidator;
+import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
