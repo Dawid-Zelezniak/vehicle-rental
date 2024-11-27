@@ -7,7 +7,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.rent.service.RentService;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
+import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -18,13 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
-import static com.vehicle.rental.zelezniak.util.validation.InputValidator.*;
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.*;
 
-//refactor validation and add logs
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -64,6 +61,15 @@ public class ReservationService {
         return Page.empty();
     }
 
+    @Transactional(readOnly = true)
+    public Collection<Vehicle> findVehiclesByReservationId(Long id) {
+        validateNotNull(id, RESERVATION_ID_NOT_NULL);
+        if (repository.existsById(id)) {
+            return repository.findVehiclesByReservationId(id);
+        }
+        return new ArrayList<>();
+    }
+
     @Transactional
     public Reservation addReservation(ReservationCreationRequest request) {
         log.debug("Received new ReservationCreationRequest : {}", request);
@@ -72,19 +78,24 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation updateLocation(Long id, RentInformation newData) {
+    public Reservation updateLocationForNewReservation(Long id, RentInformation newData) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
         validateNotNull(newData, "Rent information" + CAN_NOT_BE_NULL);
         Reservation r = findReservation(id);
         return newReservationService.updateLocationForReservation(r, newData);
     }
 
+    /**
+     * Updates the duration of an existing reservation and removes any vehicles associated with it.
+     */
     @Transactional
-    public Reservation updateDuration(Long id, RentDuration duration) {
+    public Reservation updateDurationForNewReservation(Long id, RentDuration duration) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
         validateNotNull(duration, "Rent duration" + CAN_NOT_BE_NULL);
-        Reservation r = findReservation(id);
-        return newReservationService.updateDurationForReservation(r, duration);
+        Reservation reservation = findReservation(id);
+        Reservation updated = newReservationService.updateDurationForReservation(reservation, duration);
+        handleRemoveVehicles(id);
+        return updated;
     }
 
     @Transactional
@@ -95,7 +106,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public void addVehicleToReservation(Long id, Long vehicleId) {
+    public void addVehicleToNewReservation(Long id, Long vehicleId) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
         validateNotNull(vehicleId, VEHICLE_ID_NOT_NULL);
         Reservation r = findReservation(id);
@@ -103,7 +114,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteVehicleFromReservation(Long id, Long vehicleId) {
+    public void deleteVehicleFromNewReservation(Long id, Long vehicleId) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
         validateNotNull(vehicleId, VEHICLE_ID_NOT_NULL);
         Reservation r = findReservation(id);
@@ -111,19 +122,26 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Money calculateCost(Long id) {
+    public Money calculateNewReservationCost(Long id) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
         Reservation r = findReservation(id);
         return newReservationService.calculateCost(r);
     }
 
+    /**
+     * After successful payment, this method retrieves the reservation
+     * ID from the metadata and updates its status.
+     */
     @Transactional
     public void setReservationStatusAsACTIVE(StripeObject stripeObject) {
         Long reservationId = getReservationIdFromMetadata(stripeObject);
-        Reservation reservation = findReservation(reservationId);
         log.debug("Updating reservation status to ACTIVE for reservation id: {}", reservationId);
-        reservation.setReservationStatus(Reservation.ReservationStatus.ACTIVE);
-        repository.save(reservation);
+        repository.updateReservationStatusAsActive(reservationId);
+    }
+
+    @Transactional
+    public void deleteVehiclesFromReservation(Long reservationId) {
+        handleRemoveVehicles(reservationId);
     }
 
     private void validateNotNull(Object o, String message) {
@@ -137,6 +155,12 @@ public class ReservationService {
                     log.error("Reservation with ID : {} not found", id);
                     return new NoSuchElementException("Reservation with id " + id + " does not exist.");
                 });
+    }
+
+    private void handleRemoveVehicles(Long reservationId) {
+        Collection<Long> vehicleIds = repository.findVehiclesIdsByReservationId(reservationId);
+        log.warn("Deleting vehicles from reservation with id: {}", reservationId);
+        repository.deleteVehiclesFromReservation(vehicleIds);
     }
 
     private Long getReservationIdFromMetadata(StripeObject stripeObject) {
