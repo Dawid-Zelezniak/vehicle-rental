@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.security.authentication;
+package com.vehicle.rental.zelezniak.security.authentication.token;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -9,10 +9,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**

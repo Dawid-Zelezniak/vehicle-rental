@@ -1,13 +1,12 @@
-package com.vehicle.rental.zelezniak.user.controller;
+package com.vehicle.rental.zelezniak.security.controller;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
-import com.vehicle.rental.zelezniak.user.service.authentication.AuthenticationService;
+import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**

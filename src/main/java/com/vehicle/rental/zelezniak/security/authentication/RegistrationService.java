@@ -1,18 +1,21 @@
-package com.vehicle.rental.zelezniak.user.service.authentication;
+package com.vehicle.rental.zelezniak.security.authentication;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
-import com.vehicle.rental.zelezniak.user.service.ClientValidator;
+import com.vehicle.rental.zelezniak.user.service.validation.ClientValidator;
 import com.vehicle.rental.zelezniak.util.TimeFormatter;
+import com.vehicle.rental.zelezniak.util.validation.EmailPatternValidator;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CLIENT_NOT_NULL;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ class RegistrationService {
     }
 
     private void validateData(Client client) {
-        inputValidator.throwExceptionIfObjectIsNull(client, InputValidator.CLIENT_NOT_NULL);
+        inputValidator.throwExceptionIfObjectIsNull(client, CLIENT_NOT_NULL);
         EmailPatternValidator.validate(client.getEmail());
         clientValidator.validateUserDoesNotExists(client.getEmail());
     }

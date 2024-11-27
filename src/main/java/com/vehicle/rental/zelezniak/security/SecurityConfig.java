@@ -1,6 +1,6 @@
-package com.vehicle.rental.zelezniak.config;
+package com.vehicle.rental.zelezniak.security;
 
-import com.vehicle.rental.zelezniak.user.service.authentication.RSAKeyProperties;
+import com.vehicle.rental.zelezniak.security.authentication.token.RSAKeyProperties;
 import com.nimbusds.jose.jwk.*;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -31,6 +31,7 @@ public class SecurityConfig {
 
     private static final String ADMIN = "ADMIN";
     private static final String USER = "USER";
+    private final RSAKeyProperties keyProperties;
 
     private static final String[] ADMIN_ENDPOINTS = {
             "/clients",
@@ -62,8 +63,6 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
             "/auth/**"
     };
-
-    private final RSAKeyProperties keyProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {

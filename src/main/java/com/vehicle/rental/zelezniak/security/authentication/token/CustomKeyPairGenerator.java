@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.security.authentication;
+package com.vehicle.rental.zelezniak.security.authentication.token;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

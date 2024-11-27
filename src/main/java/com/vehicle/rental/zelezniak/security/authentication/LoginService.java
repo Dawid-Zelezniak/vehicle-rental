@@ -1,5 +1,6 @@
-package com.vehicle.rental.zelezniak.user.service.authentication;
+package com.vehicle.rental.zelezniak.security.authentication;
 
+import com.vehicle.rental.zelezniak.security.authentication.token.JWTGenerator;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.user.service.ClientService;

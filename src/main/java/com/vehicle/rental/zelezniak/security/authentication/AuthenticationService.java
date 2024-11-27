@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.user.service.authentication;
+package com.vehicle.rental.zelezniak.security.authentication;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;

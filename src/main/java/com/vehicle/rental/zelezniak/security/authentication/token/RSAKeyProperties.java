@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.security.authentication;
+package com.vehicle.rental.zelezniak.security.authentication.token;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
