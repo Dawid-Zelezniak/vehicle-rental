@@ -3,15 +3,15 @@ package com.vehicle.rental.zelezniak.reservation.service;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
+import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.reservation.model.util.NewReservationBuilder;
-import com.vehicle.rental.zelezniak.reservation.model.util.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategy;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyFactory;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
+import com.vehicle.rental.zelezniak.vehicle.service.validation.AvailableVehiclesValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,7 @@ public class NewReservationService {
     private final ReservationUpdateStrategyFactory strategyFactory;
     private final ReservationRepository reservationRepository;
     private final NewReservationBuilder reservationBuilder;
+    private final AvailableVehiclesValidator vehiclesValidator;
 
     @Transactional
     public Reservation addNewReservation(ReservationCreationRequest request) {
@@ -51,9 +52,6 @@ public class NewReservationService {
         return reservationRepository.save(updated);
     }
 
-    /**
-     * Updates the duration of an existing reservation and removes any vehicles associated with it.
-     */
     @Transactional
     public Reservation updateDurationForReservation(Reservation existing, RentDuration duration) {
         log.debug("Updating duration for reservation with ID : {}", existing.getId());
@@ -62,7 +60,7 @@ public class NewReservationService {
         ReservationUpdateStrategy<RentDuration> strategy = (ReservationUpdateStrategy<RentDuration>)
                 strategyFactory.getStrategy(duration.getClass());
         Reservation updated = strategy.update(existing, duration);
-        return removeVehiclesAndSave(updated);
+        return reservationRepository.save(updated);
     }
 
     @Transactional
@@ -75,7 +73,7 @@ public class NewReservationService {
     public void addVehicleToReservation(Reservation r, Long vehicleId) {
         checkIfStatusIsEqualNEW(r, "Can not add vehicle to reservation with status: " + r.getReservationStatus());
         log.warn("Adding vehicle with ID : {} to reservation with ID : {}", vehicleId, r.getId());
-        //add check if vehicle is still available
+        vehiclesValidator.checkIfVehicleIsStillAvailable(r.getDuration(), vehicleId);
         reservationRepository.addVehicleToReservation(vehicleId, r.getId());
     }
 
@@ -114,15 +112,11 @@ public class NewReservationService {
         }
     }
 
-    private Reservation removeVehiclesAndSave(Reservation r) {
-        r.setVehicles(null);
-        return reservationRepository.save(r);
-    }
-
     private void handleRemove(Reservation r) {
         log.warn("Deleting reservation with ID : {}", r.getId());
         r.setClient(null);
         r.setVehicles(null);
+        reservationRepository.save(r);
         reservationRepository.deleteById(r.getId());
     }
 }
