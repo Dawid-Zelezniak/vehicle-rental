@@ -1,11 +1,8 @@
-package com.vehicle.rental.zelezniak.reservation.model.util;
+package com.vehicle.rental.zelezniak.reservation.model.dto;
 
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
 
