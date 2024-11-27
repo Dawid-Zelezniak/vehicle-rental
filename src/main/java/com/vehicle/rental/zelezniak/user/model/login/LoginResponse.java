@@ -1,15 +1,14 @@
 package com.vehicle.rental.zelezniak.user.model.login;
 
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import lombok.*;
 
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 public class LoginResponse {
 
-    private Client client;
+    private ClientDto client;
     private String jwt;
 }

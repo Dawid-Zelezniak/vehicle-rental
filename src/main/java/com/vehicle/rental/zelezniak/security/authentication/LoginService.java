@@ -1,8 +1,10 @@
 package com.vehicle.rental.zelezniak.security.authentication;
 
 import com.vehicle.rental.zelezniak.security.authentication.token.JWTGenerator;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
+import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +51,8 @@ class LoginService implements UserDetailsService {
             throwException();
         }
         log.info("User logged in");
-        return new LoginResponse(clientService.findByEmail(email), token);
+        ClientDto dto = ClientMapper.toDto(clientService.findByEmail(email));
+        return new LoginResponse(dto, token);
     }
 
     private void throwException() {

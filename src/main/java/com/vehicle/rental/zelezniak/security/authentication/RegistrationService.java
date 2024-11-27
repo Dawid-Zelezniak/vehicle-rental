@@ -2,9 +2,11 @@ package com.vehicle.rental.zelezniak.security.authentication;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
+import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.validation.ClientValidator;
 import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import com.vehicle.rental.zelezniak.util.validation.EmailPatternValidator;
@@ -31,13 +33,13 @@ class RegistrationService {
     private final ClientValidator clientValidator;
 
     @Transactional
-    public Client registerUser(Client client) {
+    public ClientDto registerUser(Client client) {
         String email = client.getEmail();
         log.info("Starting registration process for client: {}", email);
         validateData(client);
         saveClient(client);
         log.info("Client: {} has been registered", email);
-        return client;
+        return ClientMapper.toDto(client);
     }
 
     private void validateData(Client client) {

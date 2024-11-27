@@ -4,9 +4,11 @@ import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
+import com.vehicle.rental.zelezniak.user.service.ClientMapper;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +68,8 @@ class AuthenticationServiceTest {
         LoginRequest loginRequest = new LoginRequest(client.getEmail(), "somepassword");
         LoginResponse login = authenticationService.login(loginRequest);
 
-        assertEquals(client, login.getClient());
+        ClientDto dto = ClientMapper.toDto(client);
+        assertEquals(dto, login.getClient());
         assertNotNull(login.getJwt());
     }
 }

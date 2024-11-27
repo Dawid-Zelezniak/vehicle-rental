@@ -1,6 +1,7 @@
 package com.vehicle.rental.zelezniak.security.controller;
 
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
@@ -21,7 +22,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public Client register(@RequestBody @Valid Client client){
+    public ClientDto register(@RequestBody @Valid Client client){
     return authService.register(client);
     }
 
