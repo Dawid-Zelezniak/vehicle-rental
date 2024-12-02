@@ -26,6 +26,12 @@ Vehicle sharing application jest systemem, który umożliwia użytkownikom wypo�
 - Użytkownik ma dostęp do informacji o tym, jakich dokonał rezerwacji i jakie pojazdy znajdowały się w każdej z nich.
 - Testy integracyjne sprawdzające poprawność działania aplikacji
 
+# Technologie:
+- Java 17
+- Spring 3.30
+- Junit 5
+- MySQL
+
 # Vehicle Sharing Application
 
 _Application under development._
@@ -54,3 +60,8 @@ Vehicle sharing application is a system that allows users to rent vehicles such 
 - The user has access to information about what reservations he or she has made or what vehicles were in each of them.
 - Integration tests checking the correct operation of the application.
 
+# Technologies:
+- Java 17
+- Spring 3.30
+- Junit 5
+- MySQL
