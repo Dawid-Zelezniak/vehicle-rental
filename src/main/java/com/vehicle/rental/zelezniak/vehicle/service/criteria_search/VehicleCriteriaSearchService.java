@@ -23,44 +23,21 @@ public class VehicleCriteriaSearch {
 
     private final CriteriaSearchStrategyFactory searchStrategyFactory;
 
-    public <T> Page<Vehicle> findVehiclesByCriteria(CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
-        CriteriaType criteria = CriteriaType.getCriteriaFromString(searchRequest.getCriteriaName());
-        CriteriaAccessValidator.checkIfUserCanSearchBySuchCriteria(criteria);
-        VehicleSearchStrategy strategy = searchStrategyFactory.getStrategy(criteria);
-        return strategy.findByCriteria(searchRequest.getValue(), pageable);
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public enum CriteriaType {
-
-        BRAND("brand"),
-        MODEL("model"),
-        REGISTRATION_NUMBER("registration number"),
-        PRODUCTION_YEAR("production year"),
-        STATUS("status");
-
-        public static CriteriaType getCriteriaFromString(String value) {
-            for (CriteriaType criteriaType : CriteriaType.values()) {
-                if (criteriaType.getValue().equalsIgnoreCase(value)) {
-                    return criteriaType;
-                }
-            }
-            log.error("Undefined criteria type: {}", value);
-            throw new IllegalArgumentException("Unknown criteria type " + value);
+    public Page<Vehicle> findVehiclesByCriteria(CriteriaSearchRequest searchRequest, Pageable pageable) {
+        if(searchRequest.getRegistration() != null){
+            CriteriaAccessValidator.checkIfUserCanSearchByRegistration();
         }
 
-        private final String value;
+        VehicleSearchStrategy strategy = searchStrategyFactory.getStrategy(criteria);
+        return strategy.findByCriteria(searchRequest.getValue(), pageable);
     }
 
     private static class CriteriaAccessValidator {
 
         private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-        private static void checkIfUserCanSearchBySuchCriteria(CriteriaType criteria) {
-            if (criteria == CriteriaType.REGISTRATION_NUMBER) {
+        private static void checkIfUserCanSearchByRegistration() {
                 validateUserHasAdminRole();
-            }
         }
 
         private static void validateUserHasAdminRole() {
