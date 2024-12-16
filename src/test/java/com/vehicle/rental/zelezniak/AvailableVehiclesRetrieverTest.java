@@ -30,11 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AvailableVehiclesRetrieverTest {
 
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1 = 0;
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 = 3;
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3 = 1;
     private Map<Long, Vehicle> vehicleMap;
-    private final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
+    private final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_VEHICLES);
 
     @Autowired
     private DatabaseSetup databaseSetup;
@@ -71,7 +68,7 @@ class AvailableVehiclesRetrieverTest {
     @Test
     void shouldFindAvailableVehiclesInPeriod2() {
         Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
-        motorcycle.setStatus(Vehicle.Status.UNAVAILABLE);
+        motorcycle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleService.update(motorcycle.getId(), motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 

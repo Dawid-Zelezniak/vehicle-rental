@@ -1,7 +1,6 @@
 package com.vehicle.rental.zelezniak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vehicle.rental.zelezniak.common_value_objects.location.City;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.config.ClientCreator;
@@ -13,7 +12,6 @@ import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserNam
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
-import com.vehicle.rental.zelezniak.util.TimeFormatter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.io.IOException;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +69,7 @@ class AuthenticationControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.name.lastName").value(name.getLastName()))
-                .andExpect(jsonPath("$.credentials.email").value(client.getEmail()))
+                .andExpect(jsonPath("$.email").value(client.getEmail()))
                 .andExpect(jsonPath("$.address.street.streetName").value(address.getStreet().streetName()))
                 .andExpect(jsonPath("$.address.houseNumber").value(address.getHouseNumber()))
                 .andExpect(jsonPath("$.address.flatNumber").value(address.getFlatNumber()))
@@ -79,7 +77,7 @@ class AuthenticationControllerTest {
                 .andExpect(jsonPath("$.address.postalCode").value(address.getPostalCode()))
                 .andExpect(jsonPath("$.address.country.countryName").value(address.getCountry().countryName()));
 
-        assertEquals(EXPECTED_NUMBER_OF_CLIENTS + 1, clientRepository.count());
+        assertEquals(NUMBER_OF_CLIENTS + 1, clientRepository.count());
     }
 
     @Test
@@ -144,7 +142,7 @@ class AuthenticationControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.client.name.firstName").value(name.getFirstName()))
                 .andExpect(jsonPath("$.client.name.lastName").value(name.getLastName()))
-                .andExpect(jsonPath("$.client.credentials.email").value(client.getEmail()))
+                .andExpect(jsonPath("$.client.email").value(client.getEmail()))
                 .andExpect(jsonPath("$.client.address.street.streetName").value(address.getStreet().streetName()))
                 .andExpect(jsonPath("$.client.address.houseNumber").value(address.getHouseNumber()))
                 .andExpect(jsonPath("$.client.address.flatNumber").value(address.getFlatNumber()))

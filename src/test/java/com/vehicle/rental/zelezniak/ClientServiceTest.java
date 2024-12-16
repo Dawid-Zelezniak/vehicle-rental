@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.vehicle.rental.zelezniak.config.TestConstants.CLIENT_3_ID;
-import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
@@ -32,7 +32,7 @@ class ClientServiceTest {
 
     private static Client clientWithId2;
     private static ClientDto client2Dto;
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_CLIENTS);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_CLIENTS);
 
     @Autowired
     private Client client;
@@ -59,10 +59,10 @@ class ClientServiceTest {
 
     @Test
     void shouldReturnAllClients() {
-        List<ClientDto> clients = findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
+        List<ClientDto> clients = findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
         assertTrue(clients.contains(client2Dto));
-        assertEquals(EXPECTED_NUMBER_OF_CLIENTS, clients.size());
+        assertEquals(NUMBER_OF_CLIENTS, clients.size());
 
         for (ClientDto client : clients) {
             assertNotNull(client.getId());
@@ -121,11 +121,11 @@ class ClientServiceTest {
 
     @Test
     void shouldDeleteClientWhenDataCorrect() {
-        findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
+        findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
         clientService.delete(clientWithId2.getId());
 
-        List<ClientDto> clients = findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS - 1);
+        List<ClientDto> clients = findAllClientsAndAssertSize(NUMBER_OF_CLIENTS - 1);
         assertFalse(clients.contains(client2Dto));
     }
 

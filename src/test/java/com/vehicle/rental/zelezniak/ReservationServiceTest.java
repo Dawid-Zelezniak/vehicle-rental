@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReservationServiceTest {
 
 
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RESERVATIONS);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_RESERVATIONS);
     private static Reservation reservationWithId2;
 
     @Autowired
@@ -63,15 +63,15 @@ class ReservationServiceTest {
         Page<Reservation> all = reservationService.findAll(PAGEABLE);
         List<Reservation> reservations = all.getContent();
 
-        assertEquals(EXPECTED_NUMBER_OF_RESERVATIONS, reservations.size());
+        assertEquals(NUMBER_OF_RESERVATIONS, reservations.size());
         assertTrue(reservations.contains(reservationWithId2));
     }
 
     @Test
     void shouldFindAllReservationsByClientId() {
-        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
-        assertEquals(EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS, reservations.size());
+        assertEquals(NUMBER_OF_CLIENT_2_RESERVATIONS, reservations.size());
         assertTrue(reservations.contains(reservationWithId2));
     }
 
@@ -90,11 +90,11 @@ class ReservationServiceTest {
 
     @Test
     void shouldAddNewReservationForClientWhenDataCorrect() {
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         Reservation reservation = reservationService.addReservation(creationRequest);
 
-        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
+        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
         assertTrue(reservations.contains(reservation));
     }
 
@@ -157,11 +157,11 @@ class ReservationServiceTest {
     void shouldDeleteReservationWhenDataCorrect() {
         setReservationStatusToNew(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         reservationService.deleteReservation(reservationWithId2.getId());
 
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
     }
 
     @Test

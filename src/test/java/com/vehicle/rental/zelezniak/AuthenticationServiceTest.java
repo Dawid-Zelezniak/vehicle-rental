@@ -19,7 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -53,11 +53,11 @@ class AuthenticationServiceTest {
 
     @Test
     void shouldRegisterUserWhenRequestContainsRequiredData() {
-        assertEquals(EXPECTED_NUMBER_OF_CLIENTS, clientRepository.count());
+        assertEquals(NUMBER_OF_CLIENTS, clientRepository.count());
 
         authenticationService.register(client);
 
-        assertEquals(EXPECTED_NUMBER_OF_CLIENTS + 1, clientRepository.count());
+        assertEquals(NUMBER_OF_CLIENTS + 1, clientRepository.count());
         assertEquals(client, clientService.findClientById(client.getId()));
     }
 

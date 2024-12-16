@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RentServiceTest {
 
     public static final int EXPECTED_NUMBER_OF_UNAVAILABLE_VEHICLES_FOR_DURATION_1 = 4;
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RENTS);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_RENTS);
 
     private static Rent rentWithId1;
 
@@ -60,7 +60,7 @@ class RentServiceTest {
         Page<Rent> page = rentService.findAll(PAGEABLE);
         List<Rent> rents = page.getContent();
 
-        assertEquals(EXPECTED_NUMBER_OF_RENTS, rents.size());
+        assertEquals(NUMBER_OF_RENTS, rents.size());
         rents.forEach(Assertions::assertNotNull);
         assertTrue(rents.contains(rentWithId1));
     }

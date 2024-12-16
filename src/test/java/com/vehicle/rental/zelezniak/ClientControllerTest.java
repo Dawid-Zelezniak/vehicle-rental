@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_CLIENTS;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
 import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENT_ROLES;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,7 +84,7 @@ class ClientControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_CLIENTS)))
+                .andExpect(jsonPath("$.content", hasSize(NUMBER_OF_CLIENTS)))
                 .andExpect(jsonPath("$.content[1].id").value(clientWithId2.getId()))
                 .andExpect(jsonPath("$.content[1].email").value(credentials.getEmail()))
                 .andExpect(jsonPath("$.content[1].name.firstName").value(name.getFirstName()))
@@ -195,20 +195,20 @@ class ClientControllerTest {
     @Test
     void shouldDeleteClientForRoleADMIN() throws Exception {
         Long existingClientId = clientWithId2.getId();
-        findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
+        findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
         mockMvc.perform(delete("/clients/delete/{id}", existingClientId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
-        findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS - 1);
+        findAllClientsAndAssertSize(NUMBER_OF_CLIENTS - 1);
     }
 
     @Test
     void shouldNotDeleteClientForRoleUSER() throws Exception {
         Long existingClientId = clientWithId2.getId();
 
-        findAllClientsAndAssertSize(EXPECTED_NUMBER_OF_CLIENTS);
+        findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
         mockMvc.perform(delete("/clients/delete/{id}", existingClientId)
                         .header("Authorization", "Bearer " + userToken))

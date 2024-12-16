@@ -29,7 +29,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.EXPECTED_NUMBER_OF_VEHICLES;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_VEHICLES;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class VehicleControllerTest {
 
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_VEHICLES);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
 
     private static Vehicle vehicleWithId1;
@@ -91,7 +91,7 @@ class VehicleControllerTest {
                         .param("size", String.valueOf(PAGEABLE.getPageSize())))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_VEHICLES)))
+                .andExpect(jsonPath("$.content", hasSize(NUMBER_OF_VEHICLES)))
                 .andExpect(jsonPath("$.content[0].id").value(vehicleWithId1.getId()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.model").value(info.getModel()))
                 .andExpect(jsonPath("$.content[0].vehicleInformation.brand").value(info.getBrand()))
@@ -161,7 +161,7 @@ class VehicleControllerTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isCreated());
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES + 1, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES + 1, vehicleRepository.count());
         assertTrue(vehicleRepository.existsByVehicleInformationRegistrationNumber(testCar.getRegistrationNumber()));
     }
 
@@ -258,15 +258,15 @@ class VehicleControllerTest {
 
     @Test
     void shouldDeleteWhenVehicleStatusIsUNAVAILABLE() throws Exception {
-        vehicleWithId1.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicleWithId1.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(vehicleWithId1);
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
         mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES - 1, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES - 1, vehicleRepository.count());
 
         List<Vehicle> list = vehicleRepository.findAll();
         assertFalse(list.contains(vehicleWithId1));
@@ -276,21 +276,21 @@ class VehicleControllerTest {
     void shouldNotDeleteVehicleWhenDoesNotExists() throws Exception {
         Long notExistingId = 20L;
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
         mockMvc.perform(delete("/vehicles/delete/{id}", notExistingId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Vehicle with id: " + notExistingId + " does not exist."));
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
     }
 
     @Test
     void shouldNotDeleteVehicleForRoleUSER() throws Exception {
-        vehicleWithId1.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicleWithId1.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(vehicleWithId1);
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
         mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
@@ -300,14 +300,14 @@ class VehicleControllerTest {
     void shouldNotDeleteVehicleWithStatusAvailable() throws Exception {
         Long vehicleToDeleteId = vehicleWithId1.getId();
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
         mockMvc.perform(delete("/vehicles/delete/{id}", vehicleToDeleteId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(
                         "Vehicle must be in status UNAVAILABLE before it can be deleted."));
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
     }
 
     private String generateToken(String email, String password) {

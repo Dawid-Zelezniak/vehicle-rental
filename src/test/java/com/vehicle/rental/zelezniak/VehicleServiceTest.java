@@ -61,13 +61,13 @@ class VehicleServiceTest {
 
     @Test
     void shouldReturnAllVehicles() {
-        Pageable pageable = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
+        Pageable pageable = PageRequest.of(0, NUMBER_OF_VEHICLES);
         Page<Vehicle> page = vehicleService.findAll(pageable);
         List<Vehicle> vehicles = page.getContent();
 
         assertTrue(vehicles.contains(vehicleWithId1));
         assertTrue(vehicles.contains(vehicleWithId2));
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicles.size());
+        assertEquals(NUMBER_OF_VEHICLES, vehicles.size());
     }
 
     @Test
@@ -93,7 +93,7 @@ class VehicleServiceTest {
 
         Vehicle vehicle = vehicleService.addVehicle(testCar);
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES + 1, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES + 1, vehicleRepository.count());
         assertTrue(vehicleRepository.existsByVehicleInformationRegistrationNumber(vehicle.getRegistrationNumber()));
     }
 
@@ -147,14 +147,14 @@ class VehicleServiceTest {
 
     @Test
     void shouldDeleteVehicle() {
-        vehicleWithId1.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicleWithId1.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(vehicleWithId1);
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
 
         vehicleService.delete(vehicleWithId1.getId());
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES - 1, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES - 1, vehicleRepository.count());
 
         List<Vehicle> all = vehicleRepository.findAll();
         assertFalse(all.contains(vehicleWithId1));
@@ -164,10 +164,10 @@ class VehicleServiceTest {
     void shouldNotDeleteVehicleWhenDoesNotExist() {
         Long nonExistentId = 20L;
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> vehicleService.delete(nonExistentId));
         assertEquals("Vehicle with id: " + nonExistentId + " does not exist.", exception.getMessage());
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
     }
 
     @Test
@@ -180,7 +180,7 @@ class VehicleServiceTest {
 
     @Test
     void shouldFindAvailableVehiclesInPeriod() {
-        Pageable pageable = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
+        Pageable pageable = PageRequest.of(0, NUMBER_OF_VEHICLES);
         RentDurationCreator durationCreator = new RentDurationCreator();
         Page<Vehicle> availableVehicles = vehicleService.findAvailableVehicles(durationCreator.createDuration2(), pageable);
         List<Vehicle> vehicles = availableVehicles.getContent();

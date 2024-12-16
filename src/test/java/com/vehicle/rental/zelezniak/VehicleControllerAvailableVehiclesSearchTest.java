@@ -3,9 +3,7 @@ package com.vehicle.rental.zelezniak;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.config.*;
-import com.vehicle.rental.zelezniak.constants.Roles;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VehicleControllerAvailableVehiclesSearchTest {
-
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1 = 0;
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 = 3;
-    private static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3 = 1;
 
     private final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
 
@@ -83,7 +77,7 @@ class VehicleControllerAvailableVehiclesSearchTest {
     @Test
     void shouldFindAvailableVehiclesInPeriod2() throws Exception {
         Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
-        motorcycle.setStatus(Vehicle.Status.UNAVAILABLE);
+        motorcycle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleService.update(motorcycle.getId(), motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 

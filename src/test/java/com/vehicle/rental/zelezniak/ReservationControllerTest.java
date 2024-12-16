@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ReservationControllerTest {
 
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RESERVATIONS);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_RESERVATIONS);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
 
     private static Reservation reservationWithId2;
@@ -95,7 +95,7 @@ class ReservationControllerTest {
                 .param("page", String.valueOf(PAGEABLE.getPageNumber()))
                 .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + adminToken));
-        performReservationExpectations(actions, EXPECTED_NUMBER_OF_RESERVATIONS, reservationWithId2);
+        performReservationExpectations(actions, NUMBER_OF_RESERVATIONS, reservationWithId2);
     }
 
     @Test
@@ -122,7 +122,7 @@ class ReservationControllerTest {
                 .param("page", String.valueOf(PAGEABLE.getPageNumber()))
                 .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + userToken));
-        performReservationExpectations(actions, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS, reservationWithId2);
+        performReservationExpectations(actions, NUMBER_OF_CLIENT_2_RESERVATIONS, reservationWithId2);
     }
 
     @Test
@@ -157,7 +157,7 @@ class ReservationControllerTest {
         RentDuration rentDuration = information.getRentDuration();
 
         List<Reservation> reservations = reservationRepository.findAll();
-        assertEquals(EXPECTED_NUMBER_OF_RESERVATIONS, reservations.size());
+        assertEquals(NUMBER_OF_RESERVATIONS, reservations.size());
 
         mockMvc.perform(post("/reservations/create")
                         .content(mapper.writeValueAsString(creationRequest))
@@ -170,7 +170,7 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.rentInformation.rentDuration.rentalEnd").value(rentDuration.getRentalEnd().format(formatter)));
 
         reservations = reservationRepository.findAll();
-        assertEquals(EXPECTED_NUMBER_OF_RESERVATIONS + 1, reservations.size());
+        assertEquals(NUMBER_OF_RESERVATIONS + 1, reservations.size());
     }
 
     @SuppressWarnings("UnreachableCode")
@@ -271,13 +271,13 @@ class ReservationControllerTest {
         Long clientId = CLIENT_2_ID;
         Long reservationId = reservationWithId2.getId();
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         mockMvc.perform(delete("/reservations/delete/{id}", reservationId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isNoContent());
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
 
         for (Reservation reservation : reservationRepository.findAll()) {
             assertNotEquals(reservationWithId2, reservation);

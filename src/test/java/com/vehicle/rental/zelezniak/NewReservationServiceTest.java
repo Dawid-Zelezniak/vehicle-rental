@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource("/application-test.properties")
 class NewReservationServiceTest {
 
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_RESERVATIONS);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_RESERVATIONS);
     private static Reservation reservationWithId2;
 
     @Autowired
@@ -62,12 +62,12 @@ class NewReservationServiceTest {
     void shouldAddReservationForClientWhenDataCorrect() {
         Long clientId = CLIENT_2_ID;
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         Reservation reservation = newReservationService.addNewReservation(creationRequest);
         Long reservationId = reservation.getId();
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
         assertEquals(reservation, findReservationById(reservationId));
     }
 
@@ -125,11 +125,11 @@ class NewReservationServiceTest {
         Long clientId = CLIENT_2_ID;
         setReservationStatusToNew(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
         newReservationService.deleteReservation(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(clientId, EXPECTED_NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
     }
 
     @Test
