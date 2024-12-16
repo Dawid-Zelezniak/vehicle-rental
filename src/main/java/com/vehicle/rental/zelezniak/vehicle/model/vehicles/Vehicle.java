@@ -56,7 +56,7 @@ public abstract class Vehicle {
     private Money deposit;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private VehicleStatus status;
 
     protected Vehicle() {
     }
@@ -70,7 +70,11 @@ public abstract class Vehicle {
     }
 
     public boolean canBeDeleted() {
-        return Status.UNAVAILABLE == this.status;
+        return VehicleStatus.UNAVAILABLE == this.status;
+    }
+
+    public String getBrand(){
+        return vehicleInformation.getBrand();
     }
 
     @Override
@@ -115,20 +119,18 @@ public abstract class Vehicle {
      */
     @RequiredArgsConstructor
     @Getter
-    public enum Status {
+    public enum VehicleStatus {
         AVAILABLE("available"),
         UNAVAILABLE("unavailable");
 
         private final String value;
 
-        public static Status getStatusFromString(String s) {
-            for (Status status : Status.values()) {
-                if (s.equalsIgnoreCase(status.getValue())) {
-                    return status;
-                }
+        public static VehicleStatus getStatusFromString(String s){
+            for (VehicleStatus status : VehicleStatus.values()) {
+                if(status.value.equalsIgnoreCase(s)) return status;
             }
             throw new IllegalArgumentException("Unknown status value: " + s);
         }
-    }
 
+    }
 }

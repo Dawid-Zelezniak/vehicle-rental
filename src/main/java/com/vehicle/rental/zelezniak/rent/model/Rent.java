@@ -44,16 +44,12 @@ public class Rent {
     @Enumerated(EnumType.STRING)
     private RentStatus rentStatus;
 
-    @ManyToOne(cascade = {
-            CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "client_id")
     @Valid
     private Client client;
 
-    @ManyToMany(cascade = {
-            CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @JoinTable(
             name = "rented_vehicles",
             joinColumns = @JoinColumn(name = "rent_id"),

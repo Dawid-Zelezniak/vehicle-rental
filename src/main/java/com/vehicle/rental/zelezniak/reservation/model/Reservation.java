@@ -46,16 +46,12 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
-    @ManyToOne(cascade = {
-            CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "client_id")
     @Valid
     private Client client;
 
-    @ManyToMany(cascade = {
-            CascadeType.MERGE, CascadeType.DETACH,
-            CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany
     @JoinTable(
             name = "reserved_vehicles",
             joinColumns = @JoinColumn(name = "reservation_id"),
