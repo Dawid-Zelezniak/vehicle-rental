@@ -1,10 +1,10 @@
 package com.vehicle.rental.zelezniak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.UserLogin;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
-import com.vehicle.rental.zelezniak.constants.Roles;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.Engine;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
@@ -58,6 +58,8 @@ class VehicleControllerCriteriaSearchTest {
     private ObjectMapper mapper;
     @Autowired
     private UserLogin login;
+    @Autowired
+    private CriteriaSearchRequests searchRequests;
 
     @BeforeEach
     void setupDatabase() throws IOException {
@@ -71,10 +73,9 @@ class VehicleControllerCriteriaSearchTest {
 
     @Test
     void shouldFindVehiclesByCriteriaModel() throws Exception {
-        String criteria = "model";
         int resultSize = 1;
         String value = vehicleWithId1.getVehicleInformation().getModel();
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
+        performCriteriaRequest(searchRequests.getModelSearchRequest(value),
                 resultSize, vehicleWithId1, userToken);
     }
 
@@ -82,10 +83,9 @@ class VehicleControllerCriteriaSearchTest {
     void shouldFindVehiclesByCriteriaBrand() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_3_ID);
         var info = vehicle.getVehicleInformation();
-        String criteria = "brand";
         int resultSize = 1;
         String value = info.getBrand();
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
+        performCriteriaRequest(searchRequests.getBrandSearchRequest(value),
                 resultSize, vehicle, userToken);
     }
 
@@ -93,11 +93,10 @@ class VehicleControllerCriteriaSearchTest {
     @DisplayName("Find vehicles by registration number when role is ADMIN")
     void shouldFindVehiclesByCriteriaRegistrationNumber() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        String criteria = "registration number";
         int resultSize = 1;
         RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
         String value = registrationNumber.getRegistration();
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
+        performCriteriaRequest(searchRequests.getRegistrationSearchRequest(value),
                 resultSize, vehicle, adminToken);
     }
 
@@ -105,66 +104,43 @@ class VehicleControllerCriteriaSearchTest {
     @DisplayName("Finding vehicles by registration number with role USER should throw exception")
     void shouldNotFindVehiclesByCriteriaRegistrationNumber() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        String criteria = "registration number";
         RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
         String value = registrationNumber.getRegistration();
-        performCriteriaRegistrationNumber(new CriteriaSearchRequest<>(criteria, value));
+        performCriteriaRegistrationNumber(searchRequests.getRegistrationSearchRequest(value));
     }
 
     @Test
     void shouldFindVehiclesByCriteriaProductionYear() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
         var info = vehicle.getVehicleInformation();
-        String criteria = "production year";
-        int resultSize = 2;
         String value = String.valueOf(info.getProductionYear().getYear());
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value)
-                , resultSize, vehicle, userToken);
-    }
 
-    @Test
-    void shouldNotFindVehiclesByNonExistentCriteria() throws Exception {
-        String criteria = "wheels number";
-        String value = "4";
-        var request = new CriteriaSearchRequest<>(criteria, value);
-
-        mockMvc.perform(post("/vehicles/criteria/search")
-                        .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(request))
-                        .param("page", String.valueOf(PAGEABLE.getPageNumber()))
-                        .param("size", String.valueOf(PAGEABLE.getPageSize()))
-                        .header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(
-                        "Unknown criteria type " + criteria));
+        performCriteriaRequest(searchRequests.getProductionYearSearchRequest(Integer.valueOf(value))
+                , NUMBER_OF_VEHICLES_PRODUCED_IN_2020, vehicle, userToken);
     }
 
     @Test
     void shouldFindVehiclesByCriteriaStatusAvailable() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        vehicle.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(vehicle);
 
-        String criteria = "status";
-        String value = "available";
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
+        performCriteriaRequest(searchRequests.getStatusSearchRequest("available"),
                 NUMBER_OF_AVAILABLE_VEHICLES - 1, vehicleWithId1, userToken);
     }
 
     @Test
     void shouldFindVehiclesByCriteriaStatusUnavailable() throws Exception {
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        vehicle.setStatus(Vehicle.Status.UNAVAILABLE);
+        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(vehicle);
 
-        String criteria = "status";
         int resultSize = 1;
-        String value = "unavailable";
-        performCriteriaRequest(new CriteriaSearchRequest<>(criteria, value),
+        performCriteriaRequest(searchRequests.getStatusSearchRequest("unavailable"),
                 resultSize, vehicle, userToken);
     }
 
-    private <T> void performCriteriaRequest(CriteriaSearchRequest<T> searchRequest,
+    private <T> void performCriteriaRequest(CriteriaSearchRequest searchRequest,
                                             int resultSize, Vehicle result, String token) throws Exception {
         var info = result.getVehicleInformation();
         Year productionYear = info.getProductionYear();
@@ -205,7 +181,7 @@ class VehicleControllerCriteriaSearchTest {
         return login.loginUser(email, password);
     }
 
-    private <T> void performCriteriaRegistrationNumber(CriteriaSearchRequest<T> searchRequest) throws Exception {
+    private <T> void performCriteriaRegistrationNumber(CriteriaSearchRequest searchRequest) throws Exception {
         mockMvc.perform(post("/vehicles/criteria/search")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))

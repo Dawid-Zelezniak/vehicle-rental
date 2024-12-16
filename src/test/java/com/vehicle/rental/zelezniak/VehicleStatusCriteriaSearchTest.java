@@ -1,10 +1,10 @@
 package com.vehicle.rental.zelezniak;
 
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
+import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.VehicleCriteriaSearchService;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,11 +30,13 @@ class VehicleStatusCriteriaSearchTest {
     @Autowired
     private VehicleService vehicleService;
     @Autowired
-    private VehicleCriteriaSearch criteriaSearch;
+    private VehicleCriteriaSearchService criteriaSearch;
     @Autowired
     private VehicleRepository vehicleRepository;
     @Autowired
     private DatabaseSetup databaseSetup;
+    @Autowired
+    private CriteriaSearchRequests searchRequests;
 
     @BeforeEach
     void setUp() {
@@ -44,11 +46,11 @@ class VehicleStatusCriteriaSearchTest {
     @Test
     void shouldFindVehiclesByCriteriaStatusAvailable() {
         Vehicle unavailableVehicle = vehicleService.findById(VEHICLE_2_ID);
-        unavailableVehicle.setStatus(Vehicle.Status.UNAVAILABLE);
+        unavailableVehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(unavailableVehicle);
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
-        var searchRequest = new CriteriaSearchRequest<>("status", "available");
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
+        var searchRequest = searchRequests.getStatusSearchRequest("available");
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
@@ -60,11 +62,11 @@ class VehicleStatusCriteriaSearchTest {
     @Test
     void shouldFindVehiclesByCriteriaStatusUnavailable() {
         Vehicle unavailableVehicle = vehicleService.findById(VEHICLE_2_ID);
-        unavailableVehicle.setStatus(Vehicle.Status.UNAVAILABLE);
+        unavailableVehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
         vehicleRepository.save(unavailableVehicle);
-        var searchRequest = new CriteriaSearchRequest<>("status", "unavailable");
+        var searchRequest = searchRequests.getStatusSearchRequest("unavailable");
 
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehicleRepository.count());
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();

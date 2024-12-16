@@ -1,12 +1,13 @@
 package com.vehicle.rental.zelezniak;
 
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
+import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.VehicleCriteriaSearchService;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,11 @@ class RegistrationNumberCriteriaSearchTest {
     @Autowired
     private VehicleService vehicleService;
     @Autowired
-    private VehicleCriteriaSearch criteriaSearch;
+    private VehicleCriteriaSearchService criteriaSearch;
     @Autowired
     private DatabaseSetup databaseSetup;
+    @Autowired
+    private CriteriaSearchRequests searchRequests;
 
     @BeforeEach
     void setUp() {
@@ -50,24 +53,24 @@ class RegistrationNumberCriteriaSearchTest {
     @DisplayName("Admin can search vehicles by registration")
     void shouldFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_ADMIN");
-        Vehicle vehicle4 = vehicleService.findById(4L);
-        RegistrationNumber vehicle8RegistrationNumber = vehicle4.getRegistrationNumber();
-        var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
+        Vehicle vehicle = vehicleService.findById(4L);
+        RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
+        var searchRequest = searchRequests.getRegistrationSearchRequest(registrationNumber.getRegistration());
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
         assertEquals(1, vehicles.size());
-        assertTrue(vehicles.contains(vehicle4));
+        assertTrue(vehicles.contains(vehicle));
     }
 
     @Test
     @DisplayName("Client can't search vehicles by registration")
     void shouldNotFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_USER");
-        Vehicle vehicle4 = vehicleService.findById(4L);
-        RegistrationNumber vehicle8RegistrationNumber = vehicle4.getRegistrationNumber();
-        var searchRequest = new CriteriaSearchRequest<>("registration number", vehicle8RegistrationNumber);
+        Vehicle vehicle = vehicleService.findById(4L);
+        RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
+        var searchRequest = searchRequests.getRegistrationSearchRequest(registrationNumber.getRegistration());
 
         assertThrows(CriteriaAccessException.class,
                 () -> criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE));

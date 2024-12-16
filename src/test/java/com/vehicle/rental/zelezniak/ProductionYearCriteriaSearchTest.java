@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak;
 
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
+import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.VehicleCriteriaSearchService;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,15 +24,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestPropertySource("/application-test.properties")
 class ProductionYearCriteriaSearchTest {
 
-    public static final int NUMBER_OF_VEHICLES_PRODUCED_IN_2020 = 2;
-    private static final Pageable PAGEABLE = PageRequest.of(0, EXPECTED_NUMBER_OF_VEHICLES);
+    private static final Pageable PAGEABLE = PageRequest.of(0, NUMBER_OF_VEHICLES);
 
     @Autowired
     private VehicleService vehicleService;
     @Autowired
-    private VehicleCriteriaSearch criteriaSearch;
+    private VehicleCriteriaSearchService criteriaSearch;
     @Autowired
     private DatabaseSetup databaseSetup;
+    @Autowired
+    private CriteriaSearchRequests searchRequests;
 
     @BeforeEach
     void setUp() {
@@ -44,7 +45,7 @@ class ProductionYearCriteriaSearchTest {
         Vehicle vehicle4 = vehicleService.findById(VEHICLE_4_ID);
         Vehicle vehicle5 = vehicleService.findById(VEHICLE_5_ID);
         var info = vehicle4.getVehicleInformation();
-        var searchRequest = new CriteriaSearchRequest<>("production year", info.getProductionYear().getYear());
+        var searchRequest = searchRequests.getProductionYearSearchRequest(info.getProductionYear().getYear());
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
