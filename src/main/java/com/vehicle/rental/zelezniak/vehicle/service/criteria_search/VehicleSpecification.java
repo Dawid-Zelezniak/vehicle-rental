@@ -1,31 +1,39 @@
 package com.vehicle.rental.zelezniak.vehicle.service.criteria_search;
 
-import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
-import com.vehicle.rental.zelezniak.vehicle.service.VehicleCriteriaSearch;
-import lombok.RequiredArgsConstructor;
+import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class CriteriaSearchStrategyFactory {
+public class VehicleSpecification {
 
-    private final VehicleRepository repository;
+    private static final String INFORMATION = "vehicleInformation";
 
-    public VehicleSearchStrategy getStrategy(VehicleCriteriaSearch.CriteriaType criteriaType) {
-        VehicleSearchStrategy strategy;
-        switch (criteriaType) {
-            case BRAND -> strategy = new BrandCriteriaSearch(repository);
-            case MODEL -> strategy = new ModelCriteriaSearch(repository);
-            case REGISTRATION_NUMBER -> strategy = new RegistrationNumberCriteriaSearch(repository);
-            case PRODUCTION_YEAR -> strategy = new ProductionYearCriteriaSearch(repository);
-            case STATUS -> strategy = new VehicleStatusCriteriaSearch(repository);
-            default -> {
-                log.error("Unknown criteria type: {}", criteriaType.getValue());
-                throw new IllegalArgumentException("Unknown criteria type: " + criteriaType.getValue());
-            }
-        }
-        return strategy;
+    private VehicleSpecification() {
+    }
+
+    public static Specification<Vehicle> hasBrand(String brand) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(INFORMATION).get("brand"), brand));
+    }
+
+    public static Specification<Vehicle> hasModel(String model) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(INFORMATION).get("model"), model));
+    }
+
+    public static Specification<Vehicle> hasProductionYear(Integer year) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(
+                root.get(INFORMATION).get("productionYear").get("year"), year));
+    }
+
+    public static Specification<Vehicle> hasRegistration(String registration) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(
+                root.get(INFORMATION).get("registrationNumber").get("registration"), registration));
+    }
+
+    public static Specification<Vehicle> hasStatus(String status) {
+        Vehicle.VehicleStatus vehicleStatus = Vehicle.VehicleStatus.getStatusFromString(status);
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), vehicleStatus));
     }
 }

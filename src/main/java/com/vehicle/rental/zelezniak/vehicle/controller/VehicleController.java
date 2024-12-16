@@ -46,7 +46,7 @@ public class VehicleController {
     }
 
     @PostMapping("/criteria/search")
-    public <T> Page<Vehicle> findByCriteria(@RequestBody @Validated CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
+    public Page<Vehicle> findByCriteria(@RequestBody @Validated CriteriaSearchRequest searchRequest, Pageable pageable) {
         return vehicleService.findByCriteria(searchRequest, pageable);
     }
 

@@ -6,6 +6,7 @@ import com.vehicle.rental.zelezniak.vehicle.exception.VehicleDeletionException;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
+import com.vehicle.rental.zelezniak.vehicle.service.criteria_search.VehicleCriteriaSearchService;
 import com.vehicle.rental.zelezniak.vehicle.service.validation.VehicleValidator;
 import com.vehicle.rental.zelezniak.vehicle.service.vehicle_update.VehicleUpdateStrategy;
 import com.vehicle.rental.zelezniak.vehicle.service.vehicle_update.VehicleUpdateStrategyFactory;
@@ -29,7 +30,7 @@ public class VehicleService {
     private final VehicleValidator vehicleValidator;
     private final InputValidator inputValidator;
     private final VehicleUpdateStrategyFactory strategyFactory;
-    private final VehicleCriteriaSearch criteriaSearch;
+    private final VehicleCriteriaSearchService criteriaSearch;
     private final AvailableVehiclesRetriever vehiclesRetriever;
 
     @Transactional(readOnly = true)
@@ -70,9 +71,9 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
-    public <T> Page<Vehicle> findByCriteria(CriteriaSearchRequest<T> searchRequest, Pageable pageable) {
+    public Page<Vehicle> findByCriteria(CriteriaSearchRequest searchRequest, Pageable pageable) {
         validateNotNull(searchRequest, "Criteria search request" + CAN_NOT_BE_NULL);
-        log.debug("Searching vehicles by criteria: {}", searchRequest.getCriteriaName());
+        log.debug("Searching vehicles by criteria");
         return criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
     }
 
