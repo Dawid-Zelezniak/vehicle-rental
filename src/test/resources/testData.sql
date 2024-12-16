@@ -32,13 +32,15 @@ insert into vehicles (id, price_per_day, deposit, seats_number, status, brand, d
 (2, 100.00, 1500.00, 2, 'AVAILABLE', 'Yamaha', 'Legendary Yamaha 125', 1, 125, 'Minarelli-Yamaha 5D1E', 'GASOLINE', 15, 'MANUAL', 'YZF-R125', 2015, 'ABC66666'),
 (3, 70.00, 4000.00, 5, 'AVAILABLE', 'Toyota', 'Reliable Toyota Corolla', 4, 1800, '1.8L I4', 'GASOLINE', 132, 'AUTOMATIC', 'Corolla', 2018, 'TOY77777'),
 (4, 80.00, 3500.00, 5, 'AVAILABLE', 'Honda', 'Efficient Honda Civic', 4, 2000, '2.0L I4', 'GASOLINE', 158, 'MANUAL', 'Civic', 2020, 'HON88888'),
-(5, 90.00, 2500.00, 2, 'AVAILABLE', 'Suzuki', 'Fast Suzuki GSX-R750', 4, 750, '750cc 4-stroke', 'GASOLINE', 148, 'MANUAL', 'GSX-R750', 2020, 'SUZ99999');
+(5, 90.00, 2500.00, 2, 'AVAILABLE', 'Suzuki', 'Fast Suzuki GSX-R750', 4, 750, '750cc 4-stroke', 'GASOLINE', 148, 'MANUAL', 'GSX-R750', 2020, 'SUZ99999'),
+(6, 100.00, 3000.00, 5, 'AVAILABLE', 'Honda', 'Just Honda', 4, 2000, '2.0L I4', 'GASOLINE', 306, 'MANUAL', 'Civic Type R', 2020, 'HDA24556');
 
 -- Add cars
 insert into cars (body_type, doors_number, drive_type, id) values
 ('HATCHBACK', 5, 'FRONT_WHEEL_DRIVE', 1),
 ('SEDAN', 4, 'FRONT_WHEEL_DRIVE', 3),
-('COUPE', 2, 'FRONT_WHEEL_DRIVE', 4);
+('COUPE', 2, 'FRONT_WHEEL_DRIVE', 4),
+('HATCHBACK', 5, 'FRONT_WHEEL_DRIVE', 6);
 
 -- Add motorcycles
 insert into motorcycles (id, motorcycle_type) values
