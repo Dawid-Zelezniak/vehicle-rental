@@ -2,9 +2,11 @@ package com.vehicle.rental.zelezniak.reservation.repository;
 
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,6 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT v FROM Reservation r JOIN r.vehicles v WHERE r.id = :id")
     Page<Vehicle> findVehiclesByReservationId(Long id, Pageable pageable);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT v.id FROM Reservation r " +
             "JOIN r.vehicles v " +
             "WHERE r.rentInformation.rentDuration.rentalStart <= :end " +
