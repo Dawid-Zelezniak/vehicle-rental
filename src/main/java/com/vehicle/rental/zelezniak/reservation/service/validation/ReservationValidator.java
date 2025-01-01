@@ -9,6 +9,7 @@ import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -17,6 +18,7 @@ import java.util.Collection;
 @Slf4j
 public class ReservationValidator {
 
+    private static final byte UNACCEPTABLE_VEHICLES_NUMBER = 0;
     private final AvailableVehiclesRetriever vehiclesRetriever;
     private final ReservationService reservationService;
 
@@ -26,6 +28,7 @@ public class ReservationValidator {
      * - The reservation must contain at least one vehicle.
      * - It must be ensured that none of the selected vehicles have been already reserved or rented.
      */
+    @Transactional
     public void validateReservationDataBeforePayment(Long id) {
         Reservation reservationToPay = reservationService.findById(id);
         validateReservationStatus(reservationToPay.getReservationStatus());
@@ -41,7 +44,7 @@ public class ReservationValidator {
     }
 
     private void checkIfReservationContainsVehicles(int size) {
-        if (size == 0) {
+        if (size == UNACCEPTABLE_VEHICLES_NUMBER) {
             throw new IllegalArgumentException("Reservation must contains at least one vehicle.");
         }
     }
