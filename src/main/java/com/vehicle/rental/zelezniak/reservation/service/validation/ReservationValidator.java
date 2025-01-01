@@ -18,7 +18,7 @@ import java.util.Collection;
 @Slf4j
 public class ReservationValidator {
 
-    private static final byte UNACCEPTABLE_VEHICLES_NUMBER = 0;
+    private static final int UNACCEPTABLE_VEHICLES_NUMBER = 0;
     private final AvailableVehiclesRetriever vehiclesRetriever;
     private final ReservationService reservationService;
 
