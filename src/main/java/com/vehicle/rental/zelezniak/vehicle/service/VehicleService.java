@@ -3,6 +3,7 @@ package com.vehicle.rental.zelezniak.vehicle.service;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import com.vehicle.rental.zelezniak.vehicle.exception.VehicleDeletionException;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.repository.VehicleRepository;
@@ -78,10 +79,11 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Vehicle> findAvailableVehicles(RentDuration duration, Pageable pageable) {
+    public Page<Vehicle> findAvailableVehicles(AvailableVehiclesCriteriaSearchRequest searchRequest, Pageable pageable) {
+        RentDuration duration = searchRequest.duration();
         validateNotNull(duration, "Duration" + CAN_NOT_BE_NULL);
         log.debug("Finding available vehicles from: {} to {}", duration.getRentalStart(), duration.getRentalEnd());
-        return vehiclesRetriever.findVehiclesAvailableInPeriod(duration, pageable);
+        return vehiclesRetriever.findAvailableVehiclesByCriteria(searchRequest, pageable);
     }
 
     private void validateNotNull(Object o, String message) {
