@@ -6,7 +6,6 @@ import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
-import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
@@ -64,7 +63,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod1() {
         RentDuration duration = durationCreator.createDuration1();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(getSearchRequest(duration), PAGEABLE);
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getSearchRequest(duration), PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1, availableVehicles.size());
@@ -77,7 +76,7 @@ class AvailableVehiclesRetrieverTest {
         vehicleService.update(motorcycle.getId(), motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
-        Collection<Vehicle> vehicles = vehiclesRetriever.findVehiclesAvailableInPeriod(duration);
+        Collection<Vehicle> vehicles = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration);
         List<Vehicle> availableVehicles = (List<Vehicle>) vehicles;
 
         assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1, availableVehicles.size());
@@ -92,7 +91,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod3() {
         RentDuration duration = durationCreator.createDuration3();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(getSearchRequest(duration), PAGEABLE);
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getSearchRequest(duration), PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3, availableVehicles.size());
