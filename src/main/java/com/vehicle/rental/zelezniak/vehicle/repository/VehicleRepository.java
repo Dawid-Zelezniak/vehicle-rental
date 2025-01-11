@@ -18,10 +18,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
 
     Vehicle findByVehicleInformationRegistrationNumber(RegistrationNumber registrationNumber);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT v FROM Vehicle v WHERE v.id NOT IN :idSet AND v.status = 'AVAILABLE'")
-    Page<Vehicle> findVehiclesByIdNotIn(@Param("idSet") Set<Long> vehiclesIds, Pageable pageable);
-
     @Query("SELECT v FROM Vehicle v WHERE v.id NOT IN :idSet AND v.status = 'AVAILABLE'")
     Collection<Vehicle> findVehiclesByIdNotIn(@Param("idSet") Set<Long> vehiclesIds);
 
