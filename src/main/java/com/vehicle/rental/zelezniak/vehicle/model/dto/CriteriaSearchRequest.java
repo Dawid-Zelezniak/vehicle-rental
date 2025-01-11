@@ -9,4 +9,6 @@ public record CriteriaSearchRequest(
         String sortBy,
         boolean descending
 ) {
+
+
 }

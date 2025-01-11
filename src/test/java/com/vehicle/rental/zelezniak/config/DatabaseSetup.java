@@ -1,7 +1,7 @@
 package com.vehicle.rental.zelezniak.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +12,10 @@ import java.util.Arrays;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DatabaseSetup {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     public void setupAllTables() {
         try {

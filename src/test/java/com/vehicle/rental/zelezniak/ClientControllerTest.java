@@ -27,8 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
-import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENT_ROLES;
+import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -126,11 +125,20 @@ class ClientControllerTest {
     }
 
     @Test
-    void shouldNotFindClientByIdForRoleUser() throws Exception {
+    void shouldDenyAccessToOtherClientsDataForRoleUser() throws Exception {
         Long existingClientId = clientWithId2.getId();
         mockMvc.perform(get("/clients/{id}", existingClientId)
                         .header("Authorization", "Bearer " + userToken))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("You are not authorized to search for other users."));
+    }
+
+    @Test
+    void shouldAllowUserToFindHisOwnDataById() throws Exception {
+        mockMvc.perform(get("/clients/{id}", CLIENT_3_ID)
+                        .header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(CLIENT_3_ID));
     }
 
     @Test
@@ -184,7 +192,7 @@ class ClientControllerTest {
         clientWithId2.setName(new UserName("Uncle", "Bob"));
         clientWithId2.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
 
-        mockMvc.perform(put("/clients/update/{id}", otherClientId)
+        mockMvc.perform(put("/clients/{id}", otherClientId)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clientWithId2))
                         .header("Authorization", "Bearer " + userToken))
@@ -197,7 +205,7 @@ class ClientControllerTest {
         Long existingClientId = clientWithId2.getId();
         findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
-        mockMvc.perform(delete("/clients/delete/{id}", existingClientId)
+        mockMvc.perform(delete("/clients/{id}", existingClientId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
@@ -210,7 +218,7 @@ class ClientControllerTest {
 
         findAllClientsAndAssertSize(NUMBER_OF_CLIENTS);
 
-        mockMvc.perform(delete("/clients/delete/{id}", existingClientId)
+        mockMvc.perform(delete("/clients/{id}", existingClientId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -260,7 +268,7 @@ class ClientControllerTest {
 
     private void performUpdateClient(Client newData, String token) throws Exception {
         Long existingClientId = clientWithId2.getId();
-        mockMvc.perform(put("/clients/update/{id}", existingClientId)
+        mockMvc.perform(put("/clients/{id}", existingClientId)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newData))
                         .header("Authorization", "Bearer " + token))

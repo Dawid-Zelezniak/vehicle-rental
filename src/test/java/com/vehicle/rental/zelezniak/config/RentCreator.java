@@ -1,14 +1,14 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.common_value_objects.location.City;
+import com.vehicle.rental.zelezniak.common_value_objects.location.Location;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.rent.model.Rent;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,12 +17,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class RentCreator {
 
-    @Autowired
-    private ClientCreator clientCreator;
-    @Autowired
-    private VehicleCreator vehicleCreator;
+    private final ClientCreator clientCreator;
+    private final VehicleCreator vehicleCreator;
 
     public Rent createRentWithId1() {
         return Rent.builder()

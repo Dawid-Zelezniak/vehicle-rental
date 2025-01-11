@@ -17,7 +17,7 @@ public class AvailableVehiclesValidator {
     private final AvailableVehiclesRetriever vehiclesRetriever;
 
     public void checkIfVehicleIsStillAvailable(RentDuration duration, Long vehicleId) {
-        List<Long> vehicleIds = vehiclesRetriever.findVehiclesAvailableInPeriod(duration)
+        List<Long> vehicleIds = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration)
                 .stream()
                 .map(Vehicle::getId)
                 .toList();

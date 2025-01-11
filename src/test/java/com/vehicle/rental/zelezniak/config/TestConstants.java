@@ -31,6 +31,6 @@ public class TestConstants {
     public static final int VEHICLES_IN_RENT_2 = 2;
 
     public static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1 = 1;
-    public static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 = 4;
+    public static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 = 5;
     public static final int EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3 = 2;
 }

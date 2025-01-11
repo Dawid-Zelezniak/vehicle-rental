@@ -1,21 +1,23 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.config.*;
+import com.vehicle.rental.zelezniak.config.DatabaseSetup;
+import com.vehicle.rental.zelezniak.config.ReservationCreator;
+import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationValidator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,7 +93,7 @@ class ReservationValidatorTest {
         assertEquals("Someone already reserved vehicle that you tried to reserve.Pick vehicles one more time.", e.getMessage());
 
         Collection<Vehicle> vehiclesByReservationId = reservationRepository.findVehiclesByReservationId(id);
-        assertEquals(EXPECTED_NUMBER_OF_VEHICLES,vehiclesByReservationId.size());
+        assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehiclesByReservationId.size());
     }
 
     private void addAvailableVehicleToReservation(Long id) {

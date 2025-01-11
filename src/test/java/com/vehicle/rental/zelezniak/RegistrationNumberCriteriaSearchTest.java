@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.vehicle.rental.zelezniak.config.TestConstants.VEHICLE_4_ID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
@@ -53,14 +54,15 @@ class RegistrationNumberCriteriaSearchTest {
     @DisplayName("Admin can search vehicles by registration")
     void shouldFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_ADMIN");
-        Vehicle vehicle = vehicleService.findById(4L);
+        Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
         RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
         var searchRequest = searchRequests.getRegistrationSearchRequest(registrationNumber.getRegistration());
 
         Page<Vehicle> page = criteriaSearch.findVehiclesByCriteria(searchRequest, PAGEABLE);
         List<Vehicle> vehicles = page.getContent();
 
-        assertEquals(1, vehicles.size());
+        int numberOfVehiclesWithSuchRegistration = 1;
+        assertEquals(numberOfVehiclesWithSuchRegistration, vehicles.size());
         assertTrue(vehicles.contains(vehicle));
     }
 
@@ -68,7 +70,7 @@ class RegistrationNumberCriteriaSearchTest {
     @DisplayName("Client can't search vehicles by registration")
     void shouldNotFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_USER");
-        Vehicle vehicle = vehicleService.findById(4L);
+        Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
         RegistrationNumber registrationNumber = vehicle.getRegistrationNumber();
         var searchRequest = searchRequests.getRegistrationSearchRequest(registrationNumber.getRegistration());
 

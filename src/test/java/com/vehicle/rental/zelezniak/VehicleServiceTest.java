@@ -1,9 +1,12 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
+import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.VehicleInformation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -182,7 +185,8 @@ class VehicleServiceTest {
     void shouldFindAvailableVehiclesInPeriod() {
         Pageable pageable = PageRequest.of(0, NUMBER_OF_VEHICLES);
         RentDurationCreator durationCreator = new RentDurationCreator();
-        Page<Vehicle> availableVehicles = vehicleService.findAvailableVehicles(durationCreator.createDuration2(), pageable);
+
+        Page<Vehicle> availableVehicles = vehicleService.findAvailableVehicles(getSearchRequest(durationCreator.createDuration2()), pageable);
         List<Vehicle> vehicles = availableVehicles.getContent();
 
         assertFalse(vehicles.contains(vehicleWithId1));
@@ -190,5 +194,10 @@ class VehicleServiceTest {
         assertTrue(vehicles.contains(vehicleService.findById(VEHICLE_3_ID)));
         assertTrue(vehicles.contains(vehicleService.findById(VEHICLE_4_ID)));
         assertTrue(vehicles.contains(vehicleService.findById(VEHICLE_5_ID)));
+    }
+
+    private AvailableVehiclesCriteriaSearchRequest getSearchRequest(RentDuration duration) {
+        CriteriaSearchRequests searchRequests = new CriteriaSearchRequests();
+        return new AvailableVehiclesCriteriaSearchRequest(duration, searchRequests.getEmptySearchRequest());
     }
 }

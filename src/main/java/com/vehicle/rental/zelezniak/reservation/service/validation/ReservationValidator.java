@@ -52,7 +52,7 @@ public class ReservationValidator {
     private void checkIfNobodyReservedAnyPickedVehicle(Reservation reservation, Collection<Vehicle> pickedVehicles) {
         RentInformation information = reservation.getRentInformation();
         RentDuration rentDuration = information.getRentDuration();
-        Collection<Vehicle> availableVehiclesInPeriod = vehiclesRetriever.findVehiclesAvailableInPeriod(rentDuration);
+        Collection<Vehicle> availableVehiclesInPeriod = vehiclesRetriever.findAvailableVehiclesByRentDuration(rentDuration);
         if (!availableVehiclesInPeriod.containsAll(pickedVehicles)) {
             removeVehiclesAndThrowException(reservation.getId());
         }

@@ -8,6 +8,7 @@ import com.vehicle.rental.zelezniak.common_value_objects.location.City;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class ReservationCreator {
 
-    @Autowired
-    private ClientCreator clientCreator;
-    @Autowired
-    private VehicleCreator vehicleCreator;
+    private final ClientCreator clientCreator;
+    private final VehicleCreator vehicleCreator;
 
     public Reservation createReservationWithId2() {
         return Reservation.builder()

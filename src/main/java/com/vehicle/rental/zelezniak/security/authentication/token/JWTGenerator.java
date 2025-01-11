@@ -39,12 +39,13 @@ public class JWTGenerator {
     }
 
     private JwtClaimsSet buildClaimsSet(String authorities, Authentication authentication) {
+        Instant now = Instant.now();
         return JwtClaimsSet.builder()
                 .issuer("self")
-                .issuedAt(Instant.now())
+                .issuedAt(now)
                 .subject(authentication.getName())
                 .claim("roles", authorities)
-                .expiresAt(Instant.now().plus(20, ChronoUnit.MINUTES))
+                .expiresAt(now.plus(20, ChronoUnit.MINUTES))
                 .build();
     }
 
