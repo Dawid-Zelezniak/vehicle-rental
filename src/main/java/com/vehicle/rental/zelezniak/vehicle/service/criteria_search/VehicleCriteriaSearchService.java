@@ -29,31 +29,17 @@ public class VehicleCriteriaSearchService {
         if (searchRequest.registration() != null) {
             CriteriaAccessValidator.checkIfUserCanSearchByRegistration();
         }
-        return createQueryAndExecute(searchRequest, pageable);
+        return searchVehiclesBySpecification(searchRequest, pageable);
     }
 
-    private Page<Vehicle> createQueryAndExecute(CriteriaSearchRequest searchRequest, Pageable pageable) {
-        Specification<Vehicle> specification = Specification.where(null);
-        if (isValid(searchRequest.brand()))
-            specification = specification.and(VehicleSpecification.hasBrand(searchRequest.brand()));
-        if (isValid(searchRequest.model()))
-            specification = specification.and(VehicleSpecification.hasModel(searchRequest.model()));
-        if (searchRequest.year() != null && 0 < searchRequest.year())
-            specification = specification.and(VehicleSpecification.hasProductionYear(searchRequest.year()));
-        if (isValid(searchRequest.registration()))
-            specification = specification.and(VehicleSpecification.hasRegistration(searchRequest.registration()));
-        if (isValid(searchRequest.status()))
-            specification = specification.and(VehicleSpecification.hasStatus(searchRequest.status()));
-        if (isValid(searchRequest.sortBy())) {
+    private Page<Vehicle> searchVehiclesBySpecification(CriteriaSearchRequest searchRequest, Pageable pageable) {
+        Specification<Vehicle> specification = VehicleSpecification.buildSpecification(searchRequest);
+        if (searchRequest.sortBy() != null) {
             Sort sort = getSort(searchRequest);
             List<Vehicle> vehicles = repository.findAll(specification, sort);
             return ListToPageConverter.convertToPage(vehicles, pageable);
         }
         return repository.findAll(specification, pageable);
-    }
-
-    private boolean isValid(String value) {
-        return value != null && !value.isEmpty();
     }
 
     private Sort getSort(CriteriaSearchRequest searchRequest) {
@@ -77,7 +63,7 @@ public class VehicleCriteriaSearchService {
             boolean hasRoleAdmin = authentication.getAuthorities().stream()
                     .anyMatch(authority -> authority.getAuthority().equals(ROLE_ADMIN));
             if (!hasRoleAdmin) {
-                log.error("User with role CLIENT tried to search vehicles by registration number.");
+                log.error("Client tried to search vehicles by registration number.");
                 throwException();
             }
         }

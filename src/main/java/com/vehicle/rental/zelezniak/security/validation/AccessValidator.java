@@ -15,16 +15,21 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AccessValidator {
 
+    private static final int ROLE_ADMIN_ID = 2;
     private final ClientService service;
 
-    public void validateClientAccess(Long toUpdateUserId, Principal p) {
+    public void validateClientAccess(Long unconfirmedId, Principal p) {
         String name = p.getName();
         Client currentUser = service.findByEmail(name);
         Set<Role> roles = currentUser.getRoles();
-        boolean isAdmin = roles.contains(new Role(2, "ADMIN"));
+        boolean hasAdminRole = roles.contains(new Role(ROLE_ADMIN_ID, "ADMIN"));
 
-        if (!currentUser.getId().equals(toUpdateUserId) && !isAdmin) {
+        if (idsNotSame(unconfirmedId, currentUser) && !hasAdminRole) {
             throw new AccessDeniedException("You are not authorized to update another client data.");
         }
+    }
+
+    private static boolean idsNotSame(Long unconfirmedId, Client currentUser) {
+        return !currentUser.getId().equals(unconfirmedId);
     }
 }

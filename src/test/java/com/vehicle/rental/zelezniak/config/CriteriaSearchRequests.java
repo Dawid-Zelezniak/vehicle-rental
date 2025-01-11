@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CriteriaSearchRequests {
 
+    public CriteriaSearchRequest getEmptySearchRequest() {
+        return new CriteriaSearchRequest(null, null, null, null, null, null,false);
+    }
+
     public CriteriaSearchRequest getBrandSearchRequest(String brand) {
         return new CriteriaSearchRequest(brand, null, null, null, null, null,false);
     }

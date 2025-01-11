@@ -121,9 +121,7 @@ class VehicleControllerCriteriaSearchTest {
 
     @Test
     void shouldFindVehiclesByCriteriaStatusAvailable() throws Exception {
-        Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
-        vehicleRepository.save(vehicle);
+        setVehicleStatusUNAVAILABLE(VEHICLE_4_ID);
 
         performCriteriaRequest(searchRequests.getStatusSearchRequest("available"),
                 NUMBER_OF_AVAILABLE_VEHICLES - 1, vehicleWithId1, userToken);
@@ -131,9 +129,8 @@ class VehicleControllerCriteriaSearchTest {
 
     @Test
     void shouldFindVehiclesByCriteriaStatusUnavailable() throws Exception {
+        setVehicleStatusUNAVAILABLE(VEHICLE_4_ID);
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);
-        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
-        vehicleRepository.save(vehicle);
 
         int resultSize = 1;
         performCriteriaRequest(searchRequests.getStatusSearchRequest("unavailable"),
@@ -181,7 +178,13 @@ class VehicleControllerCriteriaSearchTest {
         return login.loginUser(email, password);
     }
 
-    private <T> void performCriteriaRegistrationNumber(CriteriaSearchRequest searchRequest) throws Exception {
+    private void setVehicleStatusUNAVAILABLE(Long vehicleId) {
+        Vehicle vehicle = vehicleService.findById(vehicleId);
+        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
+        vehicleRepository.save(vehicle);
+    }
+
+    private void performCriteriaRegistrationNumber(CriteriaSearchRequest searchRequest) throws Exception {
         mockMvc.perform(post("/vehicles/criteria/search")
                         .contentType(APPLICATION_JSON)
                         .content(mapper.writeValueAsString(searchRequest))

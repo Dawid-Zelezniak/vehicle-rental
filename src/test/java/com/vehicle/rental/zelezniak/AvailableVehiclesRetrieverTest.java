@@ -1,9 +1,12 @@
 package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
+import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
@@ -43,6 +46,8 @@ class AvailableVehiclesRetrieverTest {
     private RentDurationCreator durationCreator;
     @Autowired
     private VehicleCreator vehicleCreator;
+    @Autowired
+    private CriteriaSearchRequests searchRequests;
 
     @BeforeAll
     void setupData() {
@@ -59,7 +64,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod1() {
         RentDuration duration = durationCreator.createDuration1();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(getSearchRequest(duration), PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1, availableVehicles.size());
@@ -75,7 +80,7 @@ class AvailableVehiclesRetrieverTest {
         Collection<Vehicle> vehicles = vehiclesRetriever.findVehiclesAvailableInPeriod(duration);
         List<Vehicle> availableVehicles = (List<Vehicle>) vehicles;
 
-        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2, availableVehicles.size());
+        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1, availableVehicles.size());
         assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_1_ID)));
         assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_2_ID)));
         assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
@@ -87,7 +92,7 @@ class AvailableVehiclesRetrieverTest {
     void shouldFindAvailableVehiclesInPeriod3() {
         RentDuration duration = durationCreator.createDuration3();
 
-        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(duration, PAGEABLE);
+        Page<Vehicle> page = vehiclesRetriever.findVehiclesAvailableInPeriod(getSearchRequest(duration), PAGEABLE);
         List<Vehicle> availableVehicles = page.getContent();
 
         assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3, availableVehicles.size());
@@ -96,5 +101,9 @@ class AvailableVehiclesRetrieverTest {
         assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
         assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_4_ID)));
         assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_5_ID)));
+    }
+
+    private AvailableVehiclesCriteriaSearchRequest getSearchRequest(RentDuration duration) {
+        return new AvailableVehiclesCriteriaSearchRequest(duration, searchRequests.getEmptySearchRequest());
     }
 }

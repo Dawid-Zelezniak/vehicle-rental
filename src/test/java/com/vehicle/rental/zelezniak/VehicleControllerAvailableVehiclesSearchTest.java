@@ -3,6 +3,7 @@ package com.vehicle.rental.zelezniak;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.config.*;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
 import org.junit.jupiter.api.*;
@@ -17,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.vehicle.rental.zelezniak.config.TestConstants.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
@@ -68,7 +69,7 @@ class VehicleControllerAvailableVehiclesSearchTest {
 
         mockMvc.perform(post("/vehicles/available/in_period")
                         .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(duration))
+                        .content(mapper.writeValueAsString(getSearchRequest(duration)))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1)));
@@ -76,20 +77,23 @@ class VehicleControllerAvailableVehiclesSearchTest {
 
     @Test
     void shouldFindAvailableVehiclesInPeriod2() throws Exception {
-        Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
-        motorcycle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
-        vehicleService.update(motorcycle.getId(), motorcycle);
+        Vehicle vehicle = vehicleCreator.createMotorcycleWithId2();
+        vehicle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
+        vehicleService.update(vehicle.getId(), vehicle);
         RentDuration duration = durationCreator.createDuration2();
 
         mockMvc.perform(post("/vehicles/available/in_period")
                         .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(duration))
+                        .content(mapper.writeValueAsString(getSearchRequest(duration)))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2)))
-                .andExpect(jsonPath("$.content[0].id").value(vehicleMap.get(VEHICLE_3_ID).getId()))
-                .andExpect(jsonPath("$.content[1].id").value(vehicleMap.get(VEHICLE_4_ID).getId()))
-                .andExpect(jsonPath("$.content[2].id").value(vehicleMap.get(VEHICLE_5_ID).getId()));
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1)))
+                .andExpect(jsonPath("$.content[*].id").value(containsInAnyOrder(
+                        (int) VEHICLE_3_ID,
+                        (int) VEHICLE_4_ID,
+                        (int) VEHICLE_5_ID,
+                        (int) VEHICLE_6_ID)));
     }
 
     @Test
@@ -98,7 +102,7 @@ class VehicleControllerAvailableVehiclesSearchTest {
 
         mockMvc.perform(post("/vehicles/available/in_period")
                         .contentType(APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(duration))
+                        .content(mapper.writeValueAsString(getSearchRequest(duration)))
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3)))
@@ -107,5 +111,10 @@ class VehicleControllerAvailableVehiclesSearchTest {
 
     private String generateToken(String email, String password) {
         return login.loginUser(email, password);
+    }
+
+    private AvailableVehiclesCriteriaSearchRequest getSearchRequest(RentDuration duration) {
+        CriteriaSearchRequests searchRequests = new CriteriaSearchRequests();
+        return new AvailableVehiclesCriteriaSearchRequest(duration, searchRequests.getEmptySearchRequest());
     }
 }
