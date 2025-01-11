@@ -155,7 +155,7 @@ class VehicleControllerTest {
     @Test
     void shouldAddVehicleWhenUserHasRoleADMIN() throws Exception {
         Vehicle testCar = vehicleCreator.createTestCar();
-        mockMvc.perform(post("/vehicles/add")
+        mockMvc.perform(post("/vehicles")
                         .content(objectMapper.writeValueAsString(testCar))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
@@ -176,7 +176,7 @@ class VehicleControllerTest {
                 .build();
         testCar.setVehicleInformation(invalid);
 
-        mockMvc.perform(post("/vehicles/add")
+        mockMvc.perform(post("/vehicles")
                         .content(objectMapper.writeValueAsString(testCar))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
@@ -189,7 +189,7 @@ class VehicleControllerTest {
 
     @Test
     void shouldNotAddVehicleWithExistingRegistrationNumber() throws Exception {
-        mockMvc.perform(post("/vehicles/add")
+        mockMvc.perform(post("/vehicles")
                         .content(objectMapper.writeValueAsString(vehicleWithId1))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
@@ -201,7 +201,7 @@ class VehicleControllerTest {
     @Test
     void shouldNotAddVehicleForRoleUSER() throws Exception {
         Vehicle testCar = vehicleCreator.createTestCar();
-        mockMvc.perform(post("/vehicles/add")
+        mockMvc.perform(post("/vehicles")
                         .content(objectMapper.writeValueAsString(testCar))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -213,7 +213,7 @@ class VehicleControllerTest {
         Long vehicleToUpdateId = vehicleWithId1.getId();
         Vehicle newData = vehicleCreator.buildVehicle1WithDifferentData();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
+        mockMvc.perform(put("/vehicles/{id}", vehicleToUpdateId)
                 .content(objectMapper.writeValueAsString(newData))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + adminToken)
@@ -235,7 +235,7 @@ class VehicleControllerTest {
         newData.setVehicleInformation(infoWithExistentRegistration);
         Long vehicleToUpdateId = vehicleWithId1.getId();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
+        mockMvc.perform(put("/vehicles/{id}", vehicleToUpdateId)
                         .content(objectMapper.writeValueAsString(newData))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + adminToken))
@@ -249,7 +249,7 @@ class VehicleControllerTest {
         Long vehicleToUpdateId = vehicleWithId1.getId();
         Vehicle newData = vehicleCreator.buildVehicle1WithDifferentData();
 
-        mockMvc.perform(put("/vehicles/update/{id}", vehicleToUpdateId)
+        mockMvc.perform(put("/vehicles/{id}", vehicleToUpdateId)
                 .content(objectMapper.writeValueAsString(newData))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userToken)
@@ -262,7 +262,7 @@ class VehicleControllerTest {
         vehicleRepository.save(vehicleWithId1);
 
         assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
+        mockMvc.perform(delete("/vehicles/{id}", vehicleWithId1.getId())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
@@ -273,11 +273,25 @@ class VehicleControllerTest {
     }
 
     @Test
+    void shouldNotDeleteVehicleWithStatusAVAILABLE() throws Exception {
+        Long vehicleToDeleteId = vehicleWithId1.getId();
+
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
+        mockMvc.perform(delete("/vehicles/{id}", vehicleToDeleteId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(
+                        "Vehicle must be in status UNAVAILABLE before it can be deleted."));
+
+        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
+    }
+
+    @Test
     void shouldNotDeleteVehicleWhenDoesNotExists() throws Exception {
         Long notExistingId = 20L;
 
         assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", notExistingId)
+        mockMvc.perform(delete("/vehicles/{id}", notExistingId)
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Vehicle with id: " + notExistingId + " does not exist."));
@@ -291,23 +305,9 @@ class VehicleControllerTest {
         vehicleRepository.save(vehicleWithId1);
 
         assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleWithId1.getId())
+        mockMvc.perform(delete("/vehicles/{id}", vehicleWithId1.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void shouldNotDeleteVehicleWithStatusAvailable() throws Exception {
-        Long vehicleToDeleteId = vehicleWithId1.getId();
-
-        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
-        mockMvc.perform(delete("/vehicles/delete/{id}", vehicleToDeleteId)
-                        .header("Authorization", "Bearer " + adminToken))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(
-                        "Vehicle must be in status UNAVAILABLE before it can be deleted."));
-
-        assertEquals(NUMBER_OF_VEHICLES, vehicleRepository.count());
     }
 
     private String generateToken(String email, String password) {

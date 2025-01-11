@@ -159,7 +159,7 @@ class ReservationControllerTest {
         List<Reservation> reservations = reservationRepository.findAll();
         assertEquals(NUMBER_OF_RESERVATIONS, reservations.size());
 
-        mockMvc.perform(post("/reservations/create")
+        mockMvc.perform(post("/reservations")
                         .content(mapper.writeValueAsString(creationRequest))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -179,7 +179,7 @@ class ReservationControllerTest {
         Long invalidId = 0L;
         ReservationCreationRequest request = new ReservationCreationRequest(invalidId, durationCreator.createDuration2());
 
-        mockMvc.perform(post("/reservations/create")
+        mockMvc.perform(post("/reservations")
                         .content(mapper.writeValueAsString(request))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -200,7 +200,7 @@ class ReservationControllerTest {
         RentDuration rentDuration = information.getRentDuration();
         Location pickUpLocation = information.getPickUpLocation();
 
-        mockMvc.perform(put("/reservations/update/location/{id}", id)
+        mockMvc.perform(put("/reservations/{id}/location", id)
                         .content(mapper.writeValueAsString(information))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -218,7 +218,7 @@ class ReservationControllerTest {
         Reservation newData = reservationWithId2;
         updateLocation(newData);
 
-        mockMvc.perform(put("/reservations/update/location/{id}", reservationWithId2.getId())
+        mockMvc.perform(put("/reservations/{id}/location", reservationWithId2.getId())
                         .content(mapper.writeValueAsString(newData.getRentInformation()))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -236,7 +236,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        ResultActions actions = mockMvc.perform(put("/reservations/update/duration/{id}", id)
+        ResultActions actions = mockMvc.perform(put("/reservations/{id}/duration", id)
                 .content(mapper.writeValueAsString(duration))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userToken));
@@ -254,7 +254,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        mockMvc.perform(put("/reservations/update/duration/{id}", id)
+        mockMvc.perform(put("/reservations/{id}/duration", id)
                         .content(mapper.writeValueAsString(duration))
                         .contentType(APPLICATION_JSON)
                         .header("Authorization", "Bearer " + userToken))
@@ -273,7 +273,7 @@ class ReservationControllerTest {
 
         findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
 
-        mockMvc.perform(delete("/reservations/delete/{id}", reservationId)
+        mockMvc.perform(delete("/reservations/{id}", reservationId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isNoContent());
 
@@ -288,7 +288,7 @@ class ReservationControllerTest {
     void shouldNotDeleteReservationWhenStatusIncorrect() throws Exception {
         Long id = reservationWithId2.getId();
 
-        mockMvc.perform(delete("/reservations/delete/{id}", id)
+        mockMvc.perform(delete("/reservations/{id}", id)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not remove reservation with status: " +
@@ -304,9 +304,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        mockMvc.perform(put("/reservations/add/vehicle/")
-                        .param("reservationId", reservationId.toString())
-                        .param("vehicleId", vehicleId.toString())
+        mockMvc.perform(put("/reservations/{reservationId}/vehicle/{vehicleId}", reservationId, vehicleId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk());
 
@@ -321,9 +319,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        mockMvc.perform(put("/reservations/add/vehicle/")
-                        .param("reservationId", reservationId.toString())
-                        .param("vehicleId", vehicleId.toString())
+        mockMvc.perform(put("/reservations/{reservationId}/vehicle/{vehicleId}", reservationId, vehicleId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not add vehicle to reservation with status: " +
@@ -339,9 +335,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        mockMvc.perform(put("/reservations/delete/vehicle/")
-                        .param("reservationId", reservationId.toString())
-                        .param("vehicleId", Long.toString(VEHICLE_1_ID))
+        mockMvc.perform(delete("/reservations/{reservationId}/vehicle/{vehicleId}", reservationId, VEHICLE_1_ID)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk());
 
@@ -354,9 +348,7 @@ class ReservationControllerTest {
 
         findVehiclesByReservationIdAssertSize(reservationWithId2.getId(), VEHICLES_IN_RESERVATION_2);
 
-        mockMvc.perform(put("/reservations/delete/vehicle/")
-                        .param("reservationId", reservationId.toString())
-                        .param("vehicleId", Long.toString(VEHICLE_5_ID))
+        mockMvc.perform(delete("/reservations/{reservationId}/vehicle/{vehicleId}", reservationId, VEHICLE_5_ID)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Can not remove vehicle from reservation with status: " +
@@ -474,11 +466,10 @@ class ReservationControllerTest {
         reservationRepository.save(reservation);
     }
 
-    private List<Reservation> findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
+    private void findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
         Page<Reservation> page = reservationRepository.findAllReservationsByClientId(clientId, PAGEABLE);
         List<Reservation> content = page.getContent();
         assertEquals(expectedSize, content.size());
-        return content;
     }
 
     private void findVehiclesByReservationIdAssertSize(Long reservationId, int expectedSize) {

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +23,7 @@ public class ReservationController {
     private final ReservationService service;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Page<Reservation> findAll(Pageable pageable) {
         return service.findAll(pageable);
     }
@@ -41,35 +43,38 @@ public class ReservationController {
         return service.findVehiclesByReservationId(id, pageable);
     }
 
-    @PostMapping("/create")
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Reservation add(@RequestBody @Valid ReservationCreationRequest request) {
         return service.addReservation(request);
     }
 
-    @PutMapping("/update/location/{id}")
+    @PutMapping("/{id}/location")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public Reservation updateLocation(@PathVariable Long id, @RequestBody @Valid RentInformation updatedLocation) {
         return service.updateLocationForNewReservation(id, updatedLocation);
     }
 
-    @PutMapping("/update/duration/{id}")
+    @PutMapping("/{id}/duration")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public Reservation updateDuration(@PathVariable Long id, @RequestBody @Valid RentDuration duration) {
         return service.updateDurationForNewReservation(id, duration);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.deleteReservation(id);
     }
 
-    @PutMapping("/add/vehicle/")
-    public void addVehicle(@RequestParam Long reservationId, @RequestParam Long vehicleId) {
+    @PutMapping("/{reservationId}/vehicle/{vehicleId}")
+    public void addVehicle(@PathVariable Long reservationId, @PathVariable Long vehicleId) {
         service.addVehicleToNewReservation(reservationId, vehicleId);
     }
 
-    @PutMapping("/delete/vehicle/")
-    public void deleteVhicle(@RequestParam Long reservationId, @RequestParam Long vehicleId) {
+    @DeleteMapping("/{reservationId}/vehicle/{vehicleId}")
+    public void deleteVhicle(@PathVariable Long reservationId, @PathVariable Long vehicleId) {
         service.deleteVehicleFromNewReservation(reservationId, vehicleId);
     }
 
