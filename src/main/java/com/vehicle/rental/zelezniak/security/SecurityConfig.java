@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -40,33 +41,26 @@ import static com.vehicle.rental.zelezniak.constants.Roles.USER;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableAsync
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final RSAKeyProperties keyProperties;
 
     private static final String[] ADMIN_ENDPOINTS = {
             "/clients",
-            "/clients/{id}",
-            "/clients/delete/**",
             "/clients/email/**",
-            "/vehicles/add",
-            "/vehicles/update/**",
-            "/vehicles/delete/**",
-            "/reservations",
             "/reservations/vehicles/from_reservation/**"
     };
 
     private static final String[] USER_AND_ADMIN_ENDPOINTS = {
-            "/clients/update/**",
+            "/clients/{id}",
             "/vehicles/criteria",
+            "/vehicles/available/in_period",
             "/vehicles/{id}",
-            "/reservations/{id}",
             "/vehicles",
             "/reservations/{id}",
+            "/reservations/{id}",
             "/reservations/client/**",
-            "/reservations/create",
-            "/reservations/update/**",
-            "/reservations/delete/**",
             "/reservations/add/**",
             "/reservations/calculate/**"
     };
