@@ -15,17 +15,17 @@ Aplikacja jest systemem, który umożliwia użytkownikom wyszukiwanie, rezerwowa
 - W momencie rozpoczęcia wynajmu, rezerwacja użytkownika przekształca się w wypożyczenie.
 
 ## Aktualnie działające funkcje
-#Rejestracja i logowanie użytkownika z wykorzystaniem JWT.
-#Wyszukiwanie pojazdów dostępnych w określonym przedziale czasowym.
-#Operacje CRUD oraz walidacja danych dla pojazdów, rezerwacji, wynajmów i użytkowników.
-#Dynamiczne wyszukiwanie pojazdów według różnych kryteriów, takich jak marka, model czy rok produkcji.
-#Role użytkowników:
+-Rejestracja i logowanie użytkownika z wykorzystaniem JWT.
+-Wyszukiwanie pojazdów dostępnych w określonym przedziale czasowym.
+-Operacje CRUD oraz walidacja danych dla pojazdów, rezerwacji, wynajmów i użytkowników.
+-Dynamiczne wyszukiwanie pojazdów według różnych kryteriów, takich jak marka, model czy rok produkcji.
+-Role użytkowników:
 Ograniczony dostęp do części aplikacji w zależności od uprawnień.
-#Panel użytkownika:
+-Panel użytkownika:
 Możliwość podglądu informacji o dokonanych rezerwacjach.
-#Profil administratora:
+-Profil administratora:
 Automatycznie tworzony podczas uruchamiania aplikacji, z dostępem do kluczowych funkcji systemu.
-#Testy integracyjne sprawdzające poprawność działania logiki aplikacji.
+-Testy integracyjne sprawdzające poprawność działania logiki aplikacji.
 
 # Technologie:
 - Java 17
