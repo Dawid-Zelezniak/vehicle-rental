@@ -16,24 +16,24 @@ Aplikacja umożliwia użytkownikom wyszukiwanie, rezerwowanie i zarządzanie wyn
 - Profil administratora: Automatycznie tworzony podczas uruchamiania aplikacji, z dostępem do kluczowych funkcji systemu.
 - Testy integracyjne serwisów, kontrolerów oraz innych klas w celu sprawdzenia poprawności działania aplikacji, a także zachowania spójności przechowywanych danych 
 
- ##Następne aktualizacje obejmują poniższe funkcjonalności:
+ ## Następne aktualizacje obejmują poniższe funkcjonalności:
 - Użytkownik dokonuje zapłaty, a jego rezerwacja zmienia status na ACTIVE.
 - W momencie rozpoczęcia wynajmu, rezerwacja użytkownika przekształca się w wypożyczenie.
 - Na 24 godziny przed wypożyczeniem, klient otrzymuje powiadomienie (e-mail oraz SMS) o zbliżającym się wypożyczeniu.
 - Klient może zrezygnować z wypożyczenia, a jego opłata zostanie zwrócona na konto.
 
-#Technologie:
+# Technologie:
 - Java 17
 - Spring Boot 3.30
 - Junit 5
 - MySQL
 
-#Vehicle Rental Application
+# Vehicle Rental Application
 _Application in development_
 
 The application is a system that enables users to search, book, and manage vehicle rentals.
 
-##Currently Implemented Features:
+## Currently Implemented Features:
 - User registration and login using JWT.
 - Search for vehicles available within a specified time frame.
 - CRUD operations and data validation for vehicles, reservations, rentals, and users.
@@ -45,13 +45,13 @@ The application is a system that enables users to search, book, and manage vehic
 - Administrator profile: Automatically created during application startup with access to key system functions.
 - Integration tests: Tests for services, controllers, and other classes to verify the application's functionality and ensure data consistency.
 
- #Upcoming Updates:
+ # Upcoming Updates:
 - Payment processing: Users make payments, and their reservations change to the ACTIVE status.
 - Real-time rentals: Reservations automatically convert to rentals at the start time.
 - Notifications: Clients receive reminders (email and SMS) 24 hours before their rental starts.
 - Cancellations and refunds: Clients can cancel their reservations and receive a refund.
 
-#Technologies:
+# Technologies:
 - Java 17
 - Spring Boot 3.30
 - JUnit 5
