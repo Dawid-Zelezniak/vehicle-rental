@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JWTGeneratorTest {
 
-    private final String FILE_PATH = "src/test/resources/expiredToken.txt";
     private final Pageable PAGEABLE = PageRequest.of(0, 5);
 
     @Autowired
@@ -47,13 +46,14 @@ class JWTGeneratorTest {
 
     private String readFile() {
         var builder = new StringBuilder();
-        try (var br = new BufferedReader(new FileReader(FILE_PATH))) {
+        String path = "src/test/resources/expiredToken.txt";
+        try (var br = new BufferedReader(new FileReader(path))) {
             String line = null;
             while ((line = br.readLine()) != null) {
                 builder.append(line);
             }
         } catch (IOException e) {
-            throw new RuntimeException("File on path" + FILE_PATH + " not found.");
+            throw new RuntimeException("File on path" + path + " not found.");
         }
         return builder.toString();
     }

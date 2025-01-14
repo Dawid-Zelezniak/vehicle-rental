@@ -18,8 +18,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -31,7 +29,7 @@ class LoginService implements UserDetailsService {
     private final JWTGenerator jwtGenerator;
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        inputValidator.throwExceptionIfObjectIsNull(username, "Email" + CAN_NOT_BE_NULL);
+        inputValidator.throwExceptionIfObjectIsNull(username, "Email can not be null.");
         return clientService.findByEmail(username);
     }
 

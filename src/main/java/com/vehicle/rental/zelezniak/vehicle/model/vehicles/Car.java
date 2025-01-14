@@ -12,8 +12,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
-
 @Entity
 @Table(name = "cars")
 @SuperBuilder(toBuilder = true)
@@ -22,7 +20,7 @@ import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_
 @AllArgsConstructor
 public class Car extends Vehicle {
 
-    @NotNull(message = "Number of doors" + CAN_NOT_BE_NULL)
+    @NotNull(message = "Number of doors can not be null.")
     private Integer doorsNumber;
 
     @Enumerated(EnumType.STRING)

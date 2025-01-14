@@ -73,7 +73,7 @@ public class VehicleService {
 
     @Transactional(readOnly = true)
     public Page<Vehicle> findByCriteria(CriteriaSearchRequest searchRequest, Pageable pageable) {
-        validateNotNull(searchRequest, "Criteria search request" + CAN_NOT_BE_NULL);
+        validateNotNull(searchRequest, "Criteria search request can not be null.");
         log.debug("Searching vehicles by criteria");
         return criteriaSearch.findVehiclesByCriteria(searchRequest, pageable);
     }
@@ -81,7 +81,7 @@ public class VehicleService {
     @Transactional(readOnly = true)
     public Page<Vehicle> findAvailableVehicles(AvailableVehiclesCriteriaSearchRequest searchRequest, Pageable pageable) {
         RentDuration duration = searchRequest.duration();
-        validateNotNull(duration, "Duration" + CAN_NOT_BE_NULL);
+        validateNotNull(duration, "Duration can not be null.");
         log.debug("Finding available vehicles from: {} to {}", duration.getRentalStart(), duration.getRentalEnd());
         return vehiclesRetriever.findAvailableVehiclesByCriteria(searchRequest, pageable);
     }

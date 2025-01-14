@@ -4,8 +4,6 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_BLANK;
-
 @Embeddable
 @Getter
 @ToString
@@ -14,6 +12,6 @@ import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_
 @NoArgsConstructor(force = true)
 public class RegistrationNumber {
 
-    @NotBlank(message = "Registration number" + CAN_NOT_BE_BLANK)
+    @NotBlank(message = "Registration number can not be blank.")
     private final String registration;
 }

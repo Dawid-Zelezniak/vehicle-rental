@@ -1,11 +1,11 @@
 package com.vehicle.rental.zelezniak;
 
+import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentCreator;
+import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.rent.model.Rent;
-import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
-import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.rent.repository.RentRepository;
 import com.vehicle.rental.zelezniak.rent.service.RentService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;

@@ -73,14 +73,14 @@ public class ReservationService {
     @Transactional
     public Reservation addReservation(ReservationCreationRequest request) {
         log.debug("Received new ReservationCreationRequest : {}", request);
-        inputValidator.throwExceptionIfObjectIsNull(request, "Reservation creation request" + CAN_NOT_BE_NULL);
+        inputValidator.throwExceptionIfObjectIsNull(request, "Reservation creation request can not be null.");
         return newReservationService.addNewReservation(request);
     }
 
     @Transactional
     public Reservation updateLocationForNewReservation(Long id, RentInformation newData) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
-        validateNotNull(newData, "Rent information" + CAN_NOT_BE_NULL);
+        validateNotNull(newData, "Rent information can not be null.");
         Reservation r = findReservation(id);
         return newReservationService.updateLocationForReservation(r, newData);
     }
@@ -91,7 +91,7 @@ public class ReservationService {
     @Transactional
     public Reservation updateDurationForNewReservation(Long id, RentDuration duration) {
         validateNotNull(id, RESERVATION_ID_NOT_NULL);
-        validateNotNull(duration, "Rent duration" + CAN_NOT_BE_NULL);
+        validateNotNull(duration, "Rent duration can not be null.");
         Reservation reservation = findReservation(id);
         Reservation updated = newReservationService.updateDurationForReservation(reservation, duration);
         handleRemoveVehicles(id);

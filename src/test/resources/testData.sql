@@ -79,7 +79,7 @@ insert into rented_vehicles (rent_id, vehicle_id) values
 (3, 4),
 (3, 5);
 
--- Reset IDENTITY for tables
+-- update IDENTITY for tables after inserting test data
 ALTER TABLE roles ALTER COLUMN role_id RESTART WITH (SELECT MAX(role_id) + 1 FROM roles);
 ALTER TABLE addresses ALTER COLUMN address_id RESTART WITH (SELECT MAX(address_id) + 1 FROM addresses);
 ALTER TABLE clients ALTER COLUMN client_id RESTART WITH (SELECT MAX(client_id) + 1 FROM clients);

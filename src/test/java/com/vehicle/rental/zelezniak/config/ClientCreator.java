@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static com.vehicle.rental.zelezniak.constants.Roles.USER;
+import static com.vehicle.rental.zelezniak.user.model.client.Role.USER;
 
 @Component
 public class ClientCreator {

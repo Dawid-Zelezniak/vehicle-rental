@@ -1,13 +1,11 @@
 package com.vehicle.rental.zelezniak.user.service;
 
-import com.vehicle.rental.zelezniak.constants.Roles;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
 import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
 import com.vehicle.rental.zelezniak.util.validation.EmailPatternValidator;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 public class AdminInitializationService {
 
-    private static final String ROLE_ADMIN = Roles.ADMIN;
+    private static final String ROLE_ADMIN = Role.ADMIN;
 
     @Value("${admin.password}")
     private String adminPassword;

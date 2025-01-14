@@ -19,7 +19,8 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.List;
 
 import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_VEHICLES_PRODUCED_IN_2020;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class is used for testing queries that contain multiple criteria.

@@ -16,8 +16,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_NULL;
-
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         property = "type")
@@ -41,14 +39,14 @@ public abstract class Vehicle {
     @Valid
     private VehicleInformation vehicleInformation;
 
-    @NotNull(message = "Price per day" + CAN_NOT_BE_NULL)
+    @NotNull(message = "Price per day can not be null.")
     @Valid
     @AttributeOverride(
             name = "value",
             column = @Column(name = "price_per_day"))
     private Money pricePerDay;
 
-    @NotNull(message = "Deposit" + CAN_NOT_BE_NULL)
+    @NotNull(message = "Deposit can not be null.")
     @Valid
     @AttributeOverride(
             name = "value",

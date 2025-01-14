@@ -5,7 +5,6 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.vehicle.rental.zelezniak.constants.Roles;
 import com.vehicle.rental.zelezniak.security.authentication.token.RSAKeyProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -34,8 +33,9 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.interfaces.RSAPublicKey;
 
-import static com.vehicle.rental.zelezniak.constants.Roles.ADMIN;
-import static com.vehicle.rental.zelezniak.constants.Roles.USER;
+import static com.vehicle.rental.zelezniak.user.model.client.Role.ADMIN;
+import static com.vehicle.rental.zelezniak.user.model.client.Role.USER;
+
 
 @Configuration
 @EnableWebSecurity

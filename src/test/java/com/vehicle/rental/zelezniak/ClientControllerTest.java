@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vehicle.rental.zelezniak.config.ClientCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.UserLogin;
-import com.vehicle.rental.zelezniak.constants.Roles;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.client.Role;
 import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
 import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
@@ -44,7 +44,7 @@ class ClientControllerTest {
     private static String userToken;
     private static final Pageable PAGEABLE = PageRequest.of(0, 5);
     private static final MediaType APPLICATION_JSON = MediaType.APPLICATION_JSON;
-    private static final String ROLE_USER = Roles.USER;
+    private static final String ROLE_USER = Role.USER;
 
     @Autowired
     private MockMvc mockMvc;

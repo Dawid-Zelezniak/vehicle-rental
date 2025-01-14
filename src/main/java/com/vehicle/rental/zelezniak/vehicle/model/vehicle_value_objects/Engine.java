@@ -1,10 +1,11 @@
 package com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-
-import static com.vehicle.rental.zelezniak.constants.ValidationMessages.CAN_NOT_BE_BLANK;
 
 @Embeddable
 @Builder(toBuilder = true)
@@ -17,7 +18,7 @@ public class Engine {
 
     private static final String CANT_BE_BELOW_ONE = " can not be lower than 1";
 
-    @NotBlank(message = "Engine type" + CAN_NOT_BE_BLANK)
+    @NotBlank(message = "Engine type can not be blank.")
     private final String engineType;
 
     @Enumerated(EnumType.STRING)

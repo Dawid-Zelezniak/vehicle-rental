@@ -1,9 +1,8 @@
 package com.vehicle.rental.zelezniak.user.model.client.user_value_objects;
 
-import com.vehicle.rental.zelezniak.constants.ValidationMessages;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Embeddable
@@ -16,7 +15,7 @@ public class UserCredentials {
 
     private static final String INVALID_PASSWORD = "Password must contains at least 5 characters.";
 
-    @NotNull(message = "Email address" + ValidationMessages.CAN_NOT_BE_NULL)
+    @NotNull(message = "Email address can not be null.")
     private final String email;
 
     @NotNull(message = INVALID_PASSWORD)
