@@ -6,6 +6,7 @@ import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.config.RentDurationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.vehicle.model.dto.AvailableVehiclesCriteriaSearchRequest;
+import com.vehicle.rental.zelezniak.vehicle.model.dto.CriteriaSearchRequest;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import com.vehicle.rental.zelezniak.vehicle.service.VehicleService;
@@ -19,10 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.vehicle.rental.zelezniak.config.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,21 +50,19 @@ class AvailableVehiclesRetrieverTest {
     void setupData() {
         vehicleMap = new HashMap<>();
         databaseSetup.setupAllTables();
-        vehicleMap.put(VEHICLE_1_ID, vehicleService.findById(VEHICLE_1_ID));
-        vehicleMap.put(VEHICLE_2_ID, vehicleService.findById(VEHICLE_2_ID));
-        vehicleMap.put(VEHICLE_3_ID, vehicleService.findById(VEHICLE_3_ID));
-        vehicleMap.put(VEHICLE_4_ID, vehicleService.findById(VEHICLE_4_ID));
-        vehicleMap.put(VEHICLE_5_ID, vehicleService.findById(VEHICLE_5_ID));
+        Arrays.asList(VEHICLE_1_ID, VEHICLE_2_ID, VEHICLE_3_ID, VEHICLE_4_ID, VEHICLE_5_ID, VEHICLE_6_ID)
+                .forEach(id -> vehicleMap.put(id, vehicleService.findById(id)));
     }
 
     @Test
     void shouldFindAvailableVehiclesInPeriod1() {
         RentDuration duration = durationCreator.createDuration1();
 
-        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getSearchRequest(duration), PAGEABLE);
-        List<Vehicle> availableVehicles = page.getContent();
+        AvailableVehiclesCriteriaSearchRequest searchRequest = getEmptySearchRequest(duration);
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(searchRequest, PAGEABLE);
 
-        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1, availableVehicles.size());
+        assertAvailableVehiclesCount(page.getNumberOfElements(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1);
+        assertAvailableVehicles(page.getContent(), List.of(vehicleMap.get(VEHICLE_6_ID)), List.of());
     }
 
     @Test
@@ -76,33 +72,109 @@ class AvailableVehiclesRetrieverTest {
         vehicleService.update(motorcycle.getId(), motorcycle);
         RentDuration duration = durationCreator.createDuration2();
 
-        Collection<Vehicle> vehicles = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration);
-        List<Vehicle> availableVehicles = (List<Vehicle>) vehicles;
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getEmptySearchRequest(duration), PAGEABLE);
 
-        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1, availableVehicles.size());
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_1_ID)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_2_ID)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_4_ID)));
-        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_5_ID)));
+        assertAvailableVehiclesCount(page.getNumberOfElements(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1);
+        assertAvailableVehicles(
+                page.getContent(),
+                List.of(vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_4_ID), vehicleMap.get(VEHICLE_5_ID), vehicleMap.get(VEHICLE_6_ID)),
+                List.of(vehicleMap.get(VEHICLE_1_ID), vehicleMap.get(VEHICLE_2_ID)));
+    }
+
+    @Test
+    void shouldFindSortedAvailableVehiclesInPeriod2() {
+        Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
+        motorcycle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
+        vehicleService.update(motorcycle.getId(), motorcycle);
+        RentDuration duration = durationCreator.createDuration2();
+
+        AvailableVehiclesCriteriaSearchRequest searchRequest = brandAndProductionYearRequest(duration, "Honda", 2020);
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(searchRequest, PAGEABLE);
+
+        assertAvailableVehiclesCount(page.getNumberOfElements(), NUMBER_OF_HONDA_CARS_PRODUCED_IN_2020);
+        assertAvailableVehicles(page.getContent(),
+                List.of(vehicleMap.get(VEHICLE_4_ID), vehicleMap.get(VEHICLE_6_ID)),
+                List.of(vehicleMap.get(VEHICLE_1_ID), vehicleMap.get(VEHICLE_2_ID), vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_5_ID)));
     }
 
     @Test
     void shouldFindAvailableVehiclesInPeriod3() {
         RentDuration duration = durationCreator.createDuration3();
 
-        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getSearchRequest(duration), PAGEABLE);
-        List<Vehicle> availableVehicles = page.getContent();
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(getEmptySearchRequest(duration), PAGEABLE);
 
-        assertEquals(EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3, availableVehicles.size());
-        assertTrue(availableVehicles.contains(vehicleMap.get(VEHICLE_1_ID)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_2_ID)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_3_ID)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_4_ID)));
-        assertFalse(availableVehicles.contains(vehicleMap.get(VEHICLE_5_ID)));
+        assertAvailableVehiclesCount(page.getNumberOfElements(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3);
+        assertAvailableVehicles(page.getContent(),
+                List.of(vehicleMap.get(VEHICLE_1_ID), vehicleMap.get(VEHICLE_6_ID)),
+                List.of(vehicleMap.get(VEHICLE_2_ID), vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_4_ID), vehicleMap.get(VEHICLE_5_ID)));
     }
 
-    private AvailableVehiclesCriteriaSearchRequest getSearchRequest(RentDuration duration) {
+    @Test
+    void shouldFindSortedAvailableVehiclesInPeriod3() {
+        RentDuration duration = durationCreator.createDuration3();
+
+        AvailableVehiclesCriteriaSearchRequest searchRequest = brandAndProductionYearRequest(duration, "Seat", 2001);
+        Page<Vehicle> page = vehiclesRetriever.findAvailableVehiclesByCriteria(searchRequest, PAGEABLE);
+
+        assertAvailableVehiclesCount(page.getNumberOfElements(), NUMBER_OF_SEAT_CARS_PRODUCED_IN_2001);
+        assertAvailableVehicles(page.getContent(),
+                List.of(vehicleMap.get(VEHICLE_1_ID)),
+                List.of(vehicleMap.get(VEHICLE_2_ID), vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_4_ID),
+                        vehicleMap.get(VEHICLE_5_ID), vehicleMap.get(VEHICLE_6_ID)));
+    }
+
+    @Test
+    void helperMethodShouldFindAvailableVehiclesInPeriod1() {
+        RentDuration duration = durationCreator.createDuration1();
+
+        Collection<Vehicle> vehicles = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration);
+
+        assertAvailableVehiclesCount(vehicles.size(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_1);
+        assertAvailableVehicles(vehicles, List.of(vehicleMap.get(VEHICLE_6_ID)), List.of());
+    }
+
+    @Test
+    void helperMethodShouldFindAvailableVehiclesInPeriod2() {
+        Vehicle motorcycle = vehicleCreator.createMotorcycleWithId2();
+        motorcycle.setStatus(Vehicle.VehicleStatus.UNAVAILABLE);
+        vehicleService.update(motorcycle.getId(), motorcycle);
+        RentDuration duration = durationCreator.createDuration2();
+
+        Collection<Vehicle> vehicles = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration);
+
+        assertAvailableVehiclesCount(vehicles.size(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_2 - 1);
+        assertAvailableVehicles(vehicles,
+                List.of(vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_4_ID), vehicleMap.get(VEHICLE_5_ID), vehicleMap.get(VEHICLE_6_ID)),
+                List.of(vehicleMap.get(VEHICLE_1_ID), vehicleMap.get(VEHICLE_2_ID)));
+    }
+
+    @Test
+    void helperMethodShouldFindAvailableVehiclesInPeriod3() {
+        RentDuration duration = durationCreator.createDuration3();
+
+        Collection<Vehicle> vehicles = vehiclesRetriever.findAvailableVehiclesByRentDuration(duration);
+        
+        assertAvailableVehiclesCount(vehicles.size(), EXPECTED_NUMBER_OF_AVAILABLE_VEHICLES_FOR_DURATION_3);
+        assertAvailableVehicles(vehicles,
+                List.of(vehicleMap.get(VEHICLE_1_ID), vehicleMap.get(VEHICLE_6_ID)),
+                List.of(vehicleMap.get(VEHICLE_2_ID), vehicleMap.get(VEHICLE_3_ID), vehicleMap.get(VEHICLE_4_ID), vehicleMap.get(VEHICLE_5_ID)));
+    }
+
+    private void assertAvailableVehiclesCount(int actualSize, int expectedCount) {
+        assertEquals(expectedCount, actualSize);
+    }
+
+    private void assertAvailableVehicles(Collection<Vehicle> actualVehicles, List<Vehicle> expectedVehicles, List<Vehicle> unexpectedVehicles) {
+        expectedVehicles.forEach(vehicle -> assertTrue(actualVehicles.contains(vehicle)));
+        unexpectedVehicles.forEach(vehicle -> assertFalse(actualVehicles.contains(vehicle)));
+    }
+
+    private AvailableVehiclesCriteriaSearchRequest getEmptySearchRequest(RentDuration duration) {
         return new AvailableVehiclesCriteriaSearchRequest(duration, searchRequests.getEmptySearchRequest());
+    }
+
+    private AvailableVehiclesCriteriaSearchRequest brandAndProductionYearRequest(RentDuration duration, String brand, Integer year) {
+        CriteriaSearchRequest request = searchRequests.getBrandAndProductionYearSearchRequest(brand, year);
+        return new AvailableVehiclesCriteriaSearchRequest(duration, request);
     }
 }

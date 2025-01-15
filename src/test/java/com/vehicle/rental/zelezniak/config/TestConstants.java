@@ -11,6 +11,8 @@ public class TestConstants {
     public static final int NUMBER_OF_AVAILABLE_VEHICLES = 6;
     public static final int NUMBER_OF_UNAVAILABLE_VEHICLES = 0;
     public static final int NUMBER_OF_VEHICLES_PRODUCED_IN_2020 = 3;
+    public static final int NUMBER_OF_HONDA_CARS_PRODUCED_IN_2020 = 2;
+    public static final int NUMBER_OF_SEAT_CARS_PRODUCED_IN_2001= 1;
 
     public static final long VEHICLE_1_ID = 1L;
     public static final long VEHICLE_2_ID = 2L;
