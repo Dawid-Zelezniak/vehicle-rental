@@ -126,6 +126,18 @@ class ReservationControllerTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenUserTriesToAccessAnotherUsersReservation() throws Exception {
+        Long clientId = CLIENT_3_ID;
+
+        mockMvc.perform(get("/reservations/client/{id}", clientId)
+                .param("page", String.valueOf(PAGEABLE.getPageNumber()))
+                .param("size", String.valueOf(PAGEABLE.getPageSize()))
+                .header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("You can not search for other clients reservations."));
+    }
+
+    @Test
     void shouldFindVehiclesByReservationId() throws Exception {
         Long reservationId = TestConstants.RESERVATION_3_ID;
         Long vehicleId = TestConstants.VEHICLE_3_ID;

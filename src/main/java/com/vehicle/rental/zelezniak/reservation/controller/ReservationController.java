@@ -6,6 +6,8 @@ import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
+import com.vehicle.rental.zelezniak.security.validation.AccessValidator;
+import com.vehicle.rental.zelezniak.security.validation.UserAccess;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
 
     private final ReservationService service;
+    private final AccessValidator validator;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -34,7 +39,9 @@ public class ReservationController {
     }
 
     @GetMapping("/client/{clientId}")
-    public Page<Reservation> findAllByClientId(@PathVariable Long clientId, Pageable pageable) {
+    public Page<Reservation> findAllByClientId(@PathVariable Long clientId, Pageable pageable, Principal principal) {
+        validator.validateUserAccess(new UserAccess(principal,clientId,
+                "You can not search for other clients reservations."));
         return service.findAllByClientId(clientId, pageable);
     }
 
