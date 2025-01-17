@@ -8,7 +8,7 @@ import com.vehicle.rental.zelezniak.config.ReservationCreator;
 import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
-import com.vehicle.rental.zelezniak.reservation.service.ReservationCostCalculator;
+import com.vehicle.rental.zelezniak.reservation.service.calculations.ReservationCostService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
-class ReservationCostCalculatorTest {
+class ReservationCostServiceTest {
 
     private static Reservation reservationWithId2;
 
@@ -37,7 +37,7 @@ class ReservationCostCalculatorTest {
     @Autowired
     private ReservationCreator reservationCreator;
     @Autowired
-    private ReservationCostCalculator calculator;
+    private ReservationCostService costService;
     @Autowired
     private VehicleCreator vehicleCreator;
     @Autowired
@@ -56,7 +56,7 @@ class ReservationCostCalculatorTest {
         updateDuration(new RentDuration(start, end));
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId2.getId());
 
-        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
+        Reservation reservation = costService.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
 
         assertEquals(totalCost, reservation.getTotalCost());
         assertEquals(deposit, reservation.getDepositAmount());
@@ -70,7 +70,7 @@ class ReservationCostCalculatorTest {
         updateDuration(new RentDuration(start, end));
         Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservationWithId2.getId());
 
-        Reservation reservation = calculator.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
+        Reservation reservation = costService.calculateAndApplyCosts(reservationWithId2, new HashSet<>(vehicles));
 
         assertEquals(totalCost, reservation.getTotalCost());
         assertEquals(deposit, reservation.getDepositAmount());
