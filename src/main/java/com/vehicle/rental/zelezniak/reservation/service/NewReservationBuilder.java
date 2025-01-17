@@ -6,8 +6,11 @@ import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import org.springframework.stereotype.Component;
 
+/**
+ * Class responsible for building new reservations
+ * */
 @Component
-public class NewReservationBuilder {
+class NewReservationBuilder {
 
     public Reservation build(Client client, RentDuration duration) {
         RentInformation information = buildRentInformation(duration);
