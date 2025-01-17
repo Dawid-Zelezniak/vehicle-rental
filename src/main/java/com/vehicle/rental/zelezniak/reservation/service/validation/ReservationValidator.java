@@ -28,7 +28,6 @@ public class ReservationValidator {
      * - The reservation must contain at least one vehicle.
      * - It must be ensured that none of the selected vehicles have been already reserved or rented.
      */
-    @Transactional
     public void validateReservationDataBeforePayment(Long id) {
         Reservation reservationToPay = reservationService.findById(id);
         validateReservationStatus(reservationToPay.getReservationStatus());
