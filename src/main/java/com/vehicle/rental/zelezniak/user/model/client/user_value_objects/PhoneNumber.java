@@ -18,7 +18,7 @@ public class PhoneNumber {
 
     public PhoneNumber(String number) {
         if (!isValid(number)) {
-            throw new IllegalArgumentException("Invalid phone number format");
+            throw new IllegalArgumentException("Invalid phone number format.");
         }
         this.number = number;
     }
