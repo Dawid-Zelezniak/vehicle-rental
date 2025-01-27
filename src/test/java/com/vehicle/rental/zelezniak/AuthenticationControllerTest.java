@@ -120,8 +120,8 @@ class AuthenticationControllerTest {
                         .content(mapper.writeValueAsString(client)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldValidationErrors").value(
-                        containsInAnyOrder("Street name can not be blank.",
-                                "Country name can not be blank."
+                        containsInAnyOrder("Street name cannot be blank. Please provide a valid street name.",
+                                "Country name cannot be blank. Please provide a valid country name."
                         )));
     }
 

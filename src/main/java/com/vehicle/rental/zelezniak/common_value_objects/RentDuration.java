@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(force = true)
 public class RentDuration {
 
-    @NotNull(message = "Rental start can not be null.")
+    @NotNull(message = "Rental start date cannot be null. Please provide a valid start date.")
     private final LocalDateTime rentalStart;
 
-    @NotNull(message = "Rental end can not be null.")
+    @NotNull(message = "Rental end date cannot be null. Please provide a valid end date.")
     private final LocalDateTime rentalEnd;
 
     public RentDuration(LocalDateTime start, LocalDateTime end) {
@@ -28,7 +28,7 @@ public class RentDuration {
 
     private void validateArguments(LocalDateTime start, LocalDateTime end) {
         if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Rental start can not be after rental end.");
+            throw new IllegalArgumentException("Rental start date cannot be after the end date.");
         }
     }
 }

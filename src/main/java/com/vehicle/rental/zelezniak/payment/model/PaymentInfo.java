@@ -5,12 +5,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record PaymentInfo(
-        @NotNull(message = "Currency can not be null.")
+        @NotNull(message = "Currency is required and cannot be null.")
         String currency,
-        @NotNull(message = "To pay can not be null.")
+        @NotNull(message = "The amount to pay is required and cannot be null.")
         Money toPay,
-        @NotNull(message = "Payment method can not be null.")
+        @NotNull(message = "Please specify a payment method.")
         String paymentMethod,
-        @Min(value = 0, message = "Reservation id can not be lower than 0.")
+        @Min(value = 1, message = "Reservation ID must be 1 or greater.")
         Long reservationId) {
 }
+

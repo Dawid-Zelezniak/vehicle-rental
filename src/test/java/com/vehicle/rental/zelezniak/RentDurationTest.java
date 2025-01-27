@@ -16,6 +16,6 @@ class RentDurationTest {
         LocalDateTime end = LocalDateTime.of(2024, 7, 26, 10, 0, 0);
         IllegalArgumentException assertion = assertThrows(IllegalArgumentException.class, () ->
                 new RentDuration(end, start));
-        assertEquals("Rental start can not be after rental end.", assertion.getMessage());
+        assertEquals("Rental start date cannot be after the end date.", assertion.getMessage());
     }
 }

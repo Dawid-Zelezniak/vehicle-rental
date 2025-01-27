@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Embeddable
 public record Street(
-        @NotBlank(message = "Street name can not be blank.")
+        @NotBlank(message = "Street name cannot be blank. Please provide a valid street name.")
         String streetName) {
 }
+

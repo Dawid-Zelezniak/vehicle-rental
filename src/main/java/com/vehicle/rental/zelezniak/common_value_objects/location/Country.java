@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Embeddable
 public record Country(
-        @NotBlank(message = "Country name can not be blank.")
+        @NotBlank(message = "Country name cannot be blank. Please provide a valid country name.")
         String countryName) {
 }
+

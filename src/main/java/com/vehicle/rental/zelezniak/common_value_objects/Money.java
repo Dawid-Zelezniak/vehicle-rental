@@ -26,16 +26,12 @@ public record Money(
 
     private void validate(BigDecimal money) {
         if (money == null || isLowerThanZero(money)) {
-            throwException();
+            throw new IllegalArgumentException("Money value must not be null or negative.");
         }
     }
 
     private boolean isLowerThanZero(BigDecimal money) {
         return money.compareTo(ZERO) < 0;
-    }
-
-    private void throwException() {
-        throw new IllegalArgumentException("Money value is incorrect");
     }
 
     private BigDecimal format(BigDecimal money) {
