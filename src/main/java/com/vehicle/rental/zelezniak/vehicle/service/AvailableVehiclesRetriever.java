@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class responsible for finding vehicles available in period selected by user.
@@ -33,6 +35,7 @@ public class AvailableVehiclesRetriever {
 
     @Transactional(readOnly = true)
     public Page<Vehicle> findAvailableVehiclesByCriteria(AvailableVehiclesCriteriaSearchRequest searchRequest, Pageable pageable) {
+        log.debug("Search for vehicles in a specified period according to specific criteria");
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesIdsInPeriod(searchRequest.duration());
         Specification<Vehicle> specification = VehicleSpecification.buildSpecificationForAvailableVehicles(
                 searchRequest, unavailableVehiclesIdsInPeriod);
@@ -41,6 +44,7 @@ public class AvailableVehiclesRetriever {
 
     @Transactional(readOnly = true)
     public Collection<Vehicle> findAvailableVehiclesByRentDuration(RentDuration duration) {
+        log.debug("Search for vehicles in a specified period");
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesIdsInPeriod(duration);
         return vehicleRepository.findVehiclesByIdNotIn(unavailableVehiclesIdsInPeriod);
     }
@@ -48,10 +52,10 @@ public class AvailableVehiclesRetriever {
     private Set<Long> findReservedAndRentedVehiclesIdsInPeriod(RentDuration duration) {
         LocalDateTime start = duration.getRentalStart();
         LocalDateTime end = duration.getRentalEnd();
-        Set<Long> unavailableForRents = findUnavailableVehicleIdsForRents(start, end);
-        Set<Long> unavailableForReservations = findUnavailableVehicleIdsForReservations(start, end);
-        unavailableForRents.addAll(unavailableForReservations);
-        return unavailableForRents;
+        return Stream.concat(
+                        findUnavailableVehicleIdsForRents(start, end).stream(),
+                        findUnavailableVehicleIdsForReservations(start, end).stream())
+                .collect(Collectors.toSet());
     }
 
     private Set<Long> findUnavailableVehicleIdsForRents(LocalDateTime start, LocalDateTime end) {
@@ -61,5 +65,4 @@ public class AvailableVehiclesRetriever {
     private Set<Long> findUnavailableVehicleIdsForReservations(LocalDateTime start, LocalDateTime end) {
         return reservationRepository.unavailableVehicleIdsForReservationInPeriod(start, end);
     }
-
 }
