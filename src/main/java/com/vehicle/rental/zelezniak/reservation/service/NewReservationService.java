@@ -8,7 +8,7 @@ import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.calculations.ReservationCostService;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategy;
-import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyFactory;
+import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyProvider;
 import com.vehicle.rental.zelezniak.user.model.client.Client;
 import com.vehicle.rental.zelezniak.user.service.ClientService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -33,7 +33,7 @@ public class NewReservationService {
 
     private final ClientService clientService;
     private final ReservationCostService calculator;
-    private final ReservationUpdateStrategyFactory strategyFactory;
+    private final ReservationUpdateStrategyProvider strategyFactory;
     private final ReservationRepository reservationRepository;
     private final NewReservationBuilder reservationBuilder;
     private final AvailableVehiclesValidator vehiclesValidator;
