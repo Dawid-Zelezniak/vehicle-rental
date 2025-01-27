@@ -5,17 +5,15 @@ import com.vehicle.rental.zelezniak.common_value_objects.location.Country;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity
 @Builder
 @Table(name = "addresses")
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Address {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,15 +23,9 @@ public class Address {
     @Embedded
     @Valid
     @AttributeOverride(
-            name = "streetName",
-            column = @Column(name = "street"))
-    private Street street;
-
-    @Column(name = "house_number")
-    private String houseNumber;
-
-    @Column(name = "flat_number")
-    private String flatNumber;
+            name = "countryName",
+            column = @Column(name = "country"))
+    private Country country;
 
     @Embedded
     @Valid
@@ -42,13 +34,22 @@ public class Address {
             column = @Column(name = "city"))
     private City city;
 
-    @Column(name = "postal_code")
-    private String postalCode;
-
     @Embedded
     @Valid
     @AttributeOverride(
-            name = "countryName",
-            column = @Column(name = "country"))
-    private Country country;
+            name = "streetName",
+            column = @Column(name = "street"))
+    private Street street;
+
+    @NotBlank(message = "House number cannot be blank.")
+    @Column(name = "house_number")
+    private String houseNumber;
+
+    @NotBlank(message = "Flat number cannot be blank.")
+    @Column(name = "flat_number")
+    private String flatNumber;
+
+    @NotBlank(message = "Postal code cannot be blank.")
+    @Column(name = "postal_code")
+    private String postalCode;
 }

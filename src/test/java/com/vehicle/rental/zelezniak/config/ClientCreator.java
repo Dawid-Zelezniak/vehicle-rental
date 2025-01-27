@@ -25,9 +25,8 @@ public class ClientCreator {
         client.setName(new UserName("Uncle", "Bob"));
         client.setCredentials(new UserCredentials("bob@gmail.com", "somepassword"));
         client.setCreatedAt(TimeFormatter.getFormattedActualDateTime());
-        Address address = new Address(null, new Street("teststreet"),
-                "5", "150", new City("Warsaw"),
-                "00-001", new Country("Poland"));
+        Address address = new Address(null, new Country("Poland"), new City("Warsaw"),
+                new Street("teststreet"), "5", "150", "00-001");
         client.setAddress(address);
         return client;
     }
