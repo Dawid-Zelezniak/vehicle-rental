@@ -65,35 +65,35 @@ public class NewReservationService {
     }
 
     @Transactional
-    public void deleteReservation(Reservation r) {
-        checkIfStatusIsEqualNEW(r, "Can not remove reservation with status: " + r.getReservationStatus());
-        handleRemove(r);
+    public void deleteReservation(Reservation reservation) {
+        checkIfStatusIsEqualNEW(reservation, "Can not remove reservation with status: " + reservation.getReservationStatus());
+        handleRemove(reservation);
     }
 
     @Transactional
-    public void addVehicleToReservation(Reservation r, Long vehicleId) {
-        checkIfStatusIsEqualNEW(r, "Can not add vehicle to reservation with status: " + r.getReservationStatus());
-        log.warn("Adding vehicle with ID : {} to reservation with ID : {}", vehicleId, r.getId());
-        vehiclesValidator.checkIfVehicleIsStillAvailable(r.getDuration(), vehicleId);
-        reservationRepository.addVehicleToReservation(vehicleId, r.getId());
+    public void addVehicleToReservation(Reservation reservation, Long vehicleId) {
+        checkIfStatusIsEqualNEW(reservation, "Can not add vehicle to reservation with status: " + reservation.getReservationStatus());
+        log.warn("Adding vehicle with ID : {} to reservation with ID : {}", vehicleId, reservation.getId());
+        vehiclesValidator.checkIfVehicleIsStillAvailable(reservation.getDuration(), vehicleId);
+        reservationRepository.addVehicleToReservation(vehicleId, reservation.getId());
     }
 
     @Transactional
-    public void deleteVehicleFromReservation(Reservation r, Long vehicleId) {
-        checkIfStatusIsEqualNEW(r, "Can not remove vehicle from reservation with status: " + r.getReservationStatus());
-        log.warn("Deleting vehicle with ID : {} from reservation with ID : {}", vehicleId, r.getId());
-        reservationRepository.deleteVehicleFromReservation(r.getId(), vehicleId);
+    public void deleteVehicleFromReservation(Reservation reservation, Long vehicleId) {
+        checkIfStatusIsEqualNEW(reservation, "Can not remove vehicle from reservation with status: " + reservation.getReservationStatus());
+        log.warn("Deleting vehicle with ID : {} from reservation with ID : {}", vehicleId, reservation.getId());
+        reservationRepository.deleteVehicleFromReservation(reservation.getId(), vehicleId);
     }
 
     /**
      * Calculates the total cost and deposit amount for a reservation.
      */
     @Transactional
-    public Money calculateCost(Reservation r) {
-        checkIfStatusIsEqualNEW(r, "When calculating the total cost, the reservation status should be NEW");
-        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(r.getId());
-        log.info("Calculating cost for reservation with ID : {}", r.getId());
-        Reservation updated = calculator.calculateAndApplyCosts(r, new HashSet<>(vehicles));
+    public Money calculateCost(Reservation reservation) {
+        checkIfStatusIsEqualNEW(reservation, "When calculating the total cost, the reservation status should be NEW");
+        Collection<Vehicle> vehicles = reservationRepository.findVehiclesByReservationId(reservation.getId());
+        log.info("Calculating cost for reservation with ID : {}", reservation.getId());
+        Reservation updated = calculator.calculateAndApplyCosts(reservation, new HashSet<>(vehicles));
         reservationRepository.save(updated);
         log.info("Reservation with calculated cost has been saved.");
         return updated.getTotalCost();
@@ -113,11 +113,11 @@ public class NewReservationService {
         }
     }
 
-    private void handleRemove(Reservation r) {
-        log.warn("Deleting reservation with ID : {}", r.getId());
-        r.setClient(null);
-        r.setVehicles(null);
-        reservationRepository.save(r);
-        reservationRepository.deleteById(r.getId());
+    private void handleRemove(Reservation reservation) {
+        log.warn("Deleting reservation with ID : {}", reservation.getId());
+        reservation.setClient(null);
+        reservation.setVehicles(null);
+        reservationRepository.save(reservation);
+        reservationRepository.deleteById(reservation.getId());
     }
 }

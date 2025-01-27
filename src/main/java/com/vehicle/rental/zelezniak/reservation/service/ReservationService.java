@@ -144,8 +144,8 @@ public class ReservationService {
         handleRemoveVehicles(reservationId);
     }
 
-    private void validateNotNull(Object o, String message) {
-        inputValidator.throwExceptionIfObjectIsNull(o, message);
+    private void validateNotNull(Object object, String message) {
+        inputValidator.throwExceptionIfObjectIsNull(object, message);
     }
 
     private Reservation findReservation(Long id) {
