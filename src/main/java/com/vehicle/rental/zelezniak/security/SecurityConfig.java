@@ -59,7 +59,6 @@ public class SecurityConfig {
             "/vehicles/{id}",
             "/vehicles",
             "/reservations/{id}",
-            "/reservations/{id}",
             "/reservations/client/**",
             "/reservations/add/**",
             "/reservations/calculate/**"
