@@ -1,17 +1,17 @@
-package com.vehicle.rental.zelezniak.payment.service;
+package com.vehicle.rental.zelezniak.payment.provider;
 
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
-import com.vehicle.rental.zelezniak.payment.service.stripe.StripePayment;
+import com.vehicle.rental.zelezniak.payment.provider.stripe.StripePayment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentStrategyFactory {
+public class PaymentProvider {
 
     private final StripePayment stripePayment;
 
-    public PaymentProvider pickStrategy(PaymentInfo info) {
+    public PaymentMethod pickPaymentProvider(PaymentInfo info) {
         String method = info.paymentMethod().toLowerCase();
         return switch (method) {
             case "stripe" -> stripePayment;

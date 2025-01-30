@@ -5,7 +5,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
-import com.vehicle.rental.zelezniak.payment.service.PaymentProvider;
+import com.vehicle.rental.zelezniak.payment.service.PaymentMethod;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class StripePayment implements PaymentProvider {
+public class StripePayment implements PaymentMethod {
 
     @Value("${stripe.test-secret.key}")
     private String secretKey;
