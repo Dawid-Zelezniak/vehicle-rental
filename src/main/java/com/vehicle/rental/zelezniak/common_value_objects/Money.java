@@ -1,15 +1,18 @@
 package com.vehicle.rental.zelezniak.common_value_objects;
 
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.Min;
-import lombok.*;
+import jakarta.validation.constraints.DecimalMin;
+import org.jetbrains.annotations.NotNull;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Embeddable
 public record Money(
-        @Min(value = 0, message = "Money value can not be lower than 0.")
-        BigDecimal value) {
+
+        @DecimalMin(value = "0.00", message = "Money value can not be lower than 0.00")
+        BigDecimal value
+) {
 
     private static final BigDecimal ZERO = BigDecimal.ZERO;
     private static final int ONE_HUNDRED_CENTS = 100;
@@ -26,7 +29,7 @@ public record Money(
 
     private void validate(BigDecimal money) {
         if (money == null || isLowerThanZero(money)) {
-            throw new IllegalArgumentException("Money value must not be null or negative.");
+            throw new IllegalArgumentException("Money must be positive and can not be null.");
         }
     }
 
