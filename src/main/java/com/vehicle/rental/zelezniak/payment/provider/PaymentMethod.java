@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.payment.service;
+package com.vehicle.rental.zelezniak.payment.provider;
 
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
 
