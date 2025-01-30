@@ -9,14 +9,13 @@ import com.vehicle.rental.zelezniak.vehicle.service.AvailableVehiclesRetriever;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ReservationValidator {
+public class ReservationPaymentValidator {
 
     private static final int UNACCEPTABLE_VEHICLES_NUMBER = 0;
     private final AvailableVehiclesRetriever vehiclesRetriever;
@@ -29,6 +28,7 @@ public class ReservationValidator {
      * - It must be ensured that none of the selected vehicles have been already reserved or rented.
      */
     public void validateReservationDataBeforePayment(Long id) {
+        log.debug("Starting validation process before payment. Reservation id: {}", id);
         Reservation reservationToPay = reservationService.findById(id);
         validateReservationStatus(reservationToPay.getReservationStatus());
         Collection<Vehicle> vehicles = reservationService.findVehiclesByReservationId(reservationToPay.getId());
@@ -58,8 +58,8 @@ public class ReservationValidator {
     }
 
     private void removeVehiclesAndThrowException(Long reservationId) {
-       reservationService.deleteVehiclesFromReservation(reservationId);
+        reservationService.deleteVehiclesFromReservation(reservationId);
         throw new IllegalArgumentException(
-                "Someone already reserved vehicle that you tried to reserve.Pick vehicles one more time.");
+                "One or more vehicles in your reservation have already been taken. Please select new vehicles.");
     }
 }

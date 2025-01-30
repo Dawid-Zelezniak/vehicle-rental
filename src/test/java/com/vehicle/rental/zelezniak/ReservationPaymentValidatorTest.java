@@ -6,7 +6,7 @@ import com.vehicle.rental.zelezniak.config.VehicleCreator;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
-import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationValidator;
+import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationPaymentValidator;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = VehicleRentalApplication.class)
 @TestPropertySource("/application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ReservationValidatorTest {
+class ReservationPaymentValidatorTest {
 
     private static Reservation reservationWithId2;
     private static final int EXPECTED_NUMBER_OF_VEHICLES = 0;
 
     @Autowired
-    private ReservationValidator validator;
+    private ReservationPaymentValidator validator;
     @Autowired
     private DatabaseSetup databaseSetup;
     @Autowired
@@ -90,7 +90,7 @@ class ReservationValidatorTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> validator.validateReservationDataBeforePayment(id));
-        assertEquals("Someone already reserved vehicle that you tried to reserve.Pick vehicles one more time.", e.getMessage());
+        assertEquals("One or more vehicles in your reservation have already been taken. Please select new vehicles.", e.getMessage());
 
         Collection<Vehicle> vehiclesByReservationId = reservationRepository.findVehiclesByReservationId(id);
         assertEquals(EXPECTED_NUMBER_OF_VEHICLES, vehiclesByReservationId.size());
