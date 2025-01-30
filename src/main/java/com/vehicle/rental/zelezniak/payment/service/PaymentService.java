@@ -1,7 +1,9 @@
 package com.vehicle.rental.zelezniak.payment.service;
 
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
-import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationValidator;
+import com.vehicle.rental.zelezniak.payment.provider.PaymentMethod;
+import com.vehicle.rental.zelezniak.payment.provider.PaymentProvider;
+import com.vehicle.rental.zelezniak.reservation.service.validation.ReservationPaymentValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,13 +11,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentStrategyFactory strategyFactory;
-    private final ReservationValidator validator;
+    private final PaymentProvider provider;
+    private final ReservationPaymentValidator validator;
 
-    public String completeThePayment(PaymentInfo info) {
+    public String processThePayment(PaymentInfo info) {
         validator.validateReservationDataBeforePayment(info.reservationId());
-        PaymentProvider provider = strategyFactory.pickStrategy(info);
-        return provider.initiatePayment(info);
+        PaymentMethod method = provider.pickPaymentProvider(info);
+        return method.initiatePayment(info);
     }
 
 }
