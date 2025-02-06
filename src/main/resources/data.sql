@@ -48,7 +48,8 @@ insert into reservations (id, total_cost, deposit_amount, rental_start, rental_e
 (2, 1200.00, 1000.00, '2024-07-07 10:00:00', '2024-07-10 10:00:00', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'COMPLETED', 2),
 (3, 7183.00, 5500.00, '2024-07-11 10:00:00', '2024-07-21 10:00:00', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'COMPLETED', 3),
 (4, 6850.00, 6000.00, '2024-07-18 10:00:00', '2024-07-22 10:00:00', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'COMPLETED', 4),
-(5, 3184.00, 2500.00, '2024-08-05 10:00:00', '2024-08-12 10:00:00', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'ACTIVE', 4);
+(5, 3184.00, 2500.00, '2024-08-05 10:00:00', '2024-08-12 10:00:00', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'ACTIVE', 4),
+(6, 2770.00, 2500.00, '2025-02-05 10:00:00', '2025-02-07 10:00:00', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'NEW', 4);
 
 -- Add reserved vehicles
 insert into reserved_vehicles (reservation_id, vehicle_id) values
@@ -58,7 +59,8 @@ insert into reserved_vehicles (reservation_id, vehicle_id) values
 (3, 3),
 (4, 4),
 (4, 5),
-(5, 5);
+(5, 5),
+(6, 5);
 
 -- Add rents
 insert into rents (id, total_cost, deposit_amount, rental_start, rental_end, pick_up_city, pick_up_street, pick_up_additional_info, drop_off_city, drop_off_street, drop_off_additional_info, rent_status, client_id) values

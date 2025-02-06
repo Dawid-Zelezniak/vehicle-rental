@@ -16,7 +16,7 @@ public class PaymentService {
 
     public String processThePayment(PaymentInfo info) {
         validator.validateReservationDataBeforePayment(info.reservationId());
-        PaymentMethod method = provider.pickPaymentProvider(info);
+        PaymentMethod method = provider.pickPaymentProvider(info.paymentMethod());
         return method.initiatePayment(info);
     }
 

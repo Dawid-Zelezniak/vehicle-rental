@@ -1,10 +1,10 @@
 package com.vehicle.rental.zelezniak.reservation.service;
 
-import com.stripe.model.PaymentIntent;
-import com.stripe.model.StripeObject;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
+import com.vehicle.rental.zelezniak.payment.provider.stripe.MetadataIdRetriever;
+import com.vehicle.rental.zelezniak.payment.provider.stripe.dto.StripeWebhookEvent;
 import com.vehicle.rental.zelezniak.rent.service.RentService;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.reservation.model.dto.ReservationCreationRequest;
@@ -133,10 +133,16 @@ public class ReservationService {
      * ID from the metadata and updates its status.
      */
     @Transactional
-    public void setReservationStatusAsACTIVE(StripeObject stripeObject) {
-        Long reservationId = getReservationIdFromMetadata(stripeObject);
-        log.debug("Updating reservation status to ACTIVE for reservation id: {}", reservationId);
-        repository.updateReservationStatusAsActive(reservationId);
+    public void setReservationStatusAsACTIVE(StripeWebhookEvent.StripeObject stripeObject) {
+        Long reservationId = MetadataIdRetriever.getReservationIdFromMetadata(stripeObject);
+        log.info("Updating reservation status to ACTIVE for reservation with id: {}.", reservationId);
+        Reservation reservation = findReservation(reservationId);
+        if (reservation.hasStatus(Reservation.ReservationStatus.NEW)) {
+            repository.changeReservationStatusToActive(reservationId);
+            log.info("Reservation with id '{}' has been successfully updated after payment.", reservationId);
+        } else {
+            throw new IllegalArgumentException("Reservation has status " + reservation.getReservationStatus() + " and can not be updated.");
+        }
     }
 
     @Transactional
@@ -161,19 +167,5 @@ public class ReservationService {
         Collection<Long> vehicleIds = repository.findVehiclesIdsByReservationId(reservationId);
         log.warn("Deleting vehicles from reservation with id: {}", reservationId);
         repository.deleteVehiclesFromReservation(vehicleIds);
-    }
-
-    private Long getReservationIdFromMetadata(StripeObject stripeObject) {
-        PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
-        Map<String, String> metadata = paymentIntent.getMetadata();
-        String idAsString = metadata.get("reservation_id");
-        if (idAsString == null) {
-            throw new IllegalArgumentException("Reservation id not found in metadata");
-        }
-        try {
-            return Long.valueOf(idAsString);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid id format in metadata");
-        }
     }
 }

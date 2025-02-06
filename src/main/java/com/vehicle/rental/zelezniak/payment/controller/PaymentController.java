@@ -14,7 +14,7 @@ public class PaymentController {
 
     @PostMapping("/pay")
     public String pay(@RequestBody PaymentInfo info) {
-        return service.completeThePayment(info);
+        return service.processThePayment(info);
     }
 
     @GetMapping("/success")

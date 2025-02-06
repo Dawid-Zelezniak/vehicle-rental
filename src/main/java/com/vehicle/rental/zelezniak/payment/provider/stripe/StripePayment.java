@@ -1,12 +1,11 @@
-package com.vehicle.rental.zelezniak.payment.service.stripe;
+package com.vehicle.rental.zelezniak.payment.provider.stripe;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.vehicle.rental.zelezniak.payment.model.PaymentInfo;
-import com.vehicle.rental.zelezniak.payment.service.PaymentMethod;
-import jakarta.annotation.PostConstruct;
+import com.vehicle.rental.zelezniak.payment.provider.PaymentMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,16 +14,17 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class StripePayment implements PaymentMethod {
 
-    @Value("${stripe.test-secret.key}")
-    private String secretKey;
-    @Value("${stripe.success-url}")
-    private String successUrl;
-    @Value("${stripe.cancel-url}")
-    private String cancelUrl;
+    private static final String PAYMENT_DESCRIPTION = "Reservation payment";
+    private static final String METADATA_KEY = "reservation_id";
+    private final String successUrl;
+    private final String cancelUrl;
 
-    @PostConstruct
-    void initSecretKey() {
+    public StripePayment(@Value("${stripe.test-secret.key}") String secretKey,
+                         @Value("${stripe.success-url}") String successUrl,
+                         @Value("${stripe.cancel-url}") String cancelUrl) {
         Stripe.apiKey = secretKey;
+        this.successUrl = successUrl;
+        this.cancelUrl = cancelUrl;
     }
 
     public String initiatePayment(PaymentInfo paymentInfo) {
@@ -41,22 +41,21 @@ public class StripePayment implements PaymentMethod {
                                                 .setUnitAmount(paymentInfo.toPay().convertToCents())
                                                 .setProductData(
                                                         SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                .setName("Reservation payment")
+                                                                .setName(PAYMENT_DESCRIPTION)
                                                                 .build()
                                                 ).build()
                                 ).setQuantity(1L)
                                 .build()
                 )
-                .putMetadata("reservation_id", paymentInfo.reservationId().toString())
+                .putMetadata(METADATA_KEY, paymentInfo.reservationId().toString())
                 .build();
-        Session session = null;
         try {
-            session = Session.create(reservationPayment);
+            Session session = Session.create(reservationPayment);
+            return session.getUrl();
         } catch (StripeException e) {
             log.error("Exception in stripe payment:{}", e.getMessage());
             throw new IllegalArgumentException("Error while creating Stripe payment:", e);
         }
-        return session.getUrl();
     }
 }
 

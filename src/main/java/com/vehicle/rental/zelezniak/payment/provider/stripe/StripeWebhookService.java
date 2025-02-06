@@ -1,9 +1,6 @@
-package com.vehicle.rental.zelezniak.payment.service.stripe;
+package com.vehicle.rental.zelezniak.payment.provider.stripe;
 
-import com.stripe.exception.SignatureVerificationException;
-import com.stripe.model.Event;
-import com.stripe.model.StripeObject;
-import com.stripe.net.Webhook;
+import com.vehicle.rental.zelezniak.payment.provider.stripe.dto.StripeWebhookEvent;
 import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository;
 import com.vehicle.rental.zelezniak.reservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.rmi.UnexpectedException;
 
 /**
  * Class responsible for handling webhook events from Stripe.
@@ -23,37 +20,19 @@ import java.util.Optional;
 @Slf4j
 public class StripeWebhookService {
 
-    private final ReservationRepository repository;
     private final ReservationService service;
 
     @Value("${stripe.endpoint.secret}")
     private String endpointSecret;
 
-    @Async
-    public void handleWebhook(String payload, String signatureHeader) throws SignatureVerificationException {
-        Event event = Webhook.constructEvent(payload, signatureHeader, endpointSecret);
-        handleEvent(event);
-    }
-
-    private void handleEvent(Event event) {
-        String eventType = event.getType();
-        if ("payment_intent.succeeded" .equals(eventType)) {
-            handlePaymentIntentSucceeded(event);
-        }else {
-            log.warn("Unhandled event type: {}", eventType);
-        }
-    }
-
-    private void handlePaymentIntentSucceeded(Event event) {
-        var deserializer = event.getDataObjectDeserializer();
-        Optional<StripeObject> object = deserializer.getObject();
-        if (object.isPresent()) {
-            StripeObject stripeObject = object.get();
+    public void handleWebhook(StripeWebhookEvent.StripeEventData event) {
+        log.info("Processing stripe webhook");
+        try {
+            StripeWebhookEvent.StripeObject stripeObject = event.getStripeObject();
             service.setReservationStatusAsACTIVE(stripeObject);
-            // send email and sms confirmation
-        } else {
-            log.error("Stripe object is not present in the event.");
-            throw new IllegalArgumentException("Stripe object is not present in the event.");
+        } catch (Exception e) {
+            log.error("Error processing Stripe event {}", e.getMessage());
+            throw new IllegalArgumentException("Unexpected exception while handling stripe webhook", e);
         }
     }
 }

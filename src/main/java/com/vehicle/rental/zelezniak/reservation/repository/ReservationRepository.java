@@ -53,5 +53,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Modifying
     @Query(nativeQuery = true, value = "UPDATE reservations SET reservation_status = 'ACTIVE' WHERE id = :id")
-    void updateReservationStatusAsActive(Long id);
+    void changeReservationStatusToActive(Long id);
 }
