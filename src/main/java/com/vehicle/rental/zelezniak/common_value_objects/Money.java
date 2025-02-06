@@ -2,7 +2,6 @@ package com.vehicle.rental.zelezniak.common_value_objects;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.DecimalMin;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
