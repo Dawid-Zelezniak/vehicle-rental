@@ -99,4 +99,8 @@ public class Reservation {
                 ", client=" + client +
                 '}';
     }
+
+    public boolean hasStatus(ReservationStatus status) {
+        return this.reservationStatus == status;
+    }
 }

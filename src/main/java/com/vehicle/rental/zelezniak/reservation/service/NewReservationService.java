@@ -107,8 +107,8 @@ public class NewReservationService {
         return saved;
     }
 
-    private void checkIfStatusIsEqualNEW(Reservation r, String message) {
-        if (r.getReservationStatus() != Reservation.ReservationStatus.NEW) {
+    private void checkIfStatusIsEqualNEW(Reservation reservation, String message) {
+        if (!reservation.hasStatus(Reservation.ReservationStatus.NEW)) {
             throw new IllegalArgumentException(message);
         }
     }
