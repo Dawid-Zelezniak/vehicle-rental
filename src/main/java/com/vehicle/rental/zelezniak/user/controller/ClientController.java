@@ -38,8 +38,7 @@ public class ClientController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public Client update(@PathVariable Long id, @RequestBody @Valid Client newData, Principal principal) {
-        validator.validateUserAccess(
-                new UserAccess(principal,id,
+        validator.validateUserAccess(new UserAccess(principal,id,
                 "You are not authorized to update another client data."));
         return clientService.update(id, newData);
     }
