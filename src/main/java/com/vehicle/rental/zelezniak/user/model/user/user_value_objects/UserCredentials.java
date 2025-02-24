@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.user.model.client.user_value_objects;
+package com.vehicle.rental.zelezniak.user.model.user.user_value_objects;
 
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;

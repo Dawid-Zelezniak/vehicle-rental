@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

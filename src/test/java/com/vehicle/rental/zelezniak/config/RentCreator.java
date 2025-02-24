@@ -20,7 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RentCreator {
 
-    private final ClientCreator clientCreator;
+    private final UserCreator userCreator;
     private final VehicleCreator vehicleCreator;
 
     public Rent createRentWithId1() {
@@ -31,7 +31,7 @@ public class RentCreator {
                 .depositAmount(new Money(BigDecimal.valueOf(1000.00)))
                 .rentInformation(buildRentInformation())
                 .vehicles(addVehicleWithId5())
-                .client(clientCreator.createClientWithId2())
+                .user(userCreator.createUserWithId2())
                 .build();
     }
 

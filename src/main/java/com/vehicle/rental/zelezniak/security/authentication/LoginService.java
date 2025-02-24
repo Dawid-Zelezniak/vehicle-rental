@@ -1,11 +1,11 @@
 package com.vehicle.rental.zelezniak.security.authentication;
 
 import com.vehicle.rental.zelezniak.security.authentication.token.JWTGenerator;
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
+import com.vehicle.rental.zelezniak.user.model.user.dto.UserDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
-import com.vehicle.rental.zelezniak.user.service.ClientMapper;
-import com.vehicle.rental.zelezniak.user.service.ClientService;
+import com.vehicle.rental.zelezniak.user.service.UserMapper;
+import com.vehicle.rental.zelezniak.user.service.UserService;
 import com.vehicle.rental.zelezniak.util.validation.InputValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 class LoginService implements UserDetailsService {
 
     private final InputValidator inputValidator;
-    private final ClientService clientService;
+    private final UserService clientService;
     private final AuthenticationManager authenticationManager;
     private final JWTGenerator jwtGenerator;
 
@@ -48,8 +48,8 @@ class LoginService implements UserDetailsService {
         } catch (AuthenticationException e) {
             throwException();
         }
-        log.info("User logged in");
-        ClientDto dto = ClientMapper.toDto(clientService.findByEmail(email));
+        log.info("User '{}' logged in",email);
+        UserDto dto = UserMapper.toDto(clientService.findByEmail(email));
         return new LoginResponse(dto, token);
     }
 

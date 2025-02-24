@@ -1,15 +1,15 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.config.ClientCreator;
+import com.vehicle.rental.zelezniak.config.UserCreator;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
 import com.vehicle.rental.zelezniak.security.authentication.AuthenticationService;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
+import com.vehicle.rental.zelezniak.user.model.user.User;
+import com.vehicle.rental.zelezniak.user.model.user.dto.UserDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
-import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
-import com.vehicle.rental.zelezniak.user.service.ClientMapper;
-import com.vehicle.rental.zelezniak.user.service.ClientService;
+import com.vehicle.rental.zelezniak.user.repository.UserRepository;
+import com.vehicle.rental.zelezniak.user.service.UserMapper;
+import com.vehicle.rental.zelezniak.user.service.UserService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.io.IOException;
 
-import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_CLIENTS;
+import static com.vehicle.rental.zelezniak.config.TestConstants.NUMBER_OF_USERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -28,48 +28,48 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class AuthenticationServiceTest {
 
     @Autowired
-    private ClientRepository clientRepository;
+    private UserRepository userRepository;
     @Autowired
-    private Client client;
+    private User user;
     @Autowired
     private AuthenticationService authenticationService;
     @Autowired
-    private ClientService clientService;
+    private UserService userService;
     @Autowired
     private DatabaseSetup databaseSetup;
     @Autowired
-    private ClientCreator clientCreator;
+    private UserCreator userCreator;
 
     @BeforeEach
     void createUsers() throws IOException {
         databaseSetup.setupAllTables();
-        client = ClientCreator.createTestClient();
+        user = UserCreator.createTestUser();
     }
 
     @AfterEach
     void cleanupDatabase() {
-        client = new Client();
+        user = new User();
     }
 
     @Test
     void shouldRegisterUserWhenRequestContainsRequiredData() {
-        assertEquals(NUMBER_OF_CLIENTS, clientRepository.count());
+        assertEquals(NUMBER_OF_USERS, userRepository.count());
 
-        authenticationService.register(client);
+        authenticationService.register(user);
 
-        assertEquals(NUMBER_OF_CLIENTS + 1, clientRepository.count());
-        assertEquals(client, clientService.findClientById(client.getId()));
+        assertEquals(NUMBER_OF_USERS + 1, userRepository.count());
+        assertEquals(user, userService.findUserById(user.getId()));
     }
 
     @Test
     void shouldLoginUserWithCorrectCredentials() {
-        authenticationService.register(client);
+        authenticationService.register(user);
 
-        LoginRequest loginRequest = new LoginRequest(client.getEmail(), "somepassword");
+        LoginRequest loginRequest = new LoginRequest(user.getEmail(), "somepassword");
         LoginResponse login = authenticationService.login(loginRequest);
 
-        ClientDto dto = ClientMapper.toDto(client);
-        assertEquals(dto, login.getClient());
+        UserDto dto = UserMapper.toDto(user);
+        assertEquals(dto, login.getUser());
         assertNotNull(login.getJwt());
     }
 }

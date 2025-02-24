@@ -55,20 +55,20 @@ class NewReservationServiceTest {
     @BeforeEach
     void setupDatabase() throws IOException {
         databaseSetup.setupAllTables();
-        creationRequest = new ReservationCreationRequest(CLIENT_2_ID, durationCreator.createDuration2());
+        creationRequest = new ReservationCreationRequest(USER_2_ID, durationCreator.createDuration2());
         reservationWithId2 = reservationCreator.createReservationWithId2();
     }
 
     @Test
-    void shouldAddReservationForClientWhenDataCorrect() {
-        Long clientId = CLIENT_2_ID;
+    void shouldAddReservationForUserWhenDataCorrect() {
+        Long userId = USER_2_ID;
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS);
 
         Reservation reservation = newReservationService.addNewReservation(creationRequest);
         Long reservationId = reservation.getId();
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS + 1);
         assertEquals(reservation, findReservationById(reservationId));
     }
 
@@ -123,14 +123,14 @@ class NewReservationServiceTest {
 
     @Test
     void shouldDeleteReservationWhenStatusCorrect() {
-        Long clientId = CLIENT_2_ID;
+        Long userId = USER_2_ID;
         setReservationStatusToNew(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS);
 
         newReservationService.deleteReservation(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS - 1);
     }
 
     @Test
@@ -207,8 +207,8 @@ class NewReservationServiceTest {
                 exception.getMessage());
     }
 
-    private void findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(clientId, PAGEABLE);
+    private void findReservationsByUserIdAndAssertSize(Long userId, int expectedSize) {
+        Page<Reservation> page = reservationRepository.findAllReservationsByUserId(userId, PAGEABLE);
         List<Reservation> content = page.getContent();
         assertEquals(expectedSize, content.size());
     }

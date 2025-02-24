@@ -2,7 +2,7 @@ package com.vehicle.rental.zelezniak;
 
 import com.vehicle.rental.zelezniak.config.CriteriaSearchRequests;
 import com.vehicle.rental.zelezniak.config.DatabaseSetup;
-import com.vehicle.rental.zelezniak.user.model.client.Role;
+import com.vehicle.rental.zelezniak.user.model.user.Role;
 import com.vehicle.rental.zelezniak.vehicle.exception.CriteriaAccessException;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicle_value_objects.RegistrationNumber;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -66,7 +66,7 @@ class RegistrationNumberCriteriaSearchTest {
     }
 
     @Test
-    @DisplayName("Client can't search vehicles by registration")
+    @DisplayName("User can't search vehicles by registration")
     void shouldNotFindVehiclesByCriteriaRegistrationNumber() {
         setSecurityContextHolder("ROLE_USER");
         Vehicle vehicle = vehicleService.findById(VEHICLE_4_ID);

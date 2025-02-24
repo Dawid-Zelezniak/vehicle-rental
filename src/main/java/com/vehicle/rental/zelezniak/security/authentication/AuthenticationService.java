@@ -1,7 +1,7 @@
 package com.vehicle.rental.zelezniak.security.authentication;
 
-import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
+import com.vehicle.rental.zelezniak.user.model.user.User;
+import com.vehicle.rental.zelezniak.user.model.user.dto.UserDto;
 import com.vehicle.rental.zelezniak.user.model.login.LoginRequest;
 import com.vehicle.rental.zelezniak.user.model.login.LoginResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +20,8 @@ public class AuthenticationService {
     private final LoginService loginService;
 
     @Transactional
-    public ClientDto register(Client client) {
-      return registrationService.registerUser(client);
+    public UserDto register(User user) {
+      return registrationService.registerUser(user);
     }
 
     public LoginResponse login(LoginRequest request) {

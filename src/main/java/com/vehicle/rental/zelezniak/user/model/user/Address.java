@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.user.model.client;
+package com.vehicle.rental.zelezniak.user.model.user;
 
 import com.vehicle.rental.zelezniak.common_value_objects.location.City;
 import com.vehicle.rental.zelezniak.common_value_objects.location.Country;

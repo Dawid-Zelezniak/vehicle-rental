@@ -38,11 +38,11 @@ public class ReservationController {
         return service.findById(id);
     }
 
-    @GetMapping("/client/{clientId}")
-    public Page<Reservation> findAllByClientId(@PathVariable Long clientId, Pageable pageable, Principal principal) {
-        validator.validateUserAccess(new UserAccess(principal,clientId,
-                "You can not search for other clients reservations."));
-        return service.findAllByClientId(clientId, pageable);
+    @GetMapping("/user/{userId}")
+    public Page<Reservation> findAllByUserId(@PathVariable Long userId, Pageable pageable, Principal principal) {
+        validator.validateUserAccess(new UserAccess(principal,userId,
+                "You can not search for other users reservations."));
+        return service.findAllByUserId(userId, pageable);
     }
 
     @GetMapping("/vehicles/from_reservation/{id}")
@@ -89,4 +89,10 @@ public class ReservationController {
     public Money calculate(@PathVariable Long id) {
         return service.calculateNewReservationCost(id);
     }
+
+    //activate reservation
+    // admin must send post request with reservation id
+    // system validates the reservation status ,is Paid or not
+    // reservation changes status to inactive
+    // reservation will be converted to rent
 }

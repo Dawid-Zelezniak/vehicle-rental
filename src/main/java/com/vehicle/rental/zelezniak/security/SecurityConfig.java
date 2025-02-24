@@ -33,8 +33,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.interfaces.RSAPublicKey;
 
-import static com.vehicle.rental.zelezniak.user.model.client.Role.ADMIN;
-import static com.vehicle.rental.zelezniak.user.model.client.Role.USER;
+import static com.vehicle.rental.zelezniak.user.model.user.Role.ADMIN;
+import static com.vehicle.rental.zelezniak.user.model.user.Role.USER;
 
 
 @Configuration
@@ -47,19 +47,19 @@ public class SecurityConfig {
     private final RSAKeyProperties keyProperties;
 
     private static final String[] ADMIN_ENDPOINTS = {
-            "/clients",
-            "/clients/email/**",
+            "/users",
+            "/users/email/**",
             "/reservations/vehicles/from_reservation/**"
     };
 
     private static final String[] USER_AND_ADMIN_ENDPOINTS = {
-            "/clients/{id}",
+            "/users/{id}",
             "/vehicles/criteria",
             "/vehicles/available/in_period",
             "/vehicles/{id}",
             "/vehicles",
             "/reservations/{id}",
-            "/reservations/client/**",
+            "/reservations/user/**",
             "/reservations/add/**",
             "/reservations/calculate/**"
     };

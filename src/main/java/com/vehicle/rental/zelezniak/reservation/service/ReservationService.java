@@ -40,10 +40,10 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Reservation> findAllByClientId(Long clientId, Pageable pageable) {
-        log.info("Searching for reservations by client ID : {}", clientId);
-        validateNotNull(clientId, CLIENT_ID_NOT_NULL);
-        return repository.findAllReservationsByClientId(clientId, pageable);
+    public Page<Reservation> findAllByUserId(Long userId, Pageable pageable) {
+        log.info("Searching for reservations by user ID : {}", userId);
+        validateNotNull(userId, USER_ID_NOT_NULL);
+        return repository.findAllReservationsByUserId(userId, pageable);
     }
 
     @Transactional(readOnly = true)

@@ -14,8 +14,8 @@ import java.util.Set;
 
 public interface RentRepository extends JpaRepository<Rent, Long> {
 
-    @Query("SELECT r FROM Rent r WHERE r.client.id = :id")
-    Page<Rent> findAllByClientId(Long id, Pageable pageable);
+    @Query("SELECT r FROM Rent r WHERE r.user.id = :id")
+    Page<Rent> findAllByUserId(Long id, Pageable pageable);
 
     @Query("SELECT v FROM Rent r JOIN r.vehicles v WHERE r.id = :id")
     Page<Vehicle> findVehiclesByRentId(Long id, Pageable pageable);

@@ -53,7 +53,7 @@ class ReservationServiceTest {
 
     @BeforeEach
     void setupDatabase() throws IOException {
-        creationRequest = new ReservationCreationRequest(CLIENT_2_ID, durationCreator.createDuration2());
+        creationRequest = new ReservationCreationRequest(USER_2_ID, durationCreator.createDuration2());
         databaseSetup.setupAllTables();
         reservationWithId2 = reservationCreator.createReservationWithId2();
     }
@@ -68,10 +68,10 @@ class ReservationServiceTest {
     }
 
     @Test
-    void shouldFindAllReservationsByClientId() {
-        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
+    void shouldFindAllReservationsByUserId() {
+        List<Reservation> reservations = findReservationsByUserIdAndAssertSize(USER_2_ID, NUMBER_OF_USER_2_RESERVATIONS);
 
-        assertEquals(NUMBER_OF_CLIENT_2_RESERVATIONS, reservations.size());
+        assertEquals(NUMBER_OF_USER_2_RESERVATIONS, reservations.size());
         assertTrue(reservations.contains(reservationWithId2));
     }
 
@@ -89,12 +89,12 @@ class ReservationServiceTest {
     }
 
     @Test
-    void shouldAddNewReservationForClientWhenDataCorrect() {
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
+    void shouldAddNewReservationForUserWhenDataCorrect() {
+        findReservationsByUserIdAndAssertSize(USER_2_ID, NUMBER_OF_USER_2_RESERVATIONS);
 
         Reservation reservation = reservationService.addReservation(creationRequest);
 
-        List<Reservation> reservations = findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS + 1);
+        List<Reservation> reservations = findReservationsByUserIdAndAssertSize(USER_2_ID, NUMBER_OF_USER_2_RESERVATIONS + 1);
         assertTrue(reservations.contains(reservation));
     }
 
@@ -157,11 +157,11 @@ class ReservationServiceTest {
     void shouldDeleteReservationWhenDataCorrect() {
         setReservationStatusToNew(reservationWithId2);
 
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByUserIdAndAssertSize(USER_2_ID, NUMBER_OF_USER_2_RESERVATIONS);
 
         reservationService.deleteReservation(reservationWithId2.getId());
 
-        findReservationsByClientIdAndAssertSize(CLIENT_2_ID, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByUserIdAndAssertSize(USER_2_ID, NUMBER_OF_USER_2_RESERVATIONS - 1);
     }
 
     @Test
@@ -259,8 +259,8 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
     }
 
-    private List<Reservation> findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(clientId, PAGEABLE);
+    private List<Reservation> findReservationsByUserIdAndAssertSize(Long userId, int expectedSize) {
+        Page<Reservation> page = reservationRepository.findAllReservationsByUserId(userId, PAGEABLE);
         List<Reservation> content = page.getContent();
         assertEquals(expectedSize, content.size());
         return content;

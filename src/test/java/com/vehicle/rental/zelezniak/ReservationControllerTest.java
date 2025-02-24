@@ -79,7 +79,7 @@ class ReservationControllerTest {
 
     @BeforeEach
     void setupDatabase() throws IOException {
-        creationRequest = new ReservationCreationRequest(CLIENT_2_ID, durationCreator.createDuration2());
+        creationRequest = new ReservationCreationRequest(USER_2_ID, durationCreator.createDuration2());
         databaseSetup.setupAllTables();
         reservationWithId2 = reservationCreator.createReservationWithId2();
         vehicleWithId6 = vehicleCreator.createMotorcycleWithId2();
@@ -115,26 +115,26 @@ class ReservationControllerTest {
     }
 
     @Test
-    void shouldFindAllReservationsByClientId() throws Exception {
-        Long clientId = CLIENT_2_ID;
+    void shouldFindAllReservationsByUserId() throws Exception {
+        Long userId = USER_2_ID;
 
-        ResultActions actions = mockMvc.perform(get("/reservations/client/{id}", clientId)
+        ResultActions actions = mockMvc.perform(get("/reservations/user/{userId}", userId)
                 .param("page", String.valueOf(PAGEABLE.getPageNumber()))
                 .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + userToken));
-        performReservationExpectations(actions, NUMBER_OF_CLIENT_2_RESERVATIONS, reservationWithId2);
+        performReservationExpectations(actions, NUMBER_OF_USER_2_RESERVATIONS, reservationWithId2);
     }
 
     @Test
     void shouldThrowExceptionWhenUserTriesToAccessAnotherUsersReservation() throws Exception {
-        Long clientId = CLIENT_3_ID;
+        Long userId = USER_3_ID;
 
-        mockMvc.perform(get("/reservations/client/{id}", clientId)
+        mockMvc.perform(get("/reservations/user/{userId}", userId)
                 .param("page", String.valueOf(PAGEABLE.getPageNumber()))
                 .param("size", String.valueOf(PAGEABLE.getPageSize()))
                 .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("You can not search for other clients reservations."));
+                .andExpect(jsonPath("$.message").value("You can not search for other users reservations."));
     }
 
     @Test
@@ -163,7 +163,7 @@ class ReservationControllerTest {
     }
 
     @Test
-    void shouldAddNewReservationForClientWhenRequestCorrect() throws Exception {
+    void shouldAddNewReservationForUserWhenRequestCorrect() throws Exception {
         Reservation newReservation = reservationCreator.buildNewReservation();
         RentInformation information = newReservation.getRentInformation();
         RentDuration rentDuration = information.getRentDuration();
@@ -197,7 +197,7 @@ class ReservationControllerTest {
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldValidationErrors").value(
-                        containsInAnyOrder("Client id can not be lower than 1")));
+                        containsInAnyOrder("User id can not be lower than 1")));
     }
 
     /**
@@ -280,16 +280,16 @@ class ReservationControllerTest {
     @Test
     void shouldDeleteReservationWhenStatusCorrect() throws Exception {
         setReservationStatusToNew(reservationWithId2);
-        Long clientId = CLIENT_2_ID;
+        Long userId = USER_2_ID;
         Long reservationId = reservationWithId2.getId();
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS);
 
         mockMvc.perform(delete("/reservations/{id}", reservationId)
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isNoContent());
 
-        findReservationsByClientIdAndAssertSize(clientId, NUMBER_OF_CLIENT_2_RESERVATIONS - 1);
+        findReservationsByUserIdAndAssertSize(userId, NUMBER_OF_USER_2_RESERVATIONS - 1);
 
         for (Reservation reservation : reservationRepository.findAll()) {
             assertNotEquals(reservationWithId2, reservation);
@@ -478,8 +478,8 @@ class ReservationControllerTest {
         reservationRepository.save(reservation);
     }
 
-    private void findReservationsByClientIdAndAssertSize(Long clientId, int expectedSize) {
-        Page<Reservation> page = reservationRepository.findAllReservationsByClientId(clientId, PAGEABLE);
+    private void findReservationsByUserIdAndAssertSize(Long userId, int expectedSize) {
+        Page<Reservation> page = reservationRepository.findAllReservationsByUserId(userId, PAGEABLE);
         List<Reservation> content = page.getContent();
         assertEquals(expectedSize, content.size());
     }

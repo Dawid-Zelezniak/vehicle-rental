@@ -1,9 +1,9 @@
-package com.vehicle.rental.zelezniak.user.model.client.dto;
+package com.vehicle.rental.zelezniak.user.model.user.dto;
 
-import com.vehicle.rental.zelezniak.user.model.client.Address;
-import com.vehicle.rental.zelezniak.user.model.client.Role;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
+import com.vehicle.rental.zelezniak.user.model.user.Address;
+import com.vehicle.rental.zelezniak.user.model.user.Role;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.PhoneNumber;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.UserName;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import lombok.EqualsAndHashCode;
@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class ClientDto {
+public class UserDto {
 
     private Long id;
 

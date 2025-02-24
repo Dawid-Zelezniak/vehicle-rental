@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak.user.model.login;
 
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
+import com.vehicle.rental.zelezniak.user.model.user.dto.UserDto;
 import lombok.*;
 
 @Getter
@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class LoginResponse {
 
-    private ClientDto client;
+    private UserDto user;
     private String jwt;
 }

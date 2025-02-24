@@ -1,9 +1,9 @@
 package com.vehicle.rental.zelezniak.user.service;
 
-import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.Role;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
-import com.vehicle.rental.zelezniak.user.repository.ClientRepository;
+import com.vehicle.rental.zelezniak.user.model.user.User;
+import com.vehicle.rental.zelezniak.user.model.user.Role;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.UserCredentials;
+import com.vehicle.rental.zelezniak.user.repository.UserRepository;
 import com.vehicle.rental.zelezniak.user.repository.RoleRepository;
 import com.vehicle.rental.zelezniak.util.validation.EmailPatternValidator;
 import lombok.RequiredArgsConstructor;
@@ -26,25 +26,25 @@ public class AdminInitializationService {
     @Value("${admin.email}")
     private String adminEmail;
 
-    private final ClientRepository repository;
+    private final UserRepository repository;
     private final PasswordEncoder encoder;
     private final RoleRepository roleRepository;
 
     public void createAdmin() {
         EmailPatternValidator.validate(adminEmail);
-        Optional<Client> byCredentialsEmail = repository.findByCredentialsEmail(adminEmail);
+        Optional<User> byCredentialsEmail = repository.findByCredentialsEmail(adminEmail);
         if (byCredentialsEmail.isEmpty()) {
             createAndSave();
         }
     }
 
     private void createAndSave() {
-        Client client = new Client();
+        User user = new User();
         Role roleAdmin = findOrCreateRoleAdmin();
-        client.addRole(roleAdmin);
+        user.addRole(roleAdmin);
         String encoded = encoder.encode(adminPassword);
-        client.setCredentials(new UserCredentials(adminEmail, encoded));
-        Client saved = repository.save(client);
+        user.setCredentials(new UserCredentials(adminEmail, encoded));
+        User saved = repository.save(user);
         log.info("Admin account has been created ,email: [{}],id: [{}]", saved.getEmail(), saved.getId());
     }
 

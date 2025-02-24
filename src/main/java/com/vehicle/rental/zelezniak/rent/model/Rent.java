@@ -2,7 +2,7 @@ package com.vehicle.rental.zelezniak.rent.model;
 
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.user.User;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -45,9 +45,9 @@ public class Rent {
     private RentStatus rentStatus;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "user_id")
     @Valid
-    private Client client;
+    private User user;
 
     @ManyToMany
     @JoinTable(
@@ -71,19 +71,19 @@ public class Rent {
                 && Objects.equals(rentInformation, rent.rentInformation)
                 && Objects.equals(totalCost, rent.totalCost)
                 && rentStatus == rent.rentStatus
-                && Objects.equals(client, rent.client);
+                && Objects.equals(user, rent.user);
     }
 
     public int hashCode() {
         return Objects.hash(
                 id, rentInformation,
                 totalCost, rentStatus,
-                client);
+                user);
     }
 
     public String toString() {
         return "Rent{" +
-                "client=" + client +
+                "user=" + user +
                 ", id=" + id +
                 ", totalCost=" + totalCost +
                 ", rentInformation=" + rentInformation +

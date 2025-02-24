@@ -1,12 +1,12 @@
 DROP TABLE IF EXISTS reserved_vehicles;
-DROP TABLE IF EXISTS clients_roles;
+DROP TABLE IF EXISTS users_roles;
 DROP TABLE IF EXISTS motorcycles;
 DROP TABLE IF EXISTS rented_vehicles;
 DROP TABLE IF EXISTS rents;
 DROP TABLE IF EXISTS reservations;
 DROP TABLE IF EXISTS cars;
 DROP TABLE IF EXISTS vehicles;
-DROP TABLE IF EXISTS clients;
+DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS addresses;
 DROP TABLE IF EXISTS roles;
 
@@ -25,8 +25,8 @@ CREATE TABLE addresses (
     street VARCHAR(255)
 );
 
-CREATE TABLE clients (
-    client_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR(255),
@@ -77,8 +77,8 @@ CREATE TABLE reservations (
     drop_off_street VARCHAR(255),
     drop_off_additional_info VARCHAR(255),
     reservation_status VARCHAR(255),
-    client_id INT,
-    FOREIGN KEY (client_id) REFERENCES clients(client_id)
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE reserved_vehicles (
@@ -89,12 +89,12 @@ CREATE TABLE reserved_vehicles (
     PRIMARY KEY (reservation_id, vehicle_id)
 );
 
-CREATE TABLE clients_roles (
-    client_id INT,
+CREATE TABLE users_roles (
+    user_id INT,
     role_id INT,
-    FOREIGN KEY (client_id) REFERENCES clients(client_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (role_id) REFERENCES roles(role_id),
-    PRIMARY KEY (client_id, role_id)
+    PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE motorcycles (
@@ -116,8 +116,8 @@ CREATE TABLE rents (
     drop_off_street VARCHAR(255),
     drop_off_additional_info VARCHAR(255),
     rent_status VARCHAR(255),
-    client_id INT,
-    FOREIGN KEY (client_id) REFERENCES clients(client_id)
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 CREATE TABLE rented_vehicles (

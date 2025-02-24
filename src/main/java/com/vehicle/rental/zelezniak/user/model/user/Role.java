@@ -1,4 +1,4 @@
-package com.vehicle.rental.zelezniak.user.model.client;
+package com.vehicle.rental.zelezniak.user.model.user;
 
 import jakarta.persistence.*;
 import lombok.*;

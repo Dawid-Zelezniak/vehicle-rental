@@ -9,7 +9,6 @@ import com.vehicle.rental.zelezniak.common_value_objects.location.Street;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,7 +20,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ReservationCreator {
 
-    private final ClientCreator clientCreator;
+    private final UserCreator userCreator;
     private final VehicleCreator vehicleCreator;
 
     public Reservation createReservationWithId2() {
@@ -32,14 +31,14 @@ public class ReservationCreator {
                 .depositAmount(new Money(BigDecimal.valueOf(1000.00)))
                 .rentInformation(buildRentInformation())
                 .vehicles(addVehicleWithId1())
-                .client(clientCreator.createClientWithId2())
+                .user(userCreator.createUserWithId2())
                 .build();
     }
 
     public Reservation buildNewReservation() {
         return Reservation.builder()
                 .reservationStatus(Reservation.ReservationStatus.NEW)
-                .client(clientCreator.createClientWithId2())
+                .user(userCreator.createUserWithId2())
                 .rentInformation(buildNewRentInfo())
                 .build();
     }

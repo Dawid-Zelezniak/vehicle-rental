@@ -9,8 +9,8 @@ import com.vehicle.rental.zelezniak.reservation.repository.ReservationRepository
 import com.vehicle.rental.zelezniak.reservation.service.calculations.ReservationCostService;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategy;
 import com.vehicle.rental.zelezniak.reservation.service.reservation_update.ReservationUpdateStrategyProvider;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.service.ClientService;
+import com.vehicle.rental.zelezniak.user.model.user.User;
+import com.vehicle.rental.zelezniak.user.service.UserService;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import com.vehicle.rental.zelezniak.vehicle.service.validation.AvailableVehiclesValidator;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 @Slf4j
 public class NewReservationService {
 
-    private final ClientService clientService;
+    private final UserService userService;
     private final ReservationCostService calculator;
     private final ReservationUpdateStrategyProvider strategyFactory;
     private final ReservationRepository reservationRepository;
@@ -100,8 +100,8 @@ public class NewReservationService {
     }
 
     private Reservation buildAndSaveReservation(ReservationCreationRequest request) {
-        Client client = clientService.findClientById(request.clientId());
-        Reservation reservation = reservationBuilder.build(client, request.duration());
+        User user = userService.findUserById(request.userId());
+        Reservation reservation = reservationBuilder.build(user, request.duration());
         Reservation saved = reservationRepository.save(reservation);
         log.info("New reservation with ID : {} has been saved", saved.getId());
         return saved;
@@ -115,7 +115,7 @@ public class NewReservationService {
 
     private void handleRemove(Reservation reservation) {
         log.warn("Deleting reservation with ID : {}", reservation.getId());
-        reservation.setClient(null);
+        reservation.setUser(null);
         reservation.setVehicles(null);
         reservationRepository.save(reservation);
         reservationRepository.deleteById(reservation.getId());

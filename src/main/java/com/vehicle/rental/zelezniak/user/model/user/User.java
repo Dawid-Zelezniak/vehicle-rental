@@ -1,9 +1,9 @@
-package com.vehicle.rental.zelezniak.user.model.client;
+package com.vehicle.rental.zelezniak.user.model.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.PhoneNumber;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserCredentials;
-import com.vehicle.rental.zelezniak.user.model.client.user_value_objects.UserName;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.PhoneNumber;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.UserCredentials;
+import com.vehicle.rental.zelezniak.user.model.user.user_value_objects.UserName;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -18,17 +18,17 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "users")
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Client implements UserDetails {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "client_id")
+    @Column(name = "user_id")
     private Long id;
 
     @Embedded
@@ -54,8 +54,8 @@ public class Client implements UserDetails {
     private Address address;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "clients_roles",
-            joinColumns = @JoinColumn(name = "client_id"),
+    @JoinTable(name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     @Valid
     private Set<Role> roles = new HashSet<>();
@@ -85,13 +85,13 @@ public class Client implements UserDetails {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Client client = (Client) object;
-        return Objects.equals(id, client.id)
-                && Objects.equals(name, client.name)
-                && Objects.equals(credentials, client.credentials)
-                && Objects.equals(phoneNumber, client.phoneNumber)
-                && Objects.equals(createdAt, client.createdAt)
-                && Objects.equals(address, client.address);
+        User user = (User) object;
+        return Objects.equals(id, user.id)
+                && Objects.equals(name, user.name)
+                && Objects.equals(credentials, user.credentials)
+                && Objects.equals(phoneNumber, user.phoneNumber)
+                && Objects.equals(createdAt, user.createdAt)
+                && Objects.equals(address, user.address);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class Client implements UserDetails {
 
     @Override
     public String toString() {
-        return "Client{" +
+        return "User{" +
                 "id=" + id +
                 ", name=" + name +
                 ", credentials=" + credentials +

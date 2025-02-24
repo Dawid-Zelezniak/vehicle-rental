@@ -1,6 +1,6 @@
 package com.vehicle.rental.zelezniak.config;
 
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.user.User;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Car;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Motorcycle;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
@@ -13,8 +13,8 @@ public class TestBeans {
 
     @Bean
     @Scope(scopeName = "prototype")
-    public Client createAppUser(){
-        return new Client();
+    public User createAppUser(){
+        return new User();
     }
 
     @Bean(name = "car")

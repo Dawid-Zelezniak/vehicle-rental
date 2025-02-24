@@ -39,9 +39,9 @@ public class RentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Rent> findAllByClientId(Long id, Pageable pageable) {
-        validateNotNull(id, CLIENT_ID_NOT_NULL);
-        return rentRepository.findAllByClientId(id, pageable);
+    public Page<Rent> findAllByUserId(Long id, Pageable pageable) {
+        validateNotNull(id, USER_ID_NOT_NULL);
+        return rentRepository.findAllByUserId(id, pageable);
     }
 
     @Transactional(readOnly = true)

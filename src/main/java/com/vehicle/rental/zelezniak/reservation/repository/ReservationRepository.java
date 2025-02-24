@@ -16,8 +16,8 @@ import java.util.Set;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT r FROM Reservation r WHERE r.client.id = :id")
-    Page<Reservation> findAllReservationsByClientId(Long id, Pageable pageable);
+    @Query("SELECT r FROM Reservation r WHERE r.user.id = :id")
+    Page<Reservation> findAllReservationsByUserId(Long id, Pageable pageable);
 
     @Query("SELECT v FROM Reservation r JOIN r.vehicles v WHERE r.id = :id")
     Collection<Vehicle> findVehiclesByReservationId(Long id);

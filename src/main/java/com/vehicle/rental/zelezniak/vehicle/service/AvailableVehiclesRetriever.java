@@ -33,7 +33,7 @@ public class AvailableVehiclesRetriever {
     private final RentRepository rentRepository;
     private final ReservationRepository reservationRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<Vehicle> findAvailableVehiclesByCriteria(AvailableVehiclesCriteriaSearchRequest searchRequest, Pageable pageable) {
         log.debug("Search for vehicles in a specified period according to specific criteria");
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesIdsInPeriod(searchRequest.duration());
@@ -42,7 +42,7 @@ public class AvailableVehiclesRetriever {
         return vehicleRepository.findAll(specification, pageable);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Collection<Vehicle> findAvailableVehiclesByRentDuration(RentDuration duration) {
         log.debug("Search for vehicles in a specified period");
         Set<Long> unavailableVehiclesIdsInPeriod = findReservedAndRentedVehiclesIdsInPeriod(duration);

@@ -3,7 +3,7 @@ package com.vehicle.rental.zelezniak.reservation.model;
 import com.vehicle.rental.zelezniak.common_value_objects.Money;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.user.User;
 import com.vehicle.rental.zelezniak.vehicle.model.vehicles.Vehicle;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -47,9 +47,9 @@ public class Reservation {
     private ReservationStatus reservationStatus;
 
     @ManyToOne
-    @JoinColumn(name = "client_id")
+    @JoinColumn(name = "user_id")
     @Valid
-    private Client client;
+    private User user;
 
     @ManyToMany
     @JoinTable(
@@ -79,14 +79,14 @@ public class Reservation {
                 && Objects.equals(rentInformation, that.rentInformation)
                 && Objects.equals(totalCost, that.totalCost)
                 && reservationStatus == that.reservationStatus
-                && Objects.equals(client, that.client);
+                && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id,
                 rentInformation, totalCost,
-                reservationStatus, client);
+                reservationStatus, user);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class Reservation {
                 ", rentInformation=" + rentInformation +
                 ", estimatedCost=" + totalCost +
                 ", reservationStatus=" + reservationStatus +
-                ", client=" + client +
+                ", user=" + user +
                 '}';
     }
 

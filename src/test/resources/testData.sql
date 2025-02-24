@@ -10,17 +10,17 @@ insert into addresses (address_id, city, country, flat_number, house_number, pos
 (3, 'Warsaw', 'Poland', '150', '5', '00-001', 'teststreet'),
 (4, 'Lublin', 'Poland', '10', '18', '21-090', 'teststreet');
 
--- Add clients
+-- Add users
 -- encrypted password is "somepass"
-insert into clients (client_id, first_name, last_name, email, password, address_id, phone_number, created_at) values
+insert into users (user_id, first_name, last_name, email, password, address_id, phone_number, created_at) values
 (1, 'ADMIN', 'ADMIN', 'admin@gmail.com', '$2a$10$lz5/ozxOHeWtlY67MrHy8uWuZxZFySWNo0UNV03wSFHfMWuHn1Na.', 1, '+00 0000000', '2024-01-01 12:00:00'),
 (2, 'UserTwo', 'Two', 'usertwo@gmail.com', '$2a$10$53viTAvUEN.0LdWJ9Hwbq.uyqFWiyhSVkMa//Blhi9Zk12SqePz5a', 2, '+48 111222333', '2024-01-02 13:00:00'),
 (3, 'UserThree', 'Three', 'userthree@gmail.com', '$2a$10$53viTAvUEN.0LdWJ9Hwbq.uyqFWiyhSVkMa//Blhi9Zk12SqePz5a', 3, '+48 222333444', '2024-01-03 14:00:00'),
 (4, 'UserFour', 'Four', 'userfour@gmail.com', '$2a$10$53viTAvUEN.0LdWJ9Hwbq.uyqFWiyhSVkMa//Blhi9Zk12SqePz5a', 4, '+48 333444555', '2024-01-04 15:00:00');
 
 
--- Add roles for clients
-insert into clients_roles (client_id, role_id) values
+-- Add roles for users
+insert into users_roles (user_id, role_id) values
 (1, 2),
 (2, 1),
 (3, 1),
@@ -48,7 +48,7 @@ insert into motorcycles (id, motorcycle_type) values
 (5, 'SPORT');
 
 -- Add reservations
-insert into reservations (id, total_cost, deposit_amount, rental_start, rental_end, pick_up_city, pick_up_street, pick_up_additional_info, drop_off_city, drop_off_street, drop_off_additional_info, reservation_status, client_id) values
+insert into reservations (id, total_cost, deposit_amount, rental_start, rental_end, pick_up_city, pick_up_street, pick_up_additional_info, drop_off_city, drop_off_street, drop_off_additional_info, reservation_status, user_id) values
 (1, 1250.00, 1000.00, '2024-07-25 10:00:00', '2024-07-29 10:00:00', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'ACTIVE', 2),
 (2, 1200.00, 1000.00, '2024-07-07 10:00:00', '2024-07-10 10:00:00', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'COMPLETED', 2),
 (3, 7183.00, 5500.00, '2024-07-11 10:00:00', '2024-07-21 10:00:00', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'COMPLETED', 3),
@@ -66,7 +66,7 @@ insert into reserved_vehicles (reservation_id, vehicle_id) values
 (5, 5);
 
 -- Add rents
-insert into rents (id, total_cost, deposit_amount, rental_start, rental_end, pick_up_city, pick_up_street, pick_up_additional_info, drop_off_city, drop_off_street, drop_off_additional_info, rent_status, client_id) values
+insert into rents (id, total_cost, deposit_amount, rental_start, rental_end, pick_up_city, pick_up_street, pick_up_additional_info, drop_off_city, drop_off_street, drop_off_additional_info, rent_status, user_id) values
 (1, 1200.00, 1000.00, '2024-07-07 10:00:00', '2024-07-10 10:00:00', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'Lublin', 'Turystyczna', 'Next to the Leclerc mall', 'COMPLETED', 2),
 (2, 7183.00, 5500.00, '2024-07-11 10:00:00', '2024-07-21 10:00:00', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'Warsaw', 'Marszałkowska', 'In front of the Palace of Culture and Science', 'ACTIVE', 3),
 (3, 6850.00, 6000.00, '2024-07-18 10:00:00', '2024-07-22 10:00:00', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'Warsaw', 'Marszałkowska', 'Near the Central Station', 'ACTIVE', 4);
@@ -82,7 +82,7 @@ insert into rented_vehicles (rent_id, vehicle_id) values
 -- update IDENTITY for tables after inserting test data
 ALTER TABLE roles ALTER COLUMN role_id RESTART WITH (SELECT MAX(role_id) + 1 FROM roles);
 ALTER TABLE addresses ALTER COLUMN address_id RESTART WITH (SELECT MAX(address_id) + 1 FROM addresses);
-ALTER TABLE clients ALTER COLUMN client_id RESTART WITH (SELECT MAX(client_id) + 1 FROM clients);
+ALTER TABLE users ALTER COLUMN user_id RESTART WITH (SELECT MAX(user_id) + 1 FROM users);
 ALTER TABLE vehicles ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM vehicles);
 ALTER TABLE reservations ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM reservations);
 ALTER TABLE rents ALTER COLUMN id RESTART WITH (SELECT MAX(id) + 1 FROM rents);

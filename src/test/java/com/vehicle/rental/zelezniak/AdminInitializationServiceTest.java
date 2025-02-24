@@ -1,8 +1,8 @@
 package com.vehicle.rental.zelezniak;
 
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.user.User;
 import com.vehicle.rental.zelezniak.user.service.AdminInitializationService;
-import com.vehicle.rental.zelezniak.user.service.ClientService;
+import com.vehicle.rental.zelezniak.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ class AdminInitializationServiceTest {
     @Autowired
     private AdminInitializationService initializationService;
     @Autowired
-    private ClientService clientService;
+    private UserService clientService;
 
     @Value("${admin.email}")
     private String email;
@@ -27,7 +27,7 @@ class AdminInitializationServiceTest {
     @Test
     void shouldFindAdminAfterLoadOfContext() {
         initializationService.createAdmin();
-        Client byId = clientService.findByEmail(email);
+        User byId = clientService.findByEmail(email);
         assertNotNull(byId);
         assertEquals(email, byId.getEmail());
     }

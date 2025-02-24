@@ -74,13 +74,13 @@ class RentServiceTest {
     }
 
     @Test
-    void shouldFindAllClientRentsByClientId() {
-        Long clientId = CLIENT_2_ID;
+    void shouldFindAllUserRentsByUserId() {
+        Long userId = USER_2_ID;
 
-        Page<Rent> page = rentService.findAllByClientId(clientId, PAGEABLE);
-        List<Rent> allByClient5Id = page.getContent();
+        Page<Rent> page = rentService.findAllByUserId(userId, PAGEABLE);
+        List<Rent> allByUser5Id = page.getContent();
 
-        assertTrue(allByClient5Id.contains(rentWithId1));
+        assertTrue(allByUser5Id.contains(rentWithId1));
     }
 
     @Test

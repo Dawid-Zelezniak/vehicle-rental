@@ -2,9 +2,9 @@ package com.vehicle.rental.zelezniak.user.controller;
 
 import com.vehicle.rental.zelezniak.security.validation.AccessValidator;
 import com.vehicle.rental.zelezniak.security.validation.UserAccess;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
-import com.vehicle.rental.zelezniak.user.model.client.dto.ClientDto;
-import com.vehicle.rental.zelezniak.user.service.ClientService;
+import com.vehicle.rental.zelezniak.user.model.user.User;
+import com.vehicle.rental.zelezniak.user.model.user.dto.UserDto;
+import com.vehicle.rental.zelezniak.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,41 +17,41 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/clients")
-public class ClientController {
+@RequestMapping("/users")
+public class UserController {
 
-    private final ClientService clientService;
+    private final UserService userService;
     private final AccessValidator validator;
 
     @GetMapping
-    public Page<ClientDto> findAll(Pageable pageable) {
-        return clientService.findAll(pageable);
+    public Page<UserDto> findAll(Pageable pageable) {
+        return userService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
-    public ClientDto findById(@PathVariable Long id,Principal principal) {
+    public UserDto findById(@PathVariable Long id, Principal principal) {
         validator.validateUserAccess(new UserAccess(principal,id,
                 "You are not authorized to search for other users."));
-        return clientService.findById(id);
+        return userService.findById(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-    public Client update(@PathVariable Long id, @RequestBody @Valid Client newData, Principal principal) {
+    public User update(@PathVariable Long id, @RequestBody @Valid User newData, Principal principal) {
         validator.validateUserAccess(new UserAccess(principal,id,
-                "You are not authorized to update another client data."));
-        return clientService.update(id, newData);
+                "You are not authorized to update another user data."));
+        return userService.update(id, newData);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
-        clientService.delete(id);
+        userService.delete(id);
     }
 
     @GetMapping("/email/{email}")
-    public Client findByEmail(@PathVariable String email) {
-        return clientService.findByEmail(email);
+    public User findByEmail(@PathVariable String email) {
+        return userService.findByEmail(email);
     }
 }

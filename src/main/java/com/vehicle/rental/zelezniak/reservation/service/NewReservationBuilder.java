@@ -3,7 +3,7 @@ package com.vehicle.rental.zelezniak.reservation.service;
 import com.vehicle.rental.zelezniak.common_value_objects.RentDuration;
 import com.vehicle.rental.zelezniak.common_value_objects.RentInformation;
 import com.vehicle.rental.zelezniak.reservation.model.Reservation;
-import com.vehicle.rental.zelezniak.user.model.client.Client;
+import com.vehicle.rental.zelezniak.user.model.user.User;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 @Component
 class NewReservationBuilder {
 
-    public Reservation build(Client client, RentDuration duration) {
+    public Reservation build(User user, RentDuration duration) {
         RentInformation information = buildRentInformation(duration);
-        return buildReservation(information, client);
+        return buildReservation(information, user);
     }
 
     private RentInformation buildRentInformation(RentDuration duration) {
@@ -23,9 +23,9 @@ class NewReservationBuilder {
                 .build();
     }
 
-    private Reservation buildReservation(RentInformation information, Client client) {
+    private Reservation buildReservation(RentInformation information, User user) {
         return Reservation.builder()
-                .client(client)
+                .user(user)
                 .reservationStatus(Reservation.ReservationStatus.NEW)
                 .rentInformation(information)
                 .build();
